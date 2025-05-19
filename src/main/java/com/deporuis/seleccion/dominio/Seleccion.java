@@ -33,6 +33,11 @@ public class Seleccion {
     @Column(name = "id_deporte")
     private Integer idDeporte;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "ENUM('MASCULINO', 'FEMENINO', 'MIXTO') DEFAULT 'MIXTO'")
+    private TipoSeleccion tipo;
+
+
     @OneToMany(mappedBy = "seleccion")
     private java.util.List<Integrante> integrantes;
 
