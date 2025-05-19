@@ -20,15 +20,15 @@ public class PublicacionService {
 
         //TODO: Mirar si hay excepciones
 
-        String titulo = publicacionRequest.getTitulo();
-        String descripcion = publicacionRequest.getDescripcion();
-        String lugar = publicacionRequest.getLugar();
-//        lugar = (lugar != null) ? lugar : "";
-        LocalDateTime fecha = publicacionRequest.getFecha();
-        String duracion = publicacionRequest.getDuracion();
-        Foto foto = publicacionRequest.getFoto();
+        Publicacion nuevaPublicacion = new Publicacion(
+                publicacionRequest.getTitulo(),
+                publicacionRequest.getDescripcion(),
+                publicacionRequest.getLugar(),
+                publicacionRequest.getFecha(),
+                publicacionRequest.getDuracion(),
+                publicacionRequest.getFoto()
+        );
 
-        Publicacion nuevaPublicacion = new Publicacion(titulo, descripcion, lugar, fecha, duracion, foto);
         Publicacion publicacionGuardada = publicacionRepository.save(nuevaPublicacion);
 
         int idNuevaPublicacion = publicacionGuardada.getIdPublicacion();
