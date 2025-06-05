@@ -1,13 +1,14 @@
 package com.deporuis.integrante.dominio;
 
-import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.auth.dominio.Login;
 import com.deporuis.auth.dominio.Rol;
+import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.seleccion.dominio.Seleccion;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "Integrantes")
@@ -21,7 +22,7 @@ public class Integrante {
     @Column(name = "id_integrante")
     private Integer idIntegrante;
 
-    @Column(name = "codigo_universitario", unique = true, length = 50, nullable = false)
+    @Column(name = "codigo_universitario", length = 50, nullable = false, unique = true)
     private String codigoUniversitario;
 
     @Column(length = 50, nullable = false)
@@ -30,32 +31,29 @@ public class Integrante {
     @Column(length = 50, nullable = false)
     private String apellidos;
 
-    @Column(name = "fecha_nacimiento")
+    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
     private Float altura;
     private Float peso;
+    private Integer dorsal;
 
-    @Column(length = 100)
-    private String dorsal;
-
-    @Column(name = "correo_institucional", unique = true, length = 100, nullable = false)
+    @Column(name = "correo_institucional", length = 100, nullable = false, unique = true)
     private String correoInstitucional;
 
-    // Relaciones con otras tablas
+    // Relaciones
     @ManyToOne
-    @JoinColumn(name = "id_rol")
+    @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
 
     @ManyToOne
-    @JoinColumn(name = "id_seleccion")
+    @JoinColumn(name = "id_seleccion", nullable = false)
     private Seleccion seleccion;
 
     @ManyToOne
-    @JoinColumn(name = "id_foto")
+    @JoinColumn(name = "id_foto", nullable = false)
     private Foto foto;
 
-    @OneToOne(mappedBy = "integrante")
-    private Login login;
+    @OneToMany(mappedBy = "integrante")
+    private List<IntegrantePosicion> posiciones;
 }
-
