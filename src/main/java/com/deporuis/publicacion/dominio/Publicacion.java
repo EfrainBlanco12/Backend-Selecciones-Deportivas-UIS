@@ -43,4 +43,15 @@ public class Publicacion {
     @ManyToOne
     @JoinColumn(name = "id_foto", nullable = false)
     private Foto foto;
+
+    //Creacion de una publicacion
+
+    public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion, Foto foto) {
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.lugar = lugar;
+        this.fecha = fecha;
+        this.duracion = duracion;
+        this.foto = foto;
+    }
 }
