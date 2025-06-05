@@ -4,6 +4,9 @@ import com.deporuis.integrante.dominio.Integrante;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface InfraestructuraRepository extends JpaRepository<Integrante, Integer> {
+public interface IntegranteRepository extends JpaRepository<Integrante, Integer> {
+    Optional<Integrante> findByCodigoUniversitario(String codigoUniversitario);
 }

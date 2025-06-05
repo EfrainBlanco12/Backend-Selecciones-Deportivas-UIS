@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Publicaciones")
@@ -21,19 +22,25 @@ public class Publicacion {
     @Column(length = 50, nullable = false)
     private String titulo;
 
-    @Column(length = 500)
+    @Column(length = 500, nullable = false)
     private String descripcion;
 
     @Column(length = 50)
     private String lugar;
 
+    @Column(nullable = false)
     private LocalDateTime fecha;
 
-    @Column(length = 20)
+    @Column(length = 20, nullable = false)
     private String duracion;
 
+    private Boolean visibilidad = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_publicacion", nullable = false, columnDefinition = "ENUM('NOTICIA', 'EVENTO') default 'NOTICIA'")
+    private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
+
     @ManyToOne
-    @JoinColumn(name = "id_foto")
+    @JoinColumn(name = "id_foto", nullable = false)
     private Foto foto;
 }
-

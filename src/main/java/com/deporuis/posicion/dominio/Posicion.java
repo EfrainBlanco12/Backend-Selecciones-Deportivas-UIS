@@ -23,4 +23,3 @@ public class Posicion {
     @JoinColumn(name = "id_deporte", nullable = false)
     private Deporte deporte;
 }
-

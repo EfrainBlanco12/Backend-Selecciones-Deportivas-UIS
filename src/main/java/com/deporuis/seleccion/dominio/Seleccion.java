@@ -1,12 +1,12 @@
 package com.deporuis.seleccion.dominio;
 
+import com.deporuis.deporte.dominio.Deporte;
 import com.deporuis.integrante.dominio.Integrante;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "Selecciones")
@@ -17,30 +17,40 @@ public class Seleccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_seleccion")
     private Integer idSeleccion;
 
-    @Column(name = "fecha_creacion")
+    @Column(name = "fecha_creacion", nullable = false)
     private LocalDate fechaCreacion;
 
-    @Column(name = "nombre_seleccion", length = 50)
+    @Column(name = "nombre_seleccion", length = 50, nullable = false)
     private String nombreSeleccion;
 
-    @Column(name = "espacio_deportivo", length = 100)
+    @Column(name = "espacio_deportivo", length = 100, nullable = false)
     private String espacioDeportivo;
 
     private Boolean equipo;
 
-    @Column(name = "id_deporte")
-    private Integer idDeporte;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('MASCULINO', 'FEMENINO', 'MIXTO') DEFAULT 'MIXTO'")
-    private TipoSeleccion tipo;
+    @Column(nullable = false, columnDefinition = "ENUM('MASCULINO', 'FEMENINO', 'MIXTO') default 'MIXTO'")
+    private TipoSeleccion tipo_seleccion;
 
+    @ManyToOne
+    @JoinColumn(name = "id_deporte", nullable = false)
+    private Deporte deporte;
 
     @OneToMany(mappedBy = "seleccion")
-    private java.util.List<Integrante> integrantes;
+    private List<Integrante> integrantes;
 
+    @OneToMany(mappedBy = "seleccion")
+    private List<SeleccionLogro> logros;
 
+    @OneToMany(mappedBy = "seleccion")
+    private List<SeleccionFoto> fotos;
+
+    @OneToMany(mappedBy = "seleccion")
+    private List<SeleccionHorario> horarios;
+
+    @OneToMany(mappedBy = "seleccion")
+    private List<SeleccionPublicacion> publicaciones;
 }
-

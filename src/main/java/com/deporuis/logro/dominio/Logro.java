@@ -17,7 +17,7 @@ public class Logro {
     @Column(name = "id_logro")
     private Integer idLogro;
 
-    @Column(name = "fecha_logro")
+    @Column(name = "fecha_logro", nullable = false)
     private LocalDate fechaLogro;
 
     @Column(name = "nombre_logro", length = 100, nullable = false)
@@ -26,4 +26,3 @@ public class Logro {
     @Column(name = "descripcion_logro", length = 500)
     private String descripcionLogro;
 }
-

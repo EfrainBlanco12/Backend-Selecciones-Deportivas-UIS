@@ -3,6 +3,7 @@ package com.deporuis.excepcion;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    // Valida datos de autenticacion
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<?> handleInternalAuthError(Exception ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error en autenticación: " + ex.getMessage());
     }
 }
 
