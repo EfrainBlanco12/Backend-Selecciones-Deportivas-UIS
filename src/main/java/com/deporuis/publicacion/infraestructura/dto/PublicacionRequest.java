@@ -1,10 +1,13 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
 import com.deporuis.Foto.dominio.Foto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class PublicacionRequest {
@@ -18,12 +21,15 @@ public class PublicacionRequest {
 
     private String lugar;
 
-    @NotBlank(message = "La fecha de la publicacion es obligatoria")
+    @NotNull(message = "La fecha de la publicacion es obligatoria")
     private LocalDateTime fecha;
 
     @NotBlank(message = "La duracion de la publicacion es obligatoria")
     private String duracion;
 
-    @NotBlank(message = "La foto de la publicacion es obligatoria")
+    @NotNull(message = "La foto de la publicacion es obligatoria")
     private Foto foto;
+
+    @NotNull(message = "Debe elegir al menos una seleccion")
+    private List<Integer> selecciones;
 }

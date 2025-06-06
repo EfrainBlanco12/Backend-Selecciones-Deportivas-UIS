@@ -42,9 +42,9 @@ public class PublicacionController {
             @PathVariable int id
     ) {
         PublicacionResponse publicacion = publicacionService.obtenerPublicacion(id);
-//        if(publicacion == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body();
-//        }
+        if(publicacion == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.ok(publicacion);
     }
 

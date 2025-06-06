@@ -5,6 +5,10 @@ import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
+import com.deporuis.seleccion.dominio.Seleccion;
+import com.deporuis.seleccion.dominio.SeleccionPublicacion;
+import com.deporuis.seleccion.infraestructura.SeleccionPublicacionRepository;
+import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,8 +26,13 @@ public class PublicacionService {
     @Autowired
     private PublicacionRepository publicacionRepository;
 
-    public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
+    @Autowired
+    private SeleccionPublicacionRepository seleccionPublicacionRepository;
 
+    @Autowired
+    private SeleccionRepository seleccionRepository;
+
+    public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
         //TODO: Mirar si hay excepciones
 
         Publicacion nuevaPublicacion = new Publicacion(
@@ -34,7 +44,29 @@ public class PublicacionService {
                 publicacionRequest.getFoto()
         );
 
+        List<Integer> idSelecciones = publicacionRequest.getSelecciones();
+        List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
+
+        if (idSelecciones.isEmpty()){
+            throw new Error();
+        }
+
+        if (idSelecciones.size() != selecciones.size()){
+            throw new Error();
+        }
+
+        List<SeleccionPublicacion> relacionSelecciones = selecciones.stream()
+                .map(seleccion -> {
+                    SeleccionPublicacion cs = new SeleccionPublicacion();
+                    cs.setSeleccion(seleccion);
+                    cs.setPublicacion(nuevaPublicacion);
+                    return cs;
+                })
+                .collect(Collectors.toList());
+
         Publicacion publicacionGuardada = publicacionRepository.save(nuevaPublicacion);
+
+        seleccionPublicacionRepository.saveAll(relacionSelecciones);
 
         return publicacionToResponse(publicacionGuardada);
 
@@ -53,12 +85,12 @@ public class PublicacionService {
         return publicaciones.map(this::publicacionToResponse);
     }
 
-    public PublicacionResponse obtenerPublicacion(int id) {
+    public PublicacionResponse obtenerPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
         return publicacionToResponse(publicacion);
     }
 
-    public PublicacionResponse actualizarPublicacion(int id, PublicacionRequest request) {
+    public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
 
         publicacion.setTitulo(request.getTitulo());
@@ -73,9 +105,12 @@ public class PublicacionService {
         return publicacionToResponse(actualizada);
     }
 
-    public void eliminarPublicacion(int id) {
+    public void eliminarPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
 
+        List<SeleccionPublicacion> seleccionPublicacion = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
+
+        seleccionPublicacionRepository.deleteAll(seleccionPublicacion);
         publicacionRepository.delete(publicacion);
     }
 
@@ -89,7 +124,7 @@ public class PublicacionService {
                 .collect(Collectors.toList());
     }
 
-    private Publicacion verificarExistenciaPublicacion(int id) {
+    private Publicacion verificarExistenciaPublicacion(Integer id) {
         return publicacionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró Publicación con ID = " + id));
     }
