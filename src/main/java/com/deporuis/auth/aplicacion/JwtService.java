@@ -23,7 +23,8 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, 24 * 60 * 60 * 1000); // 24 horas
+        String token= buildToken(new HashMap<>(), userDetails, 24 * 60 * 60 * 1000); // 24 horas
+        return token;
     }
 
     private String buildToken(

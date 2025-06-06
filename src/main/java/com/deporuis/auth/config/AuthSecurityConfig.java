@@ -1,6 +1,7 @@
 package com.deporuis.auth.config;
 
 import com.deporuis.auth.aplicacion.CustomUserDetailsService;
+import com.deporuis.auth.infraestructura.CustomAccessDeniedHandler;
 import com.deporuis.auth.infraestructura.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ public class AuthSecurityConfig {
                         .requestMatchers(EndpointWhitelist.ENTRENADOR_ENDPOINTS).hasRole("ENTRENADOR")
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
