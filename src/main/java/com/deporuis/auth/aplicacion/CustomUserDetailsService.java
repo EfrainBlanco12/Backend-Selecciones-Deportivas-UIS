@@ -30,7 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new User(
                 login.getCodigoUniversitario(),
                 login.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + rol.toUpperCase()))
+                List.of(new SimpleGrantedAuthority("ROLE_" + integrante.getRol().getNombreRol().toUpperCase())
+                )
         );
     }
 }
