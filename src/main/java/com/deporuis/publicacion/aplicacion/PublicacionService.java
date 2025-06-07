@@ -100,6 +100,8 @@ public class PublicacionService {
         publicacion.setDuracion(request.getDuracion());
         publicacion.setFoto(request.getFoto());
 
+        List<SeleccionPublicacion> seleccionPublicacionOld = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
+
         Publicacion actualizada = publicacionRepository.save(publicacion);
 
         return publicacionToResponse(actualizada);
