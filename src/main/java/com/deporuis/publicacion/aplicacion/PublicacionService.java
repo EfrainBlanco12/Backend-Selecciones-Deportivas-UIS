@@ -1,6 +1,5 @@
 package com.deporuis.publicacion.aplicacion;
 
-import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
@@ -14,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +32,7 @@ public class PublicacionService {
     @Autowired
     private SeleccionRepository seleccionRepository;
 
+    @Transactional()
     public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
         //TODO: Mirar si hay excepciones
 
@@ -44,16 +45,7 @@ public class PublicacionService {
                 publicacionRequest.getFoto()
         );
 
-        List<Integer> idSelecciones = publicacionRequest.getSelecciones();
-        List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
-
-        if (idSelecciones.isEmpty()){
-            throw new Error();
-        }
-
-        if (idSelecciones.size() != selecciones.size()){
-            throw new Error();
-        }
+        List<Seleccion> selecciones = verificarExistenciaSelecciones(publicacionRequest.getSelecciones());
 
         List<SeleccionPublicacion> relacionSelecciones = selecciones.stream()
                 .map(seleccion -> {
@@ -77,19 +69,22 @@ public class PublicacionService {
      *
      * @param page Número de página (0-based).
      * @param size Cantidad de publicaciones por página.
-     * @return Page<PublicacionResponse> con metadatos (totalPages, totalElements, etc.).
+     * @return Page<PublicacionResponse> con metadatos.
      */
+    @Transactional(readOnly = true)
     public Page<PublicacionResponse> obtenerPublicacionesPaginadas(int page, int size) {
         Page<Publicacion> publicaciones = publicacionRepository.findAll(PageRequest.of(page, size));
         // Mapear cada Publicacion → PublicacionResponse
         return publicaciones.map(this::publicacionToResponse);
     }
 
+    @Transactional(readOnly = true)
     public PublicacionResponse obtenerPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
         return publicacionToResponse(publicacion);
     }
 
+    @Transactional()
     public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
 
@@ -100,13 +95,44 @@ public class PublicacionService {
         publicacion.setDuracion(request.getDuracion());
         publicacion.setFoto(request.getFoto());
 
+        List<Seleccion> selecciones = verificarExistenciaSelecciones(request.getSelecciones());
+
         List<SeleccionPublicacion> seleccionPublicacionOld = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
+
+        // Calcula la diferencia entre las relaciones a eliminar contra las que toca crear
+        Set<Integer> actualesIds = seleccionPublicacionOld.stream()
+                .map(sp -> sp.getSeleccion().getIdSeleccion())
+                .collect(Collectors.toSet());
+        Set<Integer> nuevosSet  = new HashSet<>(request.getSelecciones());
+
+        // Eliminar relaciones ya no necesarias
+        List<SeleccionPublicacion> toDelete = seleccionPublicacionOld.stream()
+                .filter(sp -> !nuevosSet.contains(sp.getSeleccion().getIdSeleccion()))
+                .collect(Collectors.toList());
+        seleccionPublicacionRepository.deleteAll(toDelete);
+
+        // Crear relaciones nuevas
+        List<Integer> toCreate = nuevosSet.stream()
+                .filter(idSel -> !actualesIds.contains(idSel))
+                .collect(Collectors.toList());
+
+        List<Seleccion> seleccionesARelacionar = verificarExistenciaSelecciones(toCreate);
+
+        seleccionesARelacionar.forEach(s -> {
+            SeleccionPublicacion sp = new SeleccionPublicacion();
+            sp.setPublicacion(publicacion);
+            sp.setSeleccion(s);
+
+            seleccionPublicacionRepository.save(sp);
+        });
+
 
         Publicacion actualizada = publicacionRepository.save(publicacion);
 
         return publicacionToResponse(actualizada);
     }
 
+    @Transactional()
     public void eliminarPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
 
@@ -129,5 +155,19 @@ public class PublicacionService {
     private Publicacion verificarExistenciaPublicacion(Integer id) {
         return publicacionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró Publicación con ID = " + id));
+    }
+
+    private List<Seleccion> verificarExistenciaSelecciones(List<Integer> idSelecciones) {
+        List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
+
+        if (idSelecciones.isEmpty()){
+            throw new Error();
+        }
+
+        if (idSelecciones.size() != selecciones.size()){
+            throw new Error();
+        }
+
+        return selecciones;
     }
 }
