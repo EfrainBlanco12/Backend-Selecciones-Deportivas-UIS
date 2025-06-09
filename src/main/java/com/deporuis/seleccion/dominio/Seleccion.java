@@ -50,7 +50,4 @@ public class Seleccion {
 
     @OneToMany(mappedBy = "seleccion")
     private List<SeleccionHorario> horarios;
-
-    @OneToMany(mappedBy = "seleccion")
-    private List<SeleccionPublicacion> publicaciones;
 }

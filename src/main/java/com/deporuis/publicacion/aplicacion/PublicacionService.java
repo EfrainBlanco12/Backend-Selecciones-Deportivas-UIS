@@ -1,6 +1,10 @@
 package com.deporuis.publicacion.aplicacion;
 
+import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.publicacion.dominio.PublicacionFoto;
+import com.deporuis.publicacion.infraestructura.PublicacionFotoRepository;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
@@ -30,22 +34,27 @@ public class PublicacionService {
     private SeleccionPublicacionRepository seleccionPublicacionRepository;
 
     @Autowired
+    private PublicacionFotoRepository publicacionFotoRepository;
+
+    @Autowired
     private SeleccionRepository seleccionRepository;
+
+    @Autowired
+    private FotoRepository fotoRepository;
 
     @Transactional()
     public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
-        //TODO: Mirar si hay excepciones
 
         Publicacion nuevaPublicacion = new Publicacion(
                 publicacionRequest.getTitulo(),
                 publicacionRequest.getDescripcion(),
                 publicacionRequest.getLugar(),
                 publicacionRequest.getFecha(),
-                publicacionRequest.getDuracion(),
-                publicacionRequest.getFoto()
+                publicacionRequest.getDuracion()
         );
 
         List<Seleccion> selecciones = verificarExistenciaSelecciones(publicacionRequest.getSelecciones());
+        List<Foto> fotos = verificarExistenciaFotos(publicacionRequest.getFotos());
 
         List<SeleccionPublicacion> relacionSelecciones = selecciones.stream()
                 .map(seleccion -> {
@@ -56,12 +65,21 @@ public class PublicacionService {
                 })
                 .collect(Collectors.toList());
 
+        List<PublicacionFoto> relacionFotos = fotos.stream()
+                .map(foto -> {
+                    PublicacionFoto pf = new PublicacionFoto();
+                    pf.setFoto(foto);
+                    pf.setPublicacion(nuevaPublicacion);
+                    return pf;
+                })
+                .collect(Collectors.toList());
+
         Publicacion publicacionGuardada = publicacionRepository.save(nuevaPublicacion);
 
         seleccionPublicacionRepository.saveAll(relacionSelecciones);
+        publicacionFotoRepository.saveAll(relacionFotos);
 
         return publicacionToResponse(publicacionGuardada);
-
     }
 
     /**
@@ -74,58 +92,95 @@ public class PublicacionService {
     @Transactional(readOnly = true)
     public Page<PublicacionResponse> obtenerPublicacionesPaginadas(int page, int size) {
         Page<Publicacion> publicaciones = publicacionRepository.findAll(PageRequest.of(page, size));
-        // Mapear cada Publicacion → PublicacionResponse
         return publicaciones.map(this::publicacionToResponse);
     }
 
+    /**
+     * Devuelve una publicacion buscando por su id.
+     */
     @Transactional(readOnly = true)
     public PublicacionResponse obtenerPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
         return publicacionToResponse(publicacion);
     }
 
+    /**
+     * Actualiza una publicacion y sus relaciones con las tablas selecciones y foto
+     */
     @Transactional()
     public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
+
         Publicacion publicacion = verificarExistenciaPublicacion(id);
+        List<Integer> idSelecciones = request.getSelecciones();
+        List<Integer> idFotos = request.getFotos();
+
+        List<SeleccionPublicacion> seleccionPublicacionOld = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
+        List<PublicacionFoto> publicacionFotoOld = publicacionFotoRepository.findAllByPublicacion(publicacion);
 
         publicacion.setTitulo(request.getTitulo());
         publicacion.setDescripcion(request.getDescripcion());
         publicacion.setLugar(request.getLugar());
         publicacion.setFecha(request.getFecha());
         publicacion.setDuracion(request.getDuracion());
-        publicacion.setFoto(request.getFoto());
 
-        List<Seleccion> selecciones = verificarExistenciaSelecciones(request.getSelecciones());
+        List<Seleccion> selecciones = verificarExistenciaSelecciones(idSelecciones);
+        List<Foto> fotos = verificarExistenciaFotos(idFotos);
 
-        List<SeleccionPublicacion> seleccionPublicacionOld = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
 
         // Calcula la diferencia entre las relaciones a eliminar contra las que toca crear
-        Set<Integer> actualesIds = seleccionPublicacionOld.stream()
+        Set<Integer> actualesIdsSelecciones = seleccionPublicacionOld.stream()
                 .map(sp -> sp.getSeleccion().getIdSeleccion())
                 .collect(Collectors.toSet());
-        Set<Integer> nuevosSet  = new HashSet<>(request.getSelecciones());
+        Set<Integer> nuevosSetSeleccion  = new HashSet<>(idSelecciones);
+
+        Set<Integer> actualesIdsFotos = publicacionFotoOld.stream()
+                .map(pf -> pf.getFoto().getIdFoto())
+                .collect(Collectors.toSet());
+        Set<Integer> nuevosSetFoto  = new HashSet<>(idFotos);
 
         // Eliminar relaciones ya no necesarias
-        List<SeleccionPublicacion> toDelete = seleccionPublicacionOld.stream()
-                .filter(sp -> !nuevosSet.contains(sp.getSeleccion().getIdSeleccion()))
+        List<SeleccionPublicacion> toDeleteSeleccion = seleccionPublicacionOld.stream()
+                .filter(sp -> !nuevosSetSeleccion.contains(sp.getSeleccion().getIdSeleccion()))
                 .collect(Collectors.toList());
-        seleccionPublicacionRepository.deleteAll(toDelete);
+        seleccionPublicacionRepository.deleteAll(toDeleteSeleccion);
+
+        List<PublicacionFoto> toDeleteFoto = publicacionFotoOld.stream()
+                .filter(pf -> !nuevosSetFoto.contains(pf.getFoto().getIdFoto()))
+                .collect(Collectors.toList());
+        publicacionFotoRepository.deleteAll(toDeleteFoto);
 
         // Crear relaciones nuevas
-        List<Integer> toCreate = nuevosSet.stream()
-                .filter(idSel -> !actualesIds.contains(idSel))
+        List<Integer> toCreateSeleccion = nuevosSetSeleccion.stream()
+                .filter(idSel -> !actualesIdsSelecciones.contains(idSel))
                 .collect(Collectors.toList());
 
-        List<Seleccion> seleccionesARelacionar = verificarExistenciaSelecciones(toCreate);
+        List<Integer> toCreateFoto = nuevosSetFoto.stream()
+                .filter(idFoto -> !actualesIdsFotos.contains(idFoto))
+                .collect(Collectors.toList());
 
-        seleccionesARelacionar.forEach(s -> {
-            SeleccionPublicacion sp = new SeleccionPublicacion();
-            sp.setPublicacion(publicacion);
-            sp.setSeleccion(s);
+        if (!toCreateSeleccion.isEmpty()){
+            List<Seleccion> seleccionesARelacionar = verificarExistenciaSelecciones(toCreateSeleccion);
 
-            seleccionPublicacionRepository.save(sp);
-        });
+            seleccionesARelacionar.forEach(s -> {
+                SeleccionPublicacion sp = new SeleccionPublicacion();
+                sp.setPublicacion(publicacion);
+                sp.setSeleccion(s);
 
+                seleccionPublicacionRepository.save(sp);
+            });
+        }
+
+        if (!toCreateFoto.isEmpty()){
+            List<Foto> fotosARelacionar = verificarExistenciaFotos(toCreateFoto);
+
+            fotosARelacionar.forEach(f -> {
+                PublicacionFoto pf = new PublicacionFoto();
+                pf.setPublicacion(publicacion);
+                pf.setFoto(f);
+
+                publicacionFotoRepository.save(pf);
+            });
+        }
 
         Publicacion actualizada = publicacionRepository.save(publicacion);
 
@@ -137,8 +192,14 @@ public class PublicacionService {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
 
         List<SeleccionPublicacion> seleccionPublicacion = seleccionPublicacionRepository.findAllByPublicacion(publicacion);
+        List<PublicacionFoto> publicacionFoto = publicacionFotoRepository.findAllByPublicacion(publicacion);
 
-        seleccionPublicacionRepository.deleteAll(seleccionPublicacion);
+        if (!seleccionPublicacion.isEmpty()){
+            seleccionPublicacionRepository.deleteAll(seleccionPublicacion);
+        }
+        if (!publicacionFoto.isEmpty()){
+            publicacionFotoRepository.deleteAll(publicacionFoto);
+        }
         publicacionRepository.delete(publicacion);
     }
 
@@ -161,13 +222,27 @@ public class PublicacionService {
         List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
 
         if (idSelecciones.isEmpty()){
-            throw new Error();
+            throw new IllegalArgumentException("Debe haber al menos una seleccion");
         }
 
         if (idSelecciones.size() != selecciones.size()){
-            throw new Error();
+            throw new IllegalArgumentException("ALGUNA SELECCION NO EXISTE");
         }
 
         return selecciones;
+    }
+
+    private List<Foto> verificarExistenciaFotos(List<Integer> idFotos) {
+        List<Foto> fotos = fotoRepository.findAllById(idFotos);
+
+        if (idFotos.isEmpty()){
+            throw new IllegalArgumentException("Debe haber al menos una foto");
+        }
+
+        if (idFotos.size() != fotos.size()){
+            throw new IllegalArgumentException("ALGUNA SELECCION NO EXISTE");
+        }
+
+        return fotos;
     }
 }

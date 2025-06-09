@@ -35,8 +35,8 @@ public class PublicacionController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesPaginadas(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "2") int size
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "2") Integer size
     ) {
         Page<PublicacionResponse> pagina = publicacionService.obtenerPublicacionesPaginadas(page, size);
         return ResponseEntity.ok(pagina);
@@ -48,7 +48,7 @@ public class PublicacionController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<PublicacionResponse> obtenerPublicacion(
-            @PathVariable int id
+            @PathVariable Integer id
     ) {
         PublicacionResponse publicacion = publicacionService.obtenerPublicacion(id);
         if(publicacion == null) {
@@ -63,7 +63,7 @@ public class PublicacionController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<PublicacionResponse> actualizarPublicacion(
-            @PathVariable int id,
+            @PathVariable Integer id,
             @Valid @RequestBody PublicacionRequest publicacionRequest
     ) {
         PublicacionResponse publicacionActualizada = publicacionService.actualizarPublicacion(id, publicacionRequest);
@@ -76,7 +76,7 @@ public class PublicacionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminarPublicacion(
-            @PathVariable int id
+            @PathVariable Integer id
     ) {
         publicacionService.eliminarPublicacion(id);
         return ResponseEntity.noContent().build();

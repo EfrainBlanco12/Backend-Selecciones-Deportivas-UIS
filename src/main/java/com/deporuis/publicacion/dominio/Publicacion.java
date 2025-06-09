@@ -40,18 +40,17 @@ public class Publicacion {
     @Column(name = "tipo_publicacion", nullable = false, columnDefinition = "ENUM('NOTICIA', 'EVENTO') default 'NOTICIA'")
     private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
 
-    @ManyToOne
-    @JoinColumn(name = "id_foto", nullable = false)
-    private Foto foto;
+//    @ManyToOne
+//    @JoinColumn(name = "id_foto", nullable = false)
+//    private Foto foto;
 
     //Creacion de una publicacion
 
-    public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion, Foto foto) {
+    public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.lugar = lugar;
         this.fecha = fecha;
         this.duracion = duracion;
-        this.foto = foto;
     }
 }
