@@ -81,4 +81,16 @@ public class PublicacionController {
         publicacionService.eliminarPublicacion(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Hace softdelete a una publicación por su ID (PATCH /publicacion/{id})
+     */
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Void> softDeletePublicacion(
+            @PathVariable Integer id
+    ) {
+        publicacionService.softDeletePublicacion(id);
+        return ResponseEntity.noContent().build();
+    }
 }

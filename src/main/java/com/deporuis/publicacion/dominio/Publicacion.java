@@ -40,10 +40,6 @@ public class Publicacion {
     @Column(name = "tipo_publicacion", nullable = false, columnDefinition = "ENUM('NOTICIA', 'EVENTO') default 'NOTICIA'")
     private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
 
-//    @ManyToOne
-//    @JoinColumn(name = "id_foto", nullable = false)
-//    private Foto foto;
-
     //Creacion de una publicacion
 
     public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion) {

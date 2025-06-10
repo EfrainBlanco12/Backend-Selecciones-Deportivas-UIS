@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,9 @@ public class PublicacionService {
     @Autowired
     private FotoRepository fotoRepository;
 
+    /**
+     * Creacion de una publicacion y relaciones de las tablas muchos a muchos con las tablas fotos y selecciones
+     */
     @Transactional()
     public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
 
@@ -91,7 +95,7 @@ public class PublicacionService {
      */
     @Transactional(readOnly = true)
     public Page<PublicacionResponse> obtenerPublicacionesPaginadas(int page, int size) {
-        Page<Publicacion> publicaciones = publicacionRepository.findAll(PageRequest.of(page, size));
+        Page<Publicacion> publicaciones = publicacionRepository.findByVisibilidadTrue(PageRequest.of(page, size));
         return publicaciones.map(this::publicacionToResponse);
     }
 
@@ -105,7 +109,7 @@ public class PublicacionService {
     }
 
     /**
-     * Actualiza una publicacion y sus relaciones con las tablas selecciones y foto
+     * Actualiza una publicacion y sus relaciones muchos a muchos con las tablas selecciones y foto
      */
     @Transactional()
     public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
@@ -187,6 +191,9 @@ public class PublicacionService {
         return publicacionToResponse(actualizada);
     }
 
+    /**
+     * Elimina una publicacion tomando su id, busca las relaciones correspondientes y las elimina tambien
+     */
     @Transactional()
     public void eliminarPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaPublicacion(id);
@@ -203,6 +210,17 @@ public class PublicacionService {
         publicacionRepository.delete(publicacion);
     }
 
+    /**
+     * Hace soft delete por su id
+     */
+    @Transactional()
+    public void softDeletePublicacion(Integer id) {
+        Publicacion publicacion = verificarExistenciaPublicacion(id);
+        publicacion.setVisibilidad(false);
+
+        publicacionRepository.save(publicacion);
+    }
+
     private PublicacionResponse publicacionToResponse(Publicacion p){
         return new PublicacionResponse(p.getIdPublicacion(), p.getTitulo());
     }
@@ -214,8 +232,19 @@ public class PublicacionService {
     }
 
     private Publicacion verificarExistenciaPublicacion(Integer id) {
-        return publicacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("No se encontró Publicación con ID = " + id));
+        Optional<Publicacion> publicacionOptional = publicacionRepository.findById(id);
+
+        if (publicacionOptional.isEmpty()) {
+            throw  new EntityNotFoundException("No se encontró Publicación con ID = " + id);
+        }
+
+        Publicacion publicacion = publicacionOptional.get();
+
+        if (!Boolean.TRUE.equals(publicacion.getVisibilidad())) {
+            throw new EntityNotFoundException("La publicación no está disponible");
+        }
+
+        return publicacion;
     }
 
     private List<Seleccion> verificarExistenciaSelecciones(List<Integer> idSelecciones) {
@@ -240,7 +269,7 @@ public class PublicacionService {
         }
 
         if (idFotos.size() != fotos.size()){
-            throw new IllegalArgumentException("ALGUNA SELECCION NO EXISTE");
+            throw new IllegalArgumentException("ALGUNA FOTO NO EXISTE");
         }
 
         return fotos;

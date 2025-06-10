@@ -28,8 +28,4 @@ public class Foto {
     // Relación inversa con Integrantes
     @OneToMany(mappedBy = "foto")
     private List<Integrante> integrantes;
-
-    // Relación inversa con Publicaciones
-    @OneToMany(mappedBy = "foto")
-    private List<Publicacion> publicaciones;
 }
