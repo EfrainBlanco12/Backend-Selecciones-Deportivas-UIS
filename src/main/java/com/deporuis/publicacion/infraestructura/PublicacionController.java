@@ -83,7 +83,7 @@ public class PublicacionController {
     }
 
     /**
-     * Hace softdelete a una publicación por su ID (PATCH /publicacion/{id})
+     * Softdelete a una publicación por su ID (PATCH /publicacion/{id})
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")

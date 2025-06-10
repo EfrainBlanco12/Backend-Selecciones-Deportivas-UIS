@@ -1,6 +1,8 @@
 package com.deporuis.deporte.excepciones;
 
-public class DeporteYaExisteException extends RuntimeException {
+import com.deporuis.excepcion.common.ResourceNotFoundException;
+
+public class DeporteYaExisteException extends ResourceNotFoundException {
     public DeporteYaExisteException(String mensaje) {
         super(mensaje);
     }

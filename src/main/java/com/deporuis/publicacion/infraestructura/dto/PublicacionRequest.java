@@ -1,6 +1,7 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
 import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.publicacion.dominio.TipoPublicacion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 public class PublicacionRequest {
 
-//    titulo, descripcion,  lugar, fecha, duracion, foto
+//    titulo, descripcion,  lugar, fecha, duracion, tipoPublicacion, selecciones, fotos
     @NotBlank(message = "El titulo de la publicacion es obligatorio")
     private String titulo;
 
@@ -25,6 +26,9 @@ public class PublicacionRequest {
 
     @NotBlank(message = "La duracion de la publicacion es obligatoria")
     private String duracion;
+
+    @NotNull(message = "El tipo de publicacion es obligatoria")
+    private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
 
     @NotNull(message = "Debe elegir al menos una seleccion")
     private List<Integer> selecciones;

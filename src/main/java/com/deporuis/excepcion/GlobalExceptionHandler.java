@@ -1,6 +1,8 @@
 package com.deporuis.excepcion;
 
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
+import com.deporuis.excepcion.common.BadRequestException;
+import com.deporuis.excepcion.common.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -40,6 +42,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<?> handleInternalAuthError(Exception ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error en autenticación: " + ex.getMessage());
+    }
+
+    // Valida si una entidad existe
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handleNotFound(ResourceNotFoundException ex) {
+        Map<String,String> body = Map.of("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    // Valida si se pasa la informacion completa en los endpoint
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String,String>> handleBadRequest(BadRequestException ex) {
+        Map<String,String> body = Map.of("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
 

@@ -2,8 +2,10 @@ package com.deporuis.publicacion.aplicacion;
 
 import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.Foto.infraestructura.FotoRepository;
+import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.dominio.PublicacionFoto;
+import com.deporuis.publicacion.excepciones.PublicacionNotFoundException;
 import com.deporuis.publicacion.infraestructura.PublicacionFotoRepository;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
@@ -12,7 +14,6 @@ import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionPublicacion;
 import com.deporuis.seleccion.infraestructura.SeleccionPublicacionRepository;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,8 @@ public class PublicacionService {
                 publicacionRequest.getDescripcion(),
                 publicacionRequest.getLugar(),
                 publicacionRequest.getFecha(),
-                publicacionRequest.getDuracion()
+                publicacionRequest.getDuracion(),
+                publicacionRequest.getTipoPublicacion()
         );
 
         List<Seleccion> selecciones = verificarExistenciaSelecciones(publicacionRequest.getSelecciones());
@@ -235,13 +237,13 @@ public class PublicacionService {
         Optional<Publicacion> publicacionOptional = publicacionRepository.findById(id);
 
         if (publicacionOptional.isEmpty()) {
-            throw  new EntityNotFoundException("No se encontró Publicación con ID = " + id);
+            throw  new PublicacionNotFoundException("No se encontró Publicación con ID = " + id);
         }
 
         Publicacion publicacion = publicacionOptional.get();
 
         if (!Boolean.TRUE.equals(publicacion.getVisibilidad())) {
-            throw new EntityNotFoundException("La publicación no está disponible");
+            throw new PublicacionNotFoundException("La publicación no está disponible");
         }
 
         return publicacion;
@@ -251,11 +253,11 @@ public class PublicacionService {
         List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
 
         if (idSelecciones.isEmpty()){
-            throw new IllegalArgumentException("Debe haber al menos una seleccion");
+            throw new BadRequestException("Debe haber al menos una seleccion");
         }
 
         if (idSelecciones.size() != selecciones.size()){
-            throw new IllegalArgumentException("ALGUNA SELECCION NO EXISTE");
+            throw new BadRequestException("Alguna seleccion no existe");
         }
 
         return selecciones;
@@ -265,11 +267,11 @@ public class PublicacionService {
         List<Foto> fotos = fotoRepository.findAllById(idFotos);
 
         if (idFotos.isEmpty()){
-            throw new IllegalArgumentException("Debe haber al menos una foto");
+            throw new BadRequestException("Debe haber al menos una foto");
         }
 
         if (idFotos.size() != fotos.size()){
-            throw new IllegalArgumentException("ALGUNA FOTO NO EXISTE");
+            throw new BadRequestException("Alguna foto no existe");
         }
 
         return fotos;

@@ -42,11 +42,12 @@ public class Publicacion {
 
     //Creacion de una publicacion
 
-    public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion) {
+    public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion, TipoPublicacion tipoPublicacion) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.lugar = lugar;
         this.fecha = fecha;
         this.duracion = duracion;
+        this.tipoPublicacion = tipoPublicacion;
     }
 }
