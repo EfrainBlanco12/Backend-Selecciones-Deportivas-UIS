@@ -6,13 +6,12 @@ public class EndpointWhitelist {
             "/public/**"
     };
 
-    public static final String[] ADMIN_ENDPOINTS = {
-            "/admin/**",
-            "/deporte/**"
+    public static final String[] PRIVATE_ENDPOINTS = {
+            "/private/**"
     };
 
-    public static final String[] ENTRENADOR_ENDPOINTS = {
-            "/entrenador/**"
-    };
+//    public static final String[] ENTRENADOR_ENDPOINTS = {
+//            "/entrenador/**"
+//    };
 }
 

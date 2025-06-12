@@ -32,8 +32,8 @@ public class AuthSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(EndpointWhitelist.PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(EndpointWhitelist.ADMIN_ENDPOINTS).hasRole("ADMINISTRADOR")
-                        .requestMatchers(EndpointWhitelist.ENTRENADOR_ENDPOINTS).hasRole("ENTRENADOR")
+//                        .requestMatchers(EndpointWhitelist.ADMIN_ENDPOINTS).hasRole("ADMINISTRADOR")
+                        .requestMatchers(EndpointWhitelist.PRIVATE_ENDPOINTS).hasAnyRole("ADMINISTRADOR", "ENTRENADOR")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()))
