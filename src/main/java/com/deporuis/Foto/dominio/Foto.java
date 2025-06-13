@@ -1,7 +1,6 @@
 package com.deporuis.Foto.dominio;
 
 import com.deporuis.integrante.dominio.Integrante;
-import com.deporuis.publicacion.dominio.Publicacion;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +18,12 @@ public class Foto {
     @Column(name = "id_foto")
     private Integer idFoto;
 
-    @Column(name = "url_foto", length = 200, nullable = false)
-    private String urlFoto;
+//    @Column(name = "url_foto", length = 500, nullable = false)
+//    private String urlFoto;
+
+    @Lob
+    @Column(name = "contenido", columnDefinition = "MEDIUMBLOB")
+    private byte[] contenido;
 
     @Column(name = "temporada")
     private Integer temporada;

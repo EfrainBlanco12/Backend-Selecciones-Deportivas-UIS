@@ -1,6 +1,5 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
-import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

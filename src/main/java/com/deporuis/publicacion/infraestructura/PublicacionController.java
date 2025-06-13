@@ -36,7 +36,7 @@ public class PublicacionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "2") Integer size
+            @RequestParam(value = "size", defaultValue = "5") Integer size
     ) {
         Page<PublicacionResponse> pagina = publicacionService.obtenerPublicacionesPaginadas(page, size);
         return ResponseEntity.ok(pagina);
