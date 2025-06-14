@@ -1,15 +1,14 @@
 package com.deporuis.Foto.infraestructura.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-import java.time.LocalDate;
-import java.util.List;
-
+@Data
 public class FotoRequest {
 
     @NotNull(message = "Debe adjuntar al menos una imagen")
-    private List<byte[]> contenidos;
+    private byte[] contenido;
 
     @NotNull(message = "Debe haber al menos una temporada")
-    private List<Integer> temporadas;
+    private Integer temporada;
 }

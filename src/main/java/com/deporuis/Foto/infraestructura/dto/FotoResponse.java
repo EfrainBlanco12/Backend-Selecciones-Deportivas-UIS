@@ -1,11 +1,19 @@
 package com.deporuis.Foto.infraestructura.dto;
 
-import java.util.List;
+import lombok.Data;
 
+@Data
 public class FotoResponse {
-    private List<Integer> idsFotos;
 
-    public FotoResponse(List<Integer> idsFotos) {
-        this.idsFotos = idsFotos;
+    private Integer idFoto;
+
+    private byte[] contenido;
+
+    private Integer temporada;
+
+    public FotoResponse(Integer idFoto, byte[] contenido, Integer temporada) {
+        this.idFoto = idFoto;
+        this.contenido = contenido;
+        this.temporada = temporada;
     }
 }

@@ -4,8 +4,6 @@ import com.deporuis.integrante.dominio.Integrante;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "Fotos")
 @Data
@@ -18,9 +16,6 @@ public class Foto {
     @Column(name = "id_foto")
     private Integer idFoto;
 
-//    @Column(name = "url_foto", length = 500, nullable = false)
-//    private String urlFoto;
-
     @Lob
     @Column(name = "contenido", columnDefinition = "MEDIUMBLOB")
     private byte[] contenido;
@@ -29,6 +24,11 @@ public class Foto {
     private Integer temporada;
 
     // Relación inversa con Integrantes
-    @OneToMany(mappedBy = "foto")
-    private List<Integrante> integrantes;
+    @OneToOne(mappedBy = "foto")
+    private Integrante integrante;
+
+    public Foto(byte[] contenido, Integer temporada) {
+        this.contenido = contenido;
+        this.temporada = temporada;
+    }
 }

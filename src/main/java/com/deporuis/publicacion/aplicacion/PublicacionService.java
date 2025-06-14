@@ -224,12 +224,29 @@ public class PublicacionService {
     }
 
     private PublicacionResponse publicacionToResponse(Publicacion p){
-        return new PublicacionResponse(p.getIdPublicacion(), p.getTitulo());
+        return new PublicacionResponse(
+                p.getIdPublicacion(),
+                p.getTitulo(),
+                p.getDescripcion(),
+                p.getLugar(),
+                p.getFecha(),
+                p.getDuracion(),
+                p.getTipoPublicacion()
+        );
     }
 
     private List<PublicacionResponse> publicacionesRequestToResponse(List<Publicacion> publicaciones){
         return publicaciones.stream()
-                .map(p -> new PublicacionResponse(p.getIdPublicacion(), p.getTitulo()))
+                .map(p -> new PublicacionResponse(
+                        p.getIdPublicacion(),
+                        p.getTitulo(),
+                        p.getDescripcion(),
+                        p.getLugar(),
+                        p.getFecha(),
+                        p.getDuracion(),
+                        p.getTipoPublicacion()
+                    )
+                )
                 .collect(Collectors.toList());
     }
 

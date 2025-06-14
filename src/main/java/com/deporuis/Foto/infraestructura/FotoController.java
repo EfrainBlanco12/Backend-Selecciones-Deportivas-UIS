@@ -36,7 +36,7 @@ public class FotoController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") Integer size
+            @RequestParam(value = "size", defaultValue = "5") Integer size
     ) {
         Page<FotoResponse> pagina = fotoService.obtenerFotosPaginadas(page, size);
         return ResponseEntity.ok(pagina);
@@ -55,26 +55,5 @@ public class FotoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(foto);
-    }
-
-    /**
-     * Elimina una foto por su ID (DELETE /foto/{id})
-     */
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Void> eliminarFoto(
-            @PathVariable Integer id
-    ) {
-        fotoService.eliminarFoto(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
-    public ResponseEntity<Void> softDeleteFoto(
-            @PathVariable Integer id
-    ) {
-        fotoService.softDeleteFoto(id);
-        return ResponseEntity.noContent().build();
     }
 }
