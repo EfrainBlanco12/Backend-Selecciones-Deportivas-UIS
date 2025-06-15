@@ -30,19 +30,6 @@ public class FotoController {
     }
 
     /**
-     * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto)
-     */
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
-    public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size
-    ) {
-        Page<FotoResponse> pagina = fotoService.obtenerFotosPaginadas(page, size);
-        return ResponseEntity.ok(pagina);
-    }
-
-    /**
      * Obtener una sola foto por su ID (GET /foto/{id})
      */
     @GetMapping("/{id}")
@@ -56,4 +43,18 @@ public class FotoController {
         }
         return ResponseEntity.ok(foto);
     }
+
+    /**
+     * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto)
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
+    public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size
+    ) {
+        Page<FotoResponse> pagina = fotoService.obtenerFotosPaginadas(page, size);
+        return ResponseEntity.ok(pagina);
+    }
+
 }
