@@ -22,8 +22,7 @@ public class PublicacionRequest {
 
     @NotNull(message = "La fecha de la publicacion es obligatoria")
     private LocalDateTime fecha;
-
-    @NotBlank(message = "La duracion de la publicacion es obligatoria")
+    
     private String duracion;
 
     @NotNull(message = "El tipo de publicacion es obligatoria")

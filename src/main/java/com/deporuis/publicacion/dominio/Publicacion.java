@@ -31,7 +31,7 @@ public class Publicacion {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20)
     private String duracion;
 
     private Boolean visibilidad = true;
