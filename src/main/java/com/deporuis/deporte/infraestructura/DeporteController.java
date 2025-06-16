@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/deporte")
 @Controller
@@ -26,4 +26,22 @@ public class DeporteController {
         DeporteResponse deporteCreado = deporteService.crearDeporte(deporteRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(deporteCreado);
     };
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<List<DeporteResponse>> obtenerTodosLosDeportes(){
+        List<DeporteResponse> deporteResponse = deporteService.obtenerTodosLosDeportes();
+        return ResponseEntity.status(HttpStatus.OK).body(deporteResponse);
+    }
+
+    @PutMapping("/actualizar/{id_deporte}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<DeporteResponse> actualizarDeporte(
+            @PathVariable("id_deporte") Integer idDeporte,
+            @Valid @RequestBody DeporteRequest deporteRequest) {
+
+        DeporteResponse deporteActualizado = deporteService.actualizarDeporte(idDeporte, deporteRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(deporteActualizado);
+    }
+
 }
