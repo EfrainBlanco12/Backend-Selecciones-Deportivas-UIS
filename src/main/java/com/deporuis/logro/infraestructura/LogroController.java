@@ -74,7 +74,7 @@ public class LogroController {
      * Eliminar un logro  por su ID (DELETE /logro/{id})
      */
     @DeleteMapping("/eliminar/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR', 'ENTRENADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<Void> eliminarLogro(
             @PathVariable Integer id
     ) {
