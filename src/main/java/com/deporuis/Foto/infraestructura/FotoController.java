@@ -22,7 +22,7 @@ public class FotoController {
     /**
      * Crear fotos (POST /foto)
      */
-    @PostMapping
+    @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<FotoResponse> crearFoto(@Valid @RequestBody FotoRequest fotoRequest) {
         FotoResponse fotoCreada = fotoService.crearFoto(fotoRequest);
@@ -32,7 +32,7 @@ public class FotoController {
     /**
      * Obtener una sola foto por su ID (GET /foto/{id})
      */
-    @GetMapping("/{id}")
+    @GetMapping("/obtener/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<FotoResponse> obtenerFoto(
             @PathVariable Integer id
@@ -47,7 +47,7 @@ public class FotoController {
     /**
      * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto)
      */
-    @GetMapping
+    @GetMapping("/lista")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,

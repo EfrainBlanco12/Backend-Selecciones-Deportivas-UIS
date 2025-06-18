@@ -1,11 +1,13 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
 import com.deporuis.publicacion.dominio.TipoPublicacion;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
 public class PublicacionResponse {
 
     private Integer idPublicacion;
@@ -22,20 +24,4 @@ public class PublicacionResponse {
 
     private TipoPublicacion tipoPublicacion;
 
-    public PublicacionResponse(
-            Integer idPublicacion,
-            String tituloPublicacion,
-            String descripcion,
-            String lugar,
-            LocalDateTime fecha,
-            String duracion,
-            TipoPublicacion tipoPublicacion) {
-        this.idPublicacion = idPublicacion;
-        this.tituloPublicacion = tituloPublicacion;
-        this.descripcion = descripcion;
-        this.lugar = lugar;
-        this.fecha = fecha;
-        this.duracion = duracion;
-        this.tipoPublicacion = tipoPublicacion;
-    }
 }

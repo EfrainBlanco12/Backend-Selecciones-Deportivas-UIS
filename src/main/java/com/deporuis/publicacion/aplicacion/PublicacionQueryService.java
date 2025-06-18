@@ -27,7 +27,7 @@ public class PublicacionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PublicacionResponse> obtenerPublicacionesPaginadas(int page, int size) {
+    public Page<PublicacionResponse> obtenerPublicacionesPaginadas(Integer page, Integer size) {
         return publicacionRepository.findByVisibilidadTrue(PageRequest.of(page, size))
                 .map(PublicacionMapper::toResponse);
     }

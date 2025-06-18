@@ -1,8 +1,10 @@
 package com.deporuis.Foto.infraestructura.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class FotoResponse {
 
     private Integer idFoto;
@@ -11,9 +13,4 @@ public class FotoResponse {
 
     private Integer temporada;
 
-    public FotoResponse(Integer idFoto, byte[] contenido, Integer temporada) {
-        this.idFoto = idFoto;
-        this.contenido = contenido;
-        this.temporada = temporada;
-    }
 }

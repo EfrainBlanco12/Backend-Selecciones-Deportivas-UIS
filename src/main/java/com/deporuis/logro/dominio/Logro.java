@@ -25,4 +25,10 @@ public class Logro {
 
     @Column(name = "descripcion_logro", length = 500)
     private String descripcionLogro;
+
+    public Logro(LocalDate fechaLogro, String nombreLogro, String descripcionLogro) {
+        this.fechaLogro = fechaLogro;
+        this.nombreLogro = nombreLogro;
+        this.descripcionLogro = descripcionLogro;
+    }
 }

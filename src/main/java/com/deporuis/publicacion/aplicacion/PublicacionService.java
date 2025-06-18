@@ -1,6 +1,5 @@
 package com.deporuis.publicacion.aplicacion;
 
-import com.deporuis.publicacion.aplicacion.helper.PublicacionVerificarExistenciaService;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,6 @@ public class PublicacionService {
 
     @Autowired
     private PublicacionQueryService publicacionQueryService;
-
-    @Autowired
-    private PublicacionVerificarExistenciaService verificarExistenciaService;
 
     /**
      * Creacion de una publicacion y relaciones de las tablas muchos a muchos con las tablas fotos y selecciones

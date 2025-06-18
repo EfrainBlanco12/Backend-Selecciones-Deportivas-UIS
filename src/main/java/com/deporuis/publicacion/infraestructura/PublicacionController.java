@@ -22,7 +22,7 @@ public class PublicacionController {
     /**
      * Crear publicacion (POST /publicacion)
      */
-    @PostMapping
+    @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<PublicacionResponse> crearPublicacion(@Valid @RequestBody PublicacionRequest publicacionRequest){
         PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest);
@@ -32,7 +32,7 @@ public class PublicacionController {
     /**
      * Obtener publicaciones por paginas, definiendo el numero de la pagina y su tamaño (GET /publicacion)
      */
-    @GetMapping
+    @GetMapping("/lista")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -45,7 +45,7 @@ public class PublicacionController {
     /**
      * Obtener una sola publicación por su ID (GET /publicacion/{id})
      */
-    @GetMapping("/{id}")
+    @GetMapping("/obtener/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<PublicacionResponse> obtenerPublicacion(
             @PathVariable Integer id
@@ -60,7 +60,7 @@ public class PublicacionController {
     /**
      * Actualizar una publicación existente (PUT /publicacion/{id})
      */
-    @PutMapping("/{id}")
+    @PutMapping("/actualizar/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<PublicacionResponse> actualizarPublicacion(
             @PathVariable Integer id,
@@ -73,7 +73,7 @@ public class PublicacionController {
     /**
      * Eliminar una publicación por su ID (DELETE /publicacion/{id})
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminarPublicacion(
             @PathVariable Integer id
@@ -85,7 +85,7 @@ public class PublicacionController {
     /**
      * Softdelete a una publicación por su ID (PATCH /publicacion/{id})
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/softdelete/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<Void> softDeletePublicacion(
             @PathVariable Integer id
