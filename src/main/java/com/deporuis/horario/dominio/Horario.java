@@ -17,12 +17,19 @@ public class Horario {
     @Column(name = "id_horario")
     private Integer idHorario;
 
-    @Column(length = 10, nullable = false)
-    private String dia;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dia",length = 10, nullable = false, columnDefinition = "ENUM('LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO') default 'LUNES'")
+    private DiaHorario dia = DiaHorario.LUNES;
 
     @Column(name = "hora_inicio", nullable = false)
     private LocalTime horaInicio;
 
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
+
+    public Horario(DiaHorario dia, LocalTime horaInicio, LocalTime horaFin) {
+        this.dia = dia;
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
+    }
 }

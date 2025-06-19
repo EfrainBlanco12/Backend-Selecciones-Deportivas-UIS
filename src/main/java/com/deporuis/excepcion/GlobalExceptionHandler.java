@@ -3,6 +3,7 @@ package com.deporuis.excepcion;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +58,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,String>> handleBadRequest(BadRequestException ex) {
         Map<String,String> body = Map.of("error", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    // Valida si los datos vienen con el formato correcto
+    @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<?> handleInvalidFormatException(InvalidFormatException ex) {
+        Map<String, String> error = new HashMap<>();
+
+        if (ex.getTargetType().isEnum()) {
+            Object[] valores = ex.getTargetType().getEnumConstants();
+            error.put("error", "Valor inválido para el campo enum.");
+            error.put("valores_permitidos", Arrays.toString(valores));
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        // Otros casos
+        error.put("error", "Formato inválido en el JSON.");
+        error.put("detalle", ex.getOriginalMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
 

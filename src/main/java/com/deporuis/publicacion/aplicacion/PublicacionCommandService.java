@@ -40,7 +40,7 @@ public class PublicacionCommandService {
     @Autowired
     private PublicacionRelacionService relacionService;
 
-    @Transactional
+    @Transactional()
     public PublicacionResponse crearPublicacion(PublicacionRequest request) {
         Publicacion publicacion = PublicacionMapper.requestToPublicacion(request);
 
@@ -58,7 +58,7 @@ public class PublicacionCommandService {
         return PublicacionMapper.toResponse(publicacion);
     }
 
-    @Transactional
+    @Transactional()
     public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
         Publicacion publicacion = verificarExistenciaService.verificarPublicacion(id);
 
@@ -111,7 +111,7 @@ public class PublicacionCommandService {
         return PublicacionMapper.toResponse(actualizada);
     }
 
-    @Transactional
+    @Transactional()
     public void eliminarPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaService.verificarPublicacion(id);
 
@@ -120,7 +120,7 @@ public class PublicacionCommandService {
         publicacionRepository.delete(publicacion);
     }
 
-    @Transactional
+    @Transactional()
     public void softDeletePublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaService.verificarPublicacion(id);
 
