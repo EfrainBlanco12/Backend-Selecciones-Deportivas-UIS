@@ -1,5 +1,6 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
+import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,5 +33,5 @@ public class PublicacionRequest {
     private List<Integer> selecciones;
 
     @NotNull(message = "Debe elegir al menos una foto")
-    private List<Integer> fotos;
+    private List<FotoRequest> fotos;
 }

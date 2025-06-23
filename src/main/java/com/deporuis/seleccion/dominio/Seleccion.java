@@ -1,11 +1,13 @@
 package com.deporuis.seleccion.dominio;
 
+import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.deporte.dominio.Deporte;
 import com.deporuis.integrante.dominio.Integrante;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -46,8 +48,11 @@ public class Seleccion {
     private List<SeleccionLogro> logros;
 
     @OneToMany(mappedBy = "seleccion")
-    private List<SeleccionFoto> fotos;
+    private List<Foto> fotos = new ArrayList<>();
 
     @OneToMany(mappedBy = "seleccion")
     private List<SeleccionHorario> horarios;
+
+    @OneToMany(mappedBy = "seleccion")
+    private List<SeleccionPublicacion> publicaciones = new ArrayList<>();
 }

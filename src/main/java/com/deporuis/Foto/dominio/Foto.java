@@ -1,6 +1,8 @@
 package com.deporuis.Foto.dominio;
 
 import com.deporuis.integrante.dominio.Integrante;
+import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.seleccion.dominio.Seleccion;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +28,16 @@ public class Foto {
     // Relación inversa con Integrantes
     @OneToOne(mappedBy = "foto")
     private Integrante integrante;
+
+    // Relación con Selección
+    @ManyToOne
+    @JoinColumn(name = "id_seleccion")
+    private Seleccion seleccion;
+
+    // Relación con Publicación
+    @ManyToOne
+    @JoinColumn(name = "id_publicacion")
+    private Publicacion publicacion;
 
     public Foto(byte[] contenido, Integer temporada) {
         this.contenido = contenido;

@@ -1,10 +1,12 @@
 package com.deporuis.publicacion.dominio;
 
 import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.seleccion.dominio.SeleccionPublicacion;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,8 +42,14 @@ public class Publicacion {
     @Column(name = "tipo_publicacion", nullable = false, columnDefinition = "ENUM('NOTICIA', 'EVENTO') default 'NOTICIA'")
     private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
 
-    //Creacion de una publicacion
+    // Relación con Foto
+    @OneToMany(mappedBy = "publicacion")
+    private List<Foto> fotos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "publicacion")
+    private List<SeleccionPublicacion> selecciones = new ArrayList<>();
+
+    //Creacion de una publicacion
     public Publicacion(String titulo, String descripcion, String lugar, LocalDateTime fecha, String duracion, TipoPublicacion tipoPublicacion) {
         this.titulo = titulo;
         this.descripcion = descripcion;

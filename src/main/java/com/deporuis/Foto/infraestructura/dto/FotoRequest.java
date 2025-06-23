@@ -11,4 +11,8 @@ public class FotoRequest {
 
     @NotNull(message = "Debe haber al menos una temporada")
     private Integer temporada;
+
+    private Integer idPublicacion;
+
+    private Integer idSeleccion;
 }
