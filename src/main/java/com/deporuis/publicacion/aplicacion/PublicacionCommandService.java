@@ -6,34 +6,22 @@ import com.deporuis.publicacion.aplicacion.helper.PublicacionRelacionService;
 import com.deporuis.publicacion.aplicacion.helper.PublicacionVerificarExistenciaService;
 import com.deporuis.publicacion.aplicacion.mapper.PublicacionMapper;
 import com.deporuis.publicacion.dominio.Publicacion;
-import com.deporuis.publicacion.dominio.PublicacionFoto;
-import com.deporuis.publicacion.infraestructura.PublicacionFotoRepository;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionPublicacion;
-import com.deporuis.seleccion.infraestructura.SeleccionPublicacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class PublicacionCommandService {
 
     @Autowired
     private PublicacionRepository publicacionRepository;
-
-    @Autowired
-    private SeleccionPublicacionRepository seleccionPublicacionRepository;
-
-    @Autowired
-    private PublicacionFotoRepository publicacionFotoRepository;
 
     @Autowired
     private PublicacionVerificarExistenciaService verificarExistenciaService;
@@ -47,16 +35,15 @@ public class PublicacionCommandService {
     @Transactional()
     public PublicacionResponse crearPublicacion(PublicacionRequest request) {
         Publicacion publicacion = PublicacionMapper.requestToPublicacion(request);
-
-        List<Seleccion> selecciones = verificarExistenciaService.verificarSelecciones(request.getSelecciones());
-
         publicacion = publicacionRepository.save(publicacion);
 
+        List<Seleccion> selecciones = verificarExistenciaService.verificarSelecciones(request.getSelecciones());
         List<SeleccionPublicacion> relacionesSeleccion = relacionService.crearRelacionesSeleccion(publicacion, selecciones);
-        seleccionPublicacionRepository.saveAll(relacionesSeleccion);
 
         List<Foto> fotosCreadas = fotoCommandService.crearFotosPublicacion(request.getFotos(), publicacion);
         List<Foto> fotos = verificarExistenciaService.verificarFotos(fotosCreadas.stream().map(Foto::getIdFoto).toList());
+
+        publicacion.setSelecciones(relacionesSeleccion);
         publicacion.setFotos(fotos);
 
         return PublicacionMapper.toResponse(publicacion);
@@ -119,8 +106,8 @@ public class PublicacionCommandService {
     public void eliminarPublicacion(Integer id) {
         Publicacion publicacion = verificarExistenciaService.verificarPublicacion(id);
 
-        seleccionPublicacionRepository.deleteAll(seleccionPublicacionRepository.findAllByPublicacion(publicacion));
-        publicacionFotoRepository.deleteAll(publicacionFotoRepository.findAllByPublicacion(publicacion));
+        relacionService.eliminarRelacionesSeleccion(publicacion);
+//        publicacionFotoRepository.deleteAll(publicacionFotoRepository.findAllByPublicacion(publicacion));
         publicacionRepository.delete(publicacion);
     }
 

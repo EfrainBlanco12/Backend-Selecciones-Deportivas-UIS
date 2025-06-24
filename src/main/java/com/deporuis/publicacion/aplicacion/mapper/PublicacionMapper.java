@@ -1,5 +1,6 @@
 package com.deporuis.publicacion.aplicacion.mapper;
 
+import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
@@ -14,7 +15,9 @@ public class PublicacionMapper {
                 p.getLugar(),
                 p.getFecha(),
                 p.getDuracion(),
-                p.getTipoPublicacion()
+                p.getTipoPublicacion(),
+                p.getSelecciones().stream().map(seleccionPublicacion -> seleccionPublicacion.getSeleccion().getIdSeleccion()).toList(),
+                p.getFotos().stream().map(Foto::getIdFoto).toList()
         );
     }
 

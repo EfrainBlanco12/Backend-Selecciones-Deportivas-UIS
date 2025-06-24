@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,4 +25,7 @@ public class PublicacionResponse {
 
     private TipoPublicacion tipoPublicacion;
 
+    private List<Integer> selecciones;
+
+    private List<Integer> fotos;
 }
