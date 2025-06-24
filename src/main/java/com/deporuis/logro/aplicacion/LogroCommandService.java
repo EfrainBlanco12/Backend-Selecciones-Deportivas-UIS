@@ -32,9 +32,6 @@ public class LogroCommandService {
     @Autowired
     private LogroRelacionService logroRelacionService;
 
-    @Autowired
-    private SeleccionLogroRepository seleccionLogroRepository;
-
     @Transactional()
     public LogroResponse crearLogro(LogroRequest logroRequest) {
         Logro logro = LogroMapper.requestToLogro(logroRequest);
@@ -45,7 +42,7 @@ public class LogroCommandService {
 
         List<SeleccionLogro> relacionesSeleccion = logroRelacionService.crearRelacionesSeleccion(logro, selecciones);
 
-        seleccionLogroRepository.saveAll(relacionesSeleccion);
+        logro.setSelecciones(relacionesSeleccion);
 
         return LogroMapper.toResponse(logro);
     }
@@ -59,25 +56,10 @@ public class LogroCommandService {
         logro.setDescripcionLogro(logroRequest.getDescripcionLogro());
 
         List<Integer> idSelecciones = logroRequest.getSelecciones();
-
         List<Seleccion> nuevasSelecciones = logroVerificarExistenciaService.verificarSelecciones(idSelecciones);
+        List<SeleccionLogro> relacionesSeleccion = logroRelacionService.actualizarRelacionesSeleccion(logro, nuevasSelecciones, idSelecciones);
 
-        List<SeleccionLogro> actualesSeleccion = seleccionLogroRepository.findAllByLogro(logro);
-
-        Set<Integer> actualesIdsSeleccion = actualesSeleccion.stream()
-                .map(sp -> sp.getSeleccion().getIdSeleccion())
-                .collect(Collectors.toSet());
-        Set<Integer> nuevasIdsSeleccion = new HashSet<>(idSelecciones);
-
-        List<SeleccionLogro> toRemoveSeleccion = actualesSeleccion.stream()
-                .filter(sp -> !nuevasIdsSeleccion.contains(sp.getSeleccion().getIdSeleccion()))
-                .collect(Collectors.toList());
-        seleccionLogroRepository.deleteAll(toRemoveSeleccion);
-
-        List<Seleccion> seleccionesToAdd = nuevasSelecciones.stream()
-                .filter(s -> !actualesIdsSeleccion.contains(s.getIdSeleccion()))
-                .collect(Collectors.toList());
-        seleccionLogroRepository.saveAll(logroRelacionService.crearRelacionesSeleccion(logro, seleccionesToAdd));
+        logro.setSelecciones(relacionesSeleccion);
 
         Logro actualizada = logroRepository.save(logro);
         return LogroMapper.toResponse(actualizada);
@@ -87,7 +69,7 @@ public class LogroCommandService {
     public void eliminarLogro(Integer id) {
         Logro logro = logroVerificarExistenciaService.verificarLogro(id);
 
-        seleccionLogroRepository.deleteAll(seleccionLogroRepository.findAllByLogro(logro));
+        logroRelacionService.eliminarRelacionesSeleccion(logro);
 
         logroRepository.delete(logro);
     }
