@@ -37,15 +37,16 @@ public class PublicacionVerificarExistenciaService {
         return selecciones;
     }
 
-    public List<Foto> verificarFotos(List<Integer> idFotos) {
+    public List<Foto> verificarFotos(List<Foto> fotos) {
+        List<Integer> idFotos = fotos.stream().map(Foto::getIdFoto).toList();
         if (idFotos.isEmpty()) {
             throw new BadRequestException("Debe haber al menos una foto");
         }
-        List<Foto> fotos = fotoRepository.findAllById(idFotos);
-        if (fotos.size() != idFotos.size()) {
+        List<Foto> fotosEncontradas = fotoRepository.findAllById(idFotos);
+        if (fotosEncontradas.size() != idFotos.size()) {
             throw new BadRequestException("Alguna foto no existe");
         }
-        return fotos;
+        return fotosEncontradas;
     }
 
     public Publicacion verificarPublicacion(Integer id) {

@@ -32,4 +32,8 @@ public class FotoCommandService {
 
         return fotoRepository.saveAll(nuevasFotos);
     }
+
+    public void eliminarFotosPublicacion(Publicacion publicacion) {
+        fotoRepository.deleteAll(fotoRepository.findAllByPublicacion(publicacion));
+    }
 }
