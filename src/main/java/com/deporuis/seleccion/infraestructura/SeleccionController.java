@@ -9,17 +9,13 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/selecciones")  // más semántico en plural
+@RequestMapping("/private/seleccion")  // más semántico en plural
 public class SeleccionController {
 
-    private final SeleccionService seleccionService;
-
     @Autowired
-    public SeleccionController(SeleccionService seleccionService) {
-        this.seleccionService = seleccionService;
-    }
+    private SeleccionService seleccionService;
 
-    @PostMapping
+    @PostMapping("/crear")
     public ResponseEntity<SeleccionResponse> crearSeleccion(@Valid @RequestBody SeleccionRequest seleccionRequest) {
         SeleccionResponse response = seleccionService.crearSeleccion(seleccionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

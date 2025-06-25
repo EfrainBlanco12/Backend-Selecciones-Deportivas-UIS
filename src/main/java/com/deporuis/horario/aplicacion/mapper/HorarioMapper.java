@@ -4,6 +4,8 @@ import com.deporuis.horario.dominio.Horario;
 import com.deporuis.horario.infraestructura.dto.HorarioRequest;
 import com.deporuis.horario.infraestructura.dto.HorarioResponse;
 
+import java.util.List;
+
 public class HorarioMapper {
 
     public static Horario requestToHorario(HorarioRequest request) {
@@ -12,6 +14,12 @@ public class HorarioMapper {
                 request.getHoraInicio(),
                 request.getHoraFin()
         );
+    }
+
+    public static List<Horario> requestToHorariosSeleccion(List<HorarioRequest> horarioRequest) {
+        return horarioRequest.stream()
+                .map(HorarioMapper::requestToHorario)
+                .toList();
     }
 
     public static HorarioResponse toResponse(Horario horario) {

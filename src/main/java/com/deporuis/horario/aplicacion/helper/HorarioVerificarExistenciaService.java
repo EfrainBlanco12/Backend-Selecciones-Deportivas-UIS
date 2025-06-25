@@ -28,4 +28,16 @@ public class HorarioVerificarExistenciaService {
 
         return horarioOptional.get();
     }
+
+    public List<Horario> verificarHorarios(List<Horario> horarios) {
+        List<Integer> idHorarios = horarios.stream().map(Horario::getIdHorario).toList();
+        if (idHorarios.isEmpty()) {
+            throw new BadRequestException("Debe haber al menos un horario");
+        }
+        List<Horario> horariosEncontrados = horarioRepository.findAllById(idHorarios);
+        if (horariosEncontrados.size() != idHorarios.size()) {
+            throw new BadRequestException("Algun horario no existe");
+        }
+        return horariosEncontrados;
+    }
 }

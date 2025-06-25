@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 public class HorarioCommandService {
@@ -26,6 +28,13 @@ public class HorarioCommandService {
 
         horario = horarioRepository.save(horario);
         return HorarioMapper.toResponse(horario);
+    }
+
+    @Transactional()
+    public List<Horario> crearHorariosSeleccion(List<HorarioRequest> horarioRequest) {
+        List<Horario> nuevosHorarios = HorarioMapper.requestToHorariosSeleccion(horarioRequest);
+
+        return horarioRepository.saveAll(nuevosHorarios);
     }
 
     @Transactional()

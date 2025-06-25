@@ -4,6 +4,7 @@ import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.seleccion.dominio.Seleccion;
 
 import java.util.List;
 
@@ -12,6 +13,15 @@ public class FotoMapper {
         return new Foto(
                 fotoRequest.getContenido(),
                 fotoRequest.getTemporada()
+        );
+    }
+
+
+    public static FotoResponse toResponse(Foto foto) {
+        return new FotoResponse(
+                foto.getIdFoto(),
+                foto.getContenido(),
+                foto.getTemporada()
         );
     }
 
@@ -27,11 +37,15 @@ public class FotoMapper {
                 .toList();
     }
 
-    public static FotoResponse toResponse(Foto foto) {
-        return new FotoResponse(
-                foto.getIdFoto(),
-                foto.getContenido(),
-                foto.getTemporada()
-        );
+    public static List<Foto> requesToFotosSeleccion(List<FotoRequest> fotos, Seleccion seleccion) {
+        return fotos.stream()
+                .map(fotoRequest -> {
+                    Foto foto = new Foto();
+                    foto.setContenido(fotoRequest.getContenido());
+                    foto.setTemporada(fotoRequest.getTemporada());
+                    foto.setSeleccion(seleccion);
+                    return foto;
+                })
+                .toList();
     }
 }

@@ -55,4 +55,13 @@ public class Seleccion {
 
     @OneToMany(mappedBy = "seleccion")
     private List<SeleccionPublicacion> publicaciones = new ArrayList<>();
+
+    // Creacion de una seleccion
+    public Seleccion(LocalDate fechaCreacion, String nombreSeleccion, String espacioDeportivo, Boolean equipo, TipoSeleccion tipo_seleccion) {
+        this.fechaCreacion = fechaCreacion;
+        this.nombreSeleccion = nombreSeleccion;
+        this.espacioDeportivo = espacioDeportivo;
+        this.equipo = equipo;
+        this.tipo_seleccion = tipo_seleccion;
+    }
 }

@@ -7,6 +7,7 @@ import com.deporuis.deporte.infraestructura.dto.DeporteRequest;
 import com.deporuis.deporte.infraestructura.dto.DeporteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ public class DeporteService {
     @Autowired
     private DeporteRepository deporteRepository;
 
+    @Transactional()
     public DeporteResponse crearDeporte(DeporteRequest deporteRequest) {
         String nombre = deporteRequest.getNombreDeporte().toLowerCase();
 

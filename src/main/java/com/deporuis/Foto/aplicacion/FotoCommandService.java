@@ -6,6 +6,7 @@ import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.seleccion.dominio.Seleccion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,15 @@ public class FotoCommandService {
         return fotoRepository.saveAll(nuevasFotos);
     }
 
+    @Transactional()
     public void eliminarFotosPublicacion(Publicacion publicacion) {
         fotoRepository.deleteAll(fotoRepository.findAllByPublicacion(publicacion));
+    }
+
+    @Transactional()
+    public List<Foto> crearFotosSeleccion(List<FotoRequest> fotos, Seleccion seleccion) {
+        List<Foto> nuevasFotos = FotoMapper.requesToFotosSeleccion(fotos, seleccion);
+
+        return fotoRepository.saveAll(nuevasFotos);
     }
 }
