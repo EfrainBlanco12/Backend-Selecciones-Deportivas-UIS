@@ -69,7 +69,7 @@ public class PublicacionCommandService {
         List<Foto> fotos = verificarExistenciaService.verificarFotos(nuevasFotos);
 
         publicacion.setSelecciones(relacionesSeleccion);
-        publicacion.setFotos(nuevasFotos);
+        publicacion.setFotos(fotos);
 
         Publicacion actualizada = publicacionRepository.save(publicacion);
         return PublicacionMapper.toResponse(actualizada);

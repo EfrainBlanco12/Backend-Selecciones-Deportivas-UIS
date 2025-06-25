@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,4 +17,6 @@ public class HorarioResponse {
     private LocalTime horaInicio;
 
     private LocalTime horaFin;
+
+    private List<Integer> selecciones;
 }

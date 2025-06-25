@@ -1,9 +1,12 @@
 package com.deporuis.horario.dominio;
 
+import com.deporuis.seleccion.dominio.SeleccionHorario;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Horarios")
@@ -26,6 +29,9 @@ public class Horario {
 
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
+
+    @OneToMany(mappedBy = "horario")
+    private List<SeleccionHorario> selecciones = new ArrayList<>();
 
     public Horario(DiaHorario dia, LocalTime horaInicio, LocalTime horaFin) {
         this.dia = dia;

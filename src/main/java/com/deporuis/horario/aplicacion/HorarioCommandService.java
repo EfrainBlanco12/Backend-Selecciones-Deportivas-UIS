@@ -1,5 +1,6 @@
 package com.deporuis.horario.aplicacion;
 
+import com.deporuis.horario.aplicacion.helper.HorarioVerificarExistenciaService;
 import com.deporuis.horario.aplicacion.mapper.HorarioMapper;
 import com.deporuis.horario.dominio.Horario;
 import com.deporuis.horario.infraestructura.HorarioRepository;
@@ -9,11 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class HorarioCommandService {
 
     @Autowired
     private HorarioRepository horarioRepository;
+
+    @Autowired
+    private HorarioVerificarExistenciaService horarioVerificarExistenciaService;
 
     @Transactional()
     public HorarioResponse crearHorario(HorarioRequest horarioRequest) {
@@ -21,5 +26,12 @@ public class HorarioCommandService {
 
         horario = horarioRepository.save(horario);
         return HorarioMapper.toResponse(horario);
+    }
+
+    @Transactional()
+    public void eliminarHorario(Integer id) {
+        Horario horario = horarioVerificarExistenciaService.verificarHorario(id);
+
+        horarioRepository.delete(horario);
     }
 }

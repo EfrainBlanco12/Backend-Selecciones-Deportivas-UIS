@@ -19,7 +19,8 @@ public class HorarioMapper {
                 horario.getIdHorario(),
                 horario.getDia(),
                 horario.getHoraInicio(),
-                horario.getHoraFin()
+                horario.getHoraFin(),
+                horario.getSelecciones().stream().map(seleccionHorario -> seleccionHorario.getSeleccion().getIdSeleccion()).toList()
         );
     }
 }

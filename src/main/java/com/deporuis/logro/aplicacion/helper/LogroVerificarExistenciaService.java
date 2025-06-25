@@ -4,6 +4,7 @@ import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.logro.dominio.Logro;
 import com.deporuis.logro.excepciones.LogroNotFoundExcepcion;
 import com.deporuis.logro.infraestructura.LogroRepository;
+import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +17,13 @@ import java.util.Optional;
 public class LogroVerificarExistenciaService {
 
     @Autowired
-    private SeleccionRepository seleccionRepository;
-
-    @Autowired
     private LogroRepository logroRepository;
 
+    @Autowired
+    private SeleccionVerificarExistenciaService seleccionVerificarExistenciaService;
+
     public List<Seleccion> verificarSelecciones(List<Integer> idSelecciones) {
-        if (idSelecciones.isEmpty()) {
-            throw new BadRequestException("Debe haber al menos una seleccion");
-        }
-        List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
-        if (selecciones.size() != idSelecciones.size()) {
-            throw new BadRequestException("Alguna seleccion no existe");
-        }
-        return selecciones;
+        return seleccionVerificarExistenciaService.verificarSelecciones(idSelecciones);
     }
 
     public Logro verificarLogro(Integer id) {

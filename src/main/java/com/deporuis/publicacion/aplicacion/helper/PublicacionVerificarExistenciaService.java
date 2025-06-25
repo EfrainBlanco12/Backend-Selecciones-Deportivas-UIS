@@ -1,11 +1,13 @@
 package com.deporuis.publicacion.aplicacion.helper;
 
+import com.deporuis.Foto.aplicacion.helper.FotoVerificarExistenciaService;
 import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.excepciones.PublicacionNotFoundException;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
+import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,35 +20,20 @@ import java.util.Optional;
 public class PublicacionVerificarExistenciaService {
 
     @Autowired
-    private SeleccionRepository seleccionRepository;
-
-    @Autowired
-    private FotoRepository fotoRepository;
-
-    @Autowired
     private PublicacionRepository publicacionRepository;
 
+    @Autowired
+    private SeleccionVerificarExistenciaService seleccionVerificarExistenciaService;
+
+    @Autowired
+    private FotoVerificarExistenciaService fotoVerificarExistenciaService;
+
     public List<Seleccion> verificarSelecciones(List<Integer> idSelecciones) {
-        if (idSelecciones.isEmpty()) {
-            throw new BadRequestException("Debe haber al menos una seleccion");
-        }
-        List<Seleccion> selecciones = seleccionRepository.findAllById(idSelecciones);
-        if (selecciones.size() != idSelecciones.size()) {
-            throw new BadRequestException("Alguna seleccion no existe");
-        }
-        return selecciones;
+        return seleccionVerificarExistenciaService.verificarSelecciones(idSelecciones);
     }
 
     public List<Foto> verificarFotos(List<Foto> fotos) {
-        List<Integer> idFotos = fotos.stream().map(Foto::getIdFoto).toList();
-        if (idFotos.isEmpty()) {
-            throw new BadRequestException("Debe haber al menos una foto");
-        }
-        List<Foto> fotosEncontradas = fotoRepository.findAllById(idFotos);
-        if (fotosEncontradas.size() != idFotos.size()) {
-            throw new BadRequestException("Alguna foto no existe");
-        }
-        return fotosEncontradas;
+        return fotoVerificarExistenciaService.verificarFotos(fotos);
     }
 
     public Publicacion verificarPublicacion(Integer id) {
