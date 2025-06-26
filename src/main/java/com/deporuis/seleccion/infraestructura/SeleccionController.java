@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/private/seleccion")  // más semántico en plural
+@RequestMapping("/private/seleccion")
 public class SeleccionController {
 
     @Autowired
@@ -55,8 +55,14 @@ public class SeleccionController {
         return ResponseEntity.ok(seleccion);
     }
 
-//    @DeleteMapping("/eliminar/{id}")
-//    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> eliminarSeleccion(
+            @PathVariable Integer id
+    ) {
+        seleccionService.eliminarSeleccion(id);
+        return ResponseEntity.noContent().build();
+    }
 //
 //    @PatchMapping("/softdelete/{id}")
 //    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")

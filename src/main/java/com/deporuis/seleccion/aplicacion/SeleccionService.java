@@ -37,4 +37,9 @@ public class SeleccionService {
     public SeleccionResponse obtenerSeleccion(Integer id) {
         return seleccionQueryService.obtenerSeleccion(id);
     }
+
+    @Transactional()
+    public void eliminarSeleccion(Integer id) {
+        seleccionCommandService.eliminarSeleccion(id);
+    }
 }

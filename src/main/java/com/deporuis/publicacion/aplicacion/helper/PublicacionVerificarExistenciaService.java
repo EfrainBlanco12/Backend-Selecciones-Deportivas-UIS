@@ -12,6 +12,7 @@ import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class PublicacionVerificarExistenciaService {
         return fotoVerificarExistenciaService.verificarFotos(fotos);
     }
 
+    @Transactional(readOnly = true)
     public Publicacion verificarPublicacion(Integer id) {
         Optional<Publicacion> publicacionOptional = publicacionRepository.findById(id);
 

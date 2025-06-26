@@ -58,4 +58,14 @@ public class SeleccionCommandService {
 
         return SeleccionMapper.seleccionToResponse(seleccion);
     }
+
+    @Transactional()
+    public void eliminarSeleccion(Integer id) {
+        Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
+
+        seleccionRelacionService.eliminarRelacionesSeleccion(seleccion);
+        fotoCommandService.eliminarFotosSeleccion(seleccion);
+
+        seleccionRepository.delete(seleccion);
+    }
 }

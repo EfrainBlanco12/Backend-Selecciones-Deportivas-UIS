@@ -6,6 +6,7 @@ import com.deporuis.seleccion.dominio.SeleccionLogro;
 import com.deporuis.seleccion.infraestructura.SeleccionLogroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ public class LogroRelacionService {
     @Autowired
     private SeleccionLogroRepository seleccionLogroRepository;
 
+    @Transactional()
     public List<SeleccionLogro> crearRelacionesSeleccion(Logro logro, List<Seleccion> selecciones) {
         List<SeleccionLogro> seleccionesLogros = selecciones.stream()
                 .map(seleccion -> {
@@ -30,6 +32,7 @@ public class LogroRelacionService {
         return seleccionLogroRepository.saveAll(seleccionesLogros);
     }
 
+    @Transactional()
     public List<SeleccionLogro> actualizarRelacionesSeleccion(Logro logro, List<Seleccion> nuevasSelecciones, List<Integer> idSelecciones) {
         List<SeleccionLogro> actualesSeleccion = seleccionLogroRepository.findAllByLogro(logro);
 
@@ -51,6 +54,7 @@ public class LogroRelacionService {
         return seleccionLogroRepository.findAllByLogro(logro);
     }
 
+    @Transactional()
     public void eliminarRelacionesSeleccion(Logro logro) {
         seleccionLogroRepository.deleteAll(seleccionLogroRepository.findAllByLogro(logro));
     }

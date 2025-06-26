@@ -5,11 +5,9 @@ import com.deporuis.horario.dominio.DiaHorario;
 import com.deporuis.horario.dominio.Horario;
 import com.deporuis.horario.excepciones.HorarioNotFoundException;
 import com.deporuis.horario.infraestructura.HorarioRepository;
-import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
-import com.deporuis.seleccion.dominio.Seleccion;
-import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -21,6 +19,7 @@ public class HorarioVerificarExistenciaService {
     @Autowired
     private HorarioRepository horarioRepository;
 
+    @Transactional(readOnly = true)
     public Horario verificarHorario(Integer id) {
         Optional<Horario> horarioOptional = horarioRepository.findById(id);
 
@@ -31,6 +30,7 @@ public class HorarioVerificarExistenciaService {
         return horarioOptional.get();
     }
 
+    @Transactional(readOnly = true)
     public List<Horario> verificarHorarios(List<Horario> horarios) {
         List<Integer> idHorarios = horarios.stream().map(Horario::getIdHorario).toList();
         if (idHorarios.isEmpty()) {
@@ -43,6 +43,7 @@ public class HorarioVerificarExistenciaService {
         return horariosEncontrados;
     }
 
+    @Transactional(readOnly = true)
     public List<Horario> verificarHorarioDuplicado(DiaHorario dia, LocalTime horaInicio, LocalTime horaFin) {
         return horarioRepository.findByDiaAndHoraInicioAndHoraFin(dia, horaInicio, horaFin);
     }

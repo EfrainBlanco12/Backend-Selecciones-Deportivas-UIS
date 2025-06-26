@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service
 public class HorarioCommandService {
 
@@ -34,7 +33,7 @@ public class HorarioCommandService {
     @Transactional()
     public List<Horario> obtenerOcrearHorariosSeleccion(List<HorarioRequest> horarioRequest) {
         List<Horario> horarios = HorarioMapper.requestToHorariosSeleccion(horarioRequest);
-//        return horarioRepository.saveAll(horarios);
+
         List<Horario> resultado = new ArrayList<>();
 
         for (Horario horario : horarios) {
@@ -57,12 +56,5 @@ public class HorarioCommandService {
             }
         }
         return resultado;
-    }
-
-    @Transactional()
-    public void eliminarHorario(Integer id) {
-        Horario horario = horarioVerificarExistenciaService.verificarHorario(id);
-
-        horarioRepository.delete(horario);
     }
 }

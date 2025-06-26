@@ -9,6 +9,7 @@ import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class LogroVerificarExistenciaService {
         return seleccionVerificarExistenciaService.verificarSelecciones(idSelecciones);
     }
 
+    @Transactional(readOnly = true)
     public Logro verificarLogro(Integer id) {
         Optional<Logro> logroOptional = logroRepository.findById(id);
 

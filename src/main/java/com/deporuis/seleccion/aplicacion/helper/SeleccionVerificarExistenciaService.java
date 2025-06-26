@@ -12,6 +12,7 @@ import com.deporuis.seleccion.excepciones.SeleccionNotFoundException;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class SeleccionVerificarExistenciaService {
     @Autowired
     private HorarioVerificarExistenciaService horarioVerificarExistenciaService;
 
+    @Transactional(readOnly = true)
     public List<Seleccion> verificarSelecciones(List<Integer> idSelecciones) {
         if (idSelecciones.isEmpty()) {
             throw new BadRequestException("Debe haber al menos una seleccion");
@@ -54,6 +56,7 @@ public class SeleccionVerificarExistenciaService {
         return horarioVerificarExistenciaService.verificarHorarios(horarios);
     }
 
+    @Transactional(readOnly = true)
     public Seleccion verificarSeleccion(Integer id) {
         Optional<Seleccion> seleccionOptional = seleccionRepository.findById(id);
 

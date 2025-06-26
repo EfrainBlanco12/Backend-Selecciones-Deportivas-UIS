@@ -45,4 +45,9 @@ public class FotoCommandService {
 
         return fotoRepository.saveAll(nuevasFotos);
     }
+
+    @Transactional()
+    public void eliminarFotosSeleccion(Seleccion seleccion) {
+        fotoRepository.deleteAll(fotoRepository.findAllBySeleccion(seleccion));
+    }
 }

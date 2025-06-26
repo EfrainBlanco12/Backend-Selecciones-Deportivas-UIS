@@ -6,6 +6,7 @@ import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.excepcion.common.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ public class FotoVerificarExistenciaService {
     @Autowired
     private FotoRepository fotoRepository;
 
+    @Transactional(readOnly = true)
     public Foto verificarFoto(Integer id) {
         Optional<Foto> fotoOptional = fotoRepository.findById(id);
 
@@ -26,6 +28,7 @@ public class FotoVerificarExistenciaService {
         return fotoOptional.get();
     }
 
+    @Transactional(readOnly = true)
     public List<Foto> verificarFotos(List<Foto> fotos) {
         List<Integer> idFotos = fotos.stream().map(Foto::getIdFoto).toList();
         if (idFotos.isEmpty()) {

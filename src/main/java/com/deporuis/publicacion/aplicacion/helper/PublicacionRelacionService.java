@@ -6,6 +6,7 @@ import com.deporuis.seleccion.dominio.SeleccionPublicacion;
 import com.deporuis.seleccion.infraestructura.SeleccionPublicacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ public class PublicacionRelacionService {
     @Autowired
     private SeleccionPublicacionRepository seleccionPublicacionRepository;
 
+    @Transactional()
     public List<SeleccionPublicacion> crearRelacionesSeleccion(Publicacion publicacion, List<Seleccion> selecciones) {
         return seleccionPublicacionRepository.saveAll(
         selecciones.stream()
@@ -31,14 +33,17 @@ public class PublicacionRelacionService {
         );
     }
 
+    @Transactional()
     public void eliminarRelacionesSeleccion(Publicacion publicacion) {
         seleccionPublicacionRepository.deleteAll(seleccionPublicacionRepository.findAllByPublicacion(publicacion));
     }
 
+    @Transactional(readOnly = true)
     public List<SeleccionPublicacion> obtenerRelacionesSeleccion(Publicacion publicacion){
         return seleccionPublicacionRepository.findAllByPublicacion(publicacion);
     }
 
+    @Transactional()
     public List<SeleccionPublicacion> actualizarRelacionesSeleccion(Publicacion publicacion, List<Seleccion> nuevasSelecciones, List<Integer> idSelecciones) {
         List<SeleccionPublicacion> actualesSeleccion = obtenerRelacionesSeleccion(publicacion);
 
