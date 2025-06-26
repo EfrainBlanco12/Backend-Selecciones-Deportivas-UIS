@@ -1,6 +1,7 @@
 package com.deporuis.horario.aplicacion.helper;
 
 import com.deporuis.excepcion.common.BadRequestException;
+import com.deporuis.horario.dominio.DiaHorario;
 import com.deporuis.horario.dominio.Horario;
 import com.deporuis.horario.excepciones.HorarioNotFoundException;
 import com.deporuis.horario.infraestructura.HorarioRepository;
@@ -10,6 +11,7 @@ import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +41,9 @@ public class HorarioVerificarExistenciaService {
             throw new BadRequestException("Algun horario no existe");
         }
         return horariosEncontrados;
+    }
+
+    public List<Horario> verificarHorarioDuplicado(DiaHorario dia, LocalTime horaInicio, LocalTime horaFin) {
+        return horarioRepository.findByDiaAndHoraInicioAndHoraFin(dia, horaInicio, horaFin);
     }
 }

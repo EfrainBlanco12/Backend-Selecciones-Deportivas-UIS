@@ -49,8 +49,8 @@ public class SeleccionCommandService {
         List<Foto> fotosCreadas = fotoCommandService.crearFotosSeleccion(request.getFotos(), seleccion);
         List<Foto> fotos = seleccionVerificarExistenciaService.verificarFotos(fotosCreadas);
 
-        List<Horario> horariosCreados = horarioCommandService.crearHorariosSeleccion(request.getHorarios());
-        List<Horario> horarios = seleccionVerificarExistenciaService.verificarHorarios(horariosCreados);
+        List<Horario> horariosSeleccion = horarioCommandService.obtenerOcrearHorariosSeleccion(request.getHorarios());
+        List<Horario> horarios = seleccionVerificarExistenciaService.verificarHorarios(horariosSeleccion);
         List<SeleccionHorario> relacionesHorario = seleccionRelacionService.crearRelacionesHorarios(seleccion, horarios);
 
         seleccion.setFotos(fotos);
