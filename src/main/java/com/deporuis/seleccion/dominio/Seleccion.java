@@ -37,6 +37,8 @@ public class Seleccion {
     @Column(nullable = false, columnDefinition = "ENUM('MASCULINO', 'FEMENINO', 'MIXTO') default 'MIXTO'")
     private TipoSeleccion tipo_seleccion;
 
+    private Boolean visibilidad = true;
+
     @ManyToOne
     @JoinColumn(name = "id_deporte", nullable = false)
     private Deporte deporte;
