@@ -39,10 +39,22 @@ public class SeleccionController {
         Page<SeleccionResponse> pagina = seleccionService.obtenerSeleccionesPaginadas(page, size);
         return ResponseEntity.ok(pagina);
     }
-//
-//    @GetMapping("/obtener/{id}")
-//    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
-//
+
+    /**
+     * Obtener una seleccion por su ID (GET /seleccion/{id}
+     */
+    @GetMapping("/obtener/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
+    public ResponseEntity<SeleccionResponse> obtenerSeleccion(
+            @PathVariable Integer id
+    ) {
+        SeleccionResponse seleccion = seleccionService.obtenerSeleccion(id);
+        if (seleccion == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(seleccion);
+    }
+
 //    @DeleteMapping("/eliminar/{id}")
 //    @PreAuthorize("hasRole('ADMINISTRADOR')")
 //

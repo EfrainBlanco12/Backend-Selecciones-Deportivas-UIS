@@ -8,11 +8,13 @@ import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.horario.aplicacion.helper.HorarioVerificarExistenciaService;
 import com.deporuis.horario.dominio.Horario;
 import com.deporuis.seleccion.dominio.Seleccion;
+import com.deporuis.seleccion.excepciones.SeleccionNotFoundException;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SeleccionVerificarExistenciaService {
@@ -50,5 +52,21 @@ public class SeleccionVerificarExistenciaService {
 
     public List<Horario> verificarHorarios(List<Horario> horarios) {
         return horarioVerificarExistenciaService.verificarHorarios(horarios);
+    }
+
+    public Seleccion verificarSeleccion(Integer id) {
+        Optional<Seleccion> seleccionOptional = seleccionRepository.findById(id);
+
+        if (seleccionOptional.isEmpty()) {
+            throw new SeleccionNotFoundException("No se encontro Seleccion con ID = " + id);
+        }
+
+        Seleccion seleccion = seleccionOptional.get();
+
+        if (!Boolean.TRUE.equals(seleccion.getVisibilidad()))  {
+            throw new SeleccionNotFoundException("La seleccion no esta disponible");
+        }
+
+        return seleccion;
     }
 }

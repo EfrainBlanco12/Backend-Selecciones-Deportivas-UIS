@@ -1,4 +1,9 @@
 package com.deporuis.seleccion.excepciones;
 
-public class SeleccionNotFoundException {
+import com.deporuis.excepcion.common.ResourceNotFoundException;
+
+public class SeleccionNotFoundException extends ResourceNotFoundException {
+    public SeleccionNotFoundException(String msg) {
+        super(msg);
+    }
 }

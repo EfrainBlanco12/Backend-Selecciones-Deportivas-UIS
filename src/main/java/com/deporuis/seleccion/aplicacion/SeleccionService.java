@@ -32,4 +32,9 @@ public class SeleccionService {
     public Page<SeleccionResponse> obtenerSeleccionesPaginadas(Integer page, Integer size) {
         return seleccionQueryService.obtenerSeleccionesPaginadas(page, size);
     }
+
+    @Transactional(readOnly = true)
+    public SeleccionResponse obtenerSeleccion(Integer id) {
+        return seleccionQueryService.obtenerSeleccion(id);
+    }
 }
