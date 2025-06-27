@@ -60,6 +60,35 @@ public class SeleccionCommandService {
     }
 
     @Transactional()
+    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest) {
+        Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
+
+        seleccion.setFechaCreacion(seleccionRequest.getFechaCreacion());
+        seleccion.setNombreSeleccion(seleccionRequest.getNombreSeleccion());
+        seleccion.setEspacioDeportivo(seleccionRequest.getEspacioDeportivo());
+        seleccion.setEquipo(seleccionRequest.getEquipo());
+        seleccion.setTipo_seleccion(seleccionRequest.getTipo_seleccion());
+
+        Deporte deporte = seleccionVerificarExistenciaService.verificarDeporte(seleccionRequest.getIdDeporte());
+        seleccion.setDeporte(deporte);
+
+        fotoCommandService.eliminarFotosSeleccion(seleccion);
+        List<Foto> nuevasFotos = fotoCommandService.crearFotosSeleccion(seleccionRequest.getFotos(), seleccion);
+        nuevasFotos = seleccionVerificarExistenciaService.verificarFotos(nuevasFotos);
+        seleccion.setFotos(nuevasFotos);
+
+        seleccionRelacionService.eliminarRelacionesSeleccion(seleccion);
+        List<Horario> nuevosHorarios = horarioCommandService.obtenerOcrearHorariosSeleccion(seleccionRequest.getHorarios());
+        nuevosHorarios = seleccionVerificarExistenciaService.verificarHorarios(nuevosHorarios);
+        List<SeleccionHorario> relacionesHorario = seleccionRelacionService.crearRelacionesHorarios(seleccion, nuevosHorarios);
+        seleccion.setHorarios(relacionesHorario);
+
+        Seleccion seleccionActualizada = seleccionRepository.save(seleccion);
+
+        return SeleccionMapper.seleccionToResponse(seleccionActualizada);
+    }
+
+    @Transactional()
     public void eliminarSeleccion(Integer id) {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
 
@@ -76,4 +105,6 @@ public class SeleccionCommandService {
         seleccion.setVisibilidad(false);
         seleccionRepository.save(seleccion);
     }
+
+
 }

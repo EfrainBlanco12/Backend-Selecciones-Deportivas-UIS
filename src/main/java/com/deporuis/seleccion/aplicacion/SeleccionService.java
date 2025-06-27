@@ -9,6 +9,7 @@ import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,10 @@ public class SeleccionService {
     @Transactional()
     public void softDeleteSeleccion(Integer id) {
         seleccionCommandService.softDeleteSeleccion(id);
+    }
+
+    @Transactional()
+    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest) {
+        return seleccionCommandService.actualizarSeleccion(id, seleccionRequest);
     }
 }

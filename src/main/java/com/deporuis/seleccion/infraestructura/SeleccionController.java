@@ -55,6 +55,9 @@ public class SeleccionController {
         return ResponseEntity.ok(seleccion);
     }
 
+    /**
+     * Elimina una seleccion por su ID (DELETE /seleccion)
+     */
     @DeleteMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminarSeleccion(
@@ -64,6 +67,9 @@ public class SeleccionController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Hace soft delete sobre una seleccion por su ID (PATCH /seleccion)
+     */
     @PatchMapping("/softdelete/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<Void> softDeleteSeleccion(
@@ -73,6 +79,17 @@ public class SeleccionController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PutMapping("/actualizar/{id}")
-//    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    /**
+     * Actualiza una seleccion por su ID, cambiando sus fotos y las relaciones correspondientes a los horarios
+     * (PUT /seleccion)
+     */
+    @PutMapping("/actualizar/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<SeleccionResponse> actualizarSeleccion(
+            @PathVariable Integer id,
+            @Valid @RequestBody SeleccionRequest seleccionRequest
+    ){
+        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccion(id, seleccionRequest);
+        return ResponseEntity.ok(seleccionActualizada);
+    }
 }
