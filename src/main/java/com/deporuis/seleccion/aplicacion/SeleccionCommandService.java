@@ -68,4 +68,12 @@ public class SeleccionCommandService {
 
         seleccionRepository.delete(seleccion);
     }
+
+    @Transactional()
+    public void softDeleteSeleccion(Integer id) {
+        Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
+
+        seleccion.setVisibilidad(false);
+        seleccionRepository.save(seleccion);
+    }
 }

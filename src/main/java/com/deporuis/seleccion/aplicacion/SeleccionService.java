@@ -42,4 +42,9 @@ public class SeleccionService {
     public void eliminarSeleccion(Integer id) {
         seleccionCommandService.eliminarSeleccion(id);
     }
+
+    @Transactional()
+    public void softDeleteSeleccion(Integer id) {
+        seleccionCommandService.softDeleteSeleccion(id);
+    }
 }

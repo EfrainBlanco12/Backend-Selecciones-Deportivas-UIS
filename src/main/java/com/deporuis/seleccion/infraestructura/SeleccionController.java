@@ -63,10 +63,16 @@ public class SeleccionController {
         seleccionService.eliminarSeleccion(id);
         return ResponseEntity.noContent().build();
     }
-//
-//    @PatchMapping("/softdelete/{id}")
-//    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
-//
+
+    @PatchMapping("/softdelete/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Void> softDeleteSeleccion(
+            @PathVariable Integer id
+    ) {
+        seleccionService.softDeleteSeleccion(id);
+        return ResponseEntity.noContent().build();
+    }
+
 //    @PutMapping("/actualizar/{id}")
 //    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
 }
