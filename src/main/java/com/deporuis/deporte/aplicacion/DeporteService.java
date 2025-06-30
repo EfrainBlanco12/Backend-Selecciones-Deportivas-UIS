@@ -15,7 +15,7 @@ import java.util.Optional;
 public class DeporteService {
 
     @Autowired
-    private DeporteRepository deporteRepository;
+    private DeporteCommandService deporteCommandService;
 
     @Transactional()
     public DeporteResponse crearDeporte(DeporteRequest deporteRequest) {
