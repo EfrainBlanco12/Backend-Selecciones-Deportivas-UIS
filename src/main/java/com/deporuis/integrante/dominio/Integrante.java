@@ -47,6 +47,8 @@ public class Integrante {
     @Column(name = "correo_institucional", length = 100, nullable = false, unique = true)
     private String correoInstitucional;
 
+    private Boolean visibilidad = true;
+
     // Relaciones
     @ManyToOne
     @JoinColumn(name = "id_rol", nullable = false)

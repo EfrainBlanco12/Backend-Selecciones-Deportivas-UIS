@@ -31,7 +31,6 @@ public class SeleccionController {
      * Obtener selecciones por paginas, definiendo el numero de la pagina y su tamaño (GET /seleccion)
      */
     @GetMapping("/lista")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<SeleccionResponse>> obtenerSeleccionesPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "3") Integer size
@@ -44,7 +43,6 @@ public class SeleccionController {
      * Obtener una seleccion por su ID (GET /seleccion/{id}
      */
     @GetMapping("/obtener/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<SeleccionResponse> obtenerSeleccion(
             @PathVariable Integer id
     ) {

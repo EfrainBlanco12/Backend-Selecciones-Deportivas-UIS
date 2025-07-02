@@ -40,6 +40,12 @@ public class IntegranteCommandService {
 
         integranteVerificarExistenciaService.verificarCorreoCodigoIntegrante(integrante);
 
+        /**
+         * TODO: Verificar los roles que pueden crear integrantes con otros roles,
+         *  admin crea todos, entrenador crea deportistas y el deportista no puede
+         *  acceder a este metodo
+         */
+        
         Rol rol = integranteVerificarExistenciaService.verificarRol(integranteRequest.getIdRol());
         integrante.setRol(rol);
 

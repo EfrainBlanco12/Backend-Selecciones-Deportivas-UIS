@@ -33,7 +33,7 @@ public class AuthSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(EndpointWhitelist.PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, EndpointWhitelist.PRIVATE_ENDPOINTS).hasAnyRole("ADMINISTRADOR", "ENTRENADOR", "DEPORTISTA")
+                        .requestMatchers(HttpMethod.GET, EndpointWhitelist.PRIVATE_ENDPOINTS).permitAll()
                         .requestMatchers(EndpointWhitelist.PRIVATE_ENDPOINTS).hasAnyRole("ADMINISTRADOR", "ENTRENADOR")
                         .anyRequest().authenticated()
                 )

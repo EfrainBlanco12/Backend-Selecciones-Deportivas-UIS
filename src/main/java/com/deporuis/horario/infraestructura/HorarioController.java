@@ -33,7 +33,6 @@ public class HorarioController {
      * Obtener un horario por su ID (GET /horario/{id})
      */
     @GetMapping("/obtener/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<HorarioResponse> obtenerHorario(
             @PathVariable Integer id
     ) {
@@ -45,7 +44,6 @@ public class HorarioController {
      * Obtiene una lista paginada de horarios, definiendo el numero de pagina y su tamaño (GET /horario)
      */
     @GetMapping("/lista")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<HorarioResponse>> obtenerHorariosPaginados(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size

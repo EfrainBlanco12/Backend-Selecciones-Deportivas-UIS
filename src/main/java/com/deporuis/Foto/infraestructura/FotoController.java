@@ -33,7 +33,6 @@ public class FotoController {
      * Obtener una sola foto por su ID (GET /foto/{id})
      */
     @GetMapping("/obtener/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<FotoResponse> obtenerFoto(
             @PathVariable Integer id
     ) {
@@ -48,7 +47,6 @@ public class FotoController {
      * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto)
      */
     @GetMapping("/lista")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size

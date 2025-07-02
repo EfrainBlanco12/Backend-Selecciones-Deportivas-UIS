@@ -33,7 +33,6 @@ public class LogroController {
      *  Obtener lista paginada de logros (GET /logro)
      */
     @GetMapping("/lista")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<LogroResponse>> obtenerLogrosPaginados(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "4") Integer size
@@ -46,7 +45,6 @@ public class LogroController {
      * Obtener un solo logro por su ID (GET /logro/{id})
      */
     @GetMapping("/obtener/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<LogroResponse> obtenerLogro(
             @PathVariable Integer id
     ) {

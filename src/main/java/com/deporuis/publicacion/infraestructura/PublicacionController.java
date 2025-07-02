@@ -33,7 +33,6 @@ public class PublicacionController {
      * Obtener publicaciones por paginas, definiendo el numero de la pagina y su tamaño (GET /publicacion)
      */
     @GetMapping("/lista")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesPaginadas(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size
@@ -46,7 +45,6 @@ public class PublicacionController {
      * Obtener una sola publicación por su ID (GET /publicacion/{id})
      */
     @GetMapping("/obtener/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR', 'DEPORTISTA')")
     public ResponseEntity<PublicacionResponse> obtenerPublicacion(
             @PathVariable Integer id
     ) {
