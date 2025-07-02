@@ -8,6 +8,7 @@ import com.deporuis.integrante.aplicacion.helper.IntegranteVerificarExistenciaSe
 import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.dominio.IntegrantePosicion;
+import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.posicion.dominio.Posicion;
@@ -30,6 +31,9 @@ public class IntegranteCommandService {
     @Autowired
     private IntegranteRelacionService integranteRelacionService;
 
+    @Autowired
+    private IntegranteRepository integranteRepository;
+
     @Transactional()
     public IntegranteResponse crearIntegrante(IntegranteRequest integranteRequest) {
         Integrante integrante = IntegranteMapper.requestToIntegrante(integranteRequest);
@@ -45,6 +49,8 @@ public class IntegranteCommandService {
         Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
         fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada);
         integrante.setFoto(fotoCreada);
+
+        integrante = integranteRepository.save(integrante);
 
         List<Posicion> posiciones = integranteVerificarExistenciaService.verificarPosiciones(integranteRequest.getIdPosiciones());
         List<IntegrantePosicion> relacionesPosicion = integranteRelacionService.crearRelacionesPosicion(integrante, posiciones);
