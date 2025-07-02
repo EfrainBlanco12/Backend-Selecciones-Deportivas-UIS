@@ -25,4 +25,9 @@ public class IntegranteService {
     public Page<IntegranteResponse> obtenerIntegrantesPaginados(Integer page, Integer size) {
         return integranteQueryService.obtenerIntegrantesPaginados(page, size);
     }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerIntegrante(Integer id) {
+        return integranteQueryService.obtenerIntegrante(id);
+    }
 }

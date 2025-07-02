@@ -42,4 +42,18 @@ public class IntegranteController {
         Page<IntegranteResponse> pagina = integranteService.obtenerIntegrantesPaginados(page, size);
         return ResponseEntity.ok(pagina);
     }
+
+    /**
+     * Obtener un integrante por su ID (GET /integrante/{id}
+     */
+    @GetMapping("/obtener/{id}")
+    public ResponseEntity<IntegranteResponse> obtenerIntegrante(
+            @PathVariable Integer id
+    ) {
+        IntegranteResponse integrante = integranteService.obtenerIntegrante(id);
+        if (integrante == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(integrante);
+    }
 }

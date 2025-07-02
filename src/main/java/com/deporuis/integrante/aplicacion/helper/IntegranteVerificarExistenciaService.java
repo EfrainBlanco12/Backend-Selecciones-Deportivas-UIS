@@ -6,6 +6,7 @@ import com.deporuis.auth.aplicacion.helper.RolVerificarExistenciaService;
 import com.deporuis.auth.dominio.Rol;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.excepciones.IntegranteDobleUniqueKeyException;
+import com.deporuis.integrante.excepciones.IntegranteNotFoundException;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.posicion.aplicacion.helper.PosicionVerificarExistenciaService;
 import com.deporuis.posicion.dominio.Posicion;
@@ -65,5 +66,22 @@ public class IntegranteVerificarExistenciaService {
 
     public List<Posicion> verificarPosiciones(List<Integer> idPosiciones) {
         return posicionVerificarExistenciaService.verificarPosiciones(idPosiciones);
+    }
+
+    @Transactional(readOnly = true)
+    public Integrante verificarIntegrante(Integer id) {
+        Optional<Integrante> integranteOptional = integranteRepository.findById(id);
+
+        if (integranteOptional.isEmpty()) {
+            throw new IntegranteNotFoundException("No se encontro Integrante con ID = " + id);
+        }
+
+        Integrante integrante = integranteOptional.get();
+
+        if (!Boolean.TRUE.equals(integrante.getVisibilidad())) {
+            throw new IntegranteNotFoundException("El integrante no esta disponible");
+        }
+
+        return integrante;
     }
 }

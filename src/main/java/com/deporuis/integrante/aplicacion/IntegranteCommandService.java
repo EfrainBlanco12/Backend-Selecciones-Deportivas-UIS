@@ -45,7 +45,7 @@ public class IntegranteCommandService {
          *  admin crea todos, entrenador crea deportistas y el deportista no puede
          *  acceder a este metodo
          */
-        
+
         Rol rol = integranteVerificarExistenciaService.verificarRol(integranteRequest.getIdRol());
         integrante.setRol(rol);
 

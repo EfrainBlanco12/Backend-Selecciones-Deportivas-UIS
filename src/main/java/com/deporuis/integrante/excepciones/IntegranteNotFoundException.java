@@ -1,4 +1,9 @@
 package com.deporuis.integrante.excepciones;
 
-public class IntegranteNotFoundException {
+import com.deporuis.excepcion.common.ResourceNotFoundException;
+
+public class IntegranteNotFoundException extends ResourceNotFoundException {
+    public IntegranteNotFoundException(String msg) {
+        super(msg);
+    }
 }
