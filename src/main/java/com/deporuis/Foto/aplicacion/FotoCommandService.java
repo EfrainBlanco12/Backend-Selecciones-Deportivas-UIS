@@ -28,6 +28,13 @@ public class FotoCommandService {
     }
 
     @Transactional()
+    public Foto crearFotoIntegrante(FotoRequest fotoRequest) {
+        Foto nuevaFoto = FotoMapper.requestToFoto(fotoRequest);
+
+        return fotoRepository.save(nuevaFoto);
+    }
+
+    @Transactional()
     public List<Foto> crearFotosPublicacion(List<FotoRequest> fotoRequest, Publicacion publicacion) {
         List<Foto> nuevasFotos = FotoMapper.requestToFotosPublicacion(fotoRequest, publicacion);
 

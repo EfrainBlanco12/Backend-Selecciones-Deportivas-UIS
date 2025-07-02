@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,8 +35,13 @@ public class Integrante {
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
+    @Column
     private Float altura;
+
+    @Column
     private Float peso;
+
+    @Column
     private Integer dorsal;
 
     @Column(name = "correo_institucional", length = 100, nullable = false, unique = true)
@@ -50,10 +56,30 @@ public class Integrante {
     @JoinColumn(name = "id_seleccion", nullable = false)
     private Seleccion seleccion;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_foto", nullable = false)
     private Foto foto;
 
     @OneToMany(mappedBy = "integrante")
-    private List<IntegrantePosicion> posiciones;
+    private List<IntegrantePosicion> posiciones = new ArrayList<>();
+
+    // Creacion de un integrante
+    public Integrante(String codigoUniversitario,
+                      String nombres,
+                      String apellidos,
+                      LocalDate fechaNacimiento,
+                      Float altura,
+                      Float peso,
+                      Integer dorsal,
+                      String correoInstitucional
+    ) {
+        this.codigoUniversitario = codigoUniversitario;
+        this.nombres = nombres;
+        this.apellidos = apellidos;
+        this.fechaNacimiento = fechaNacimiento;
+        this.altura = altura;
+        this.peso = peso;
+        this.dorsal = dorsal;
+        this.correoInstitucional = correoInstitucional;
+    }
 }

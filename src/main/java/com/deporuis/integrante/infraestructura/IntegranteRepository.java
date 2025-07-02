@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface IntegranteRepository extends JpaRepository<Integrante, Integer> {
     Optional<Integrante> findByCodigoUniversitario(String codigoUniversitario);
+    Optional<Integrante> findByCorreoInstitucional(String correoInstitucional);
 }

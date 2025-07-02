@@ -22,4 +22,6 @@ public class Posicion {
     @ManyToOne
     @JoinColumn(name = "id_deporte", nullable = false)
     private Deporte deporte;
+
+    private Boolean visibilidad = true;
 }

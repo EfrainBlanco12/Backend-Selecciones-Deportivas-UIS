@@ -40,4 +40,8 @@ public class FotoVerificarExistenciaService {
         }
         return fotosEncontradas;
     }
+
+    public Foto verificarFotoIntegrante(Foto foto) {
+        return null;
+    }
 }
