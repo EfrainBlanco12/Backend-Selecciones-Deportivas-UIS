@@ -56,4 +56,16 @@ public class IntegranteController {
         }
         return ResponseEntity.ok(integrante);
     }
+
+    /**
+     * Hace softdelete de un integrante por su ID (PATCH /integrante)
+     */
+    @PatchMapping("/softdelete/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Void> softDeleteIntegrante(
+            @PathVariable Integer id
+    ) {
+        integranteService.softDeleteIntegrante(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -30,4 +30,9 @@ public class IntegranteService {
     public IntegranteResponse obtenerIntegrante(Integer id) {
         return integranteQueryService.obtenerIntegrante(id);
     }
+
+    @Transactional()
+    public void softDeleteIntegrante(Integer id) {
+        integranteCommandService.softDeleteIntegrante(id);
+    }
 }

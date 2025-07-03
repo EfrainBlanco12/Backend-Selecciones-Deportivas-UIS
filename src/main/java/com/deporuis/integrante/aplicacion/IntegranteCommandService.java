@@ -65,4 +65,11 @@ public class IntegranteCommandService {
 
         return IntegranteMapper.integranteToResponse(integrante);
     }
+
+    public void softDeleteIntegrante(Integer id) {
+        Integrante integrante = integranteVerificarExistenciaService.verificarIntegrante(id);
+
+        integrante.setVisibilidad(false);
+        integranteRepository.save(integrante);
+    }
 }
