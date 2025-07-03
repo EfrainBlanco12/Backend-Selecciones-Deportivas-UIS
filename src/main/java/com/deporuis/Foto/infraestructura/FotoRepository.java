@@ -1,6 +1,7 @@
 package com.deporuis.Foto.infraestructura;
 
 import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.seleccion.dominio.Seleccion;
 import org.springframework.data.jpa.repository.JpaRepository;

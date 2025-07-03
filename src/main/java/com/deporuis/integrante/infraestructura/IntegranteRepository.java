@@ -14,6 +14,9 @@ import java.util.Optional;
 public interface IntegranteRepository extends JpaRepository<Integrante, Integer> {
     Optional<Integrante> findByCodigoUniversitario(String codigoUniversitario);
     Optional<Integrante> findByCorreoInstitucional(String correoInstitucional);
+    Boolean existsByCodigoUniversitarioAndIdIntegranteNot(String codigoUniversitario, Integer id);
+    Boolean existsByCorreoInstitucionalAndIdIntegranteNot(String correoInstitucional, Integer id);
+
 
     Page<Integrante> findByVisibilidadTrue(Pageable pageable);
 }

@@ -36,15 +36,16 @@ public class IntegranteCommandService {
 
     @Transactional()
     public IntegranteResponse crearIntegrante(IntegranteRequest integranteRequest) {
-        Integrante integrante = IntegranteMapper.requestToIntegrante(integranteRequest);
-
-        integranteVerificarExistenciaService.verificarCorreoCodigoIntegrante(integrante);
 
         /**
          * TODO: Verificar los roles que pueden crear integrantes con otros roles,
          *  admin crea todos, entrenador crea deportistas y el deportista no puede
          *  acceder a este metodo
          */
+
+        Integrante integrante = IntegranteMapper.requestToIntegrante(integranteRequest);
+
+        integrante = integranteVerificarExistenciaService.verificarCorreoCodigoIntegrante(integrante);
 
         Rol rol = integranteVerificarExistenciaService.verificarRol(integranteRequest.getIdRol());
         integrante.setRol(rol);
@@ -53,7 +54,7 @@ public class IntegranteCommandService {
         integrante.setSeleccion(seleccion);
 
         Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
-        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada);
+        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
         integrante.setFoto(fotoCreada);
 
         integrante = integranteRepository.save(integrante);
@@ -66,6 +67,52 @@ public class IntegranteCommandService {
         return IntegranteMapper.integranteToResponse(integrante);
     }
 
+    @Transactional()
+    public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
+
+        /**
+         * TODO: Verificar los roles que pueden crear integrantes con otros roles,
+         *  admin crea todos, entrenador crea deportistas y el deportista no puede
+         *  acceder a este metodo
+         */
+
+        Integrante integrante = integranteVerificarExistenciaService.verificarIntegrante(id);
+
+        integrante = integranteVerificarExistenciaService.verificarActualizarCodigoCorreoIntegrante(integranteRequest, integrante);
+
+        integrante.setCodigoUniversitario(integranteRequest.getCodigoUniversitario());
+        integrante.setNombres(integranteRequest.getNombres());
+        integrante.setApellidos(integranteRequest.getApellidos());
+        integrante.setFechaNacimiento(integranteRequest.getFechaNacimiento());
+        integrante.setAltura(integranteRequest.getAltura());
+        integrante.setPeso(integranteRequest.getPeso());
+        integrante.setDorsal(integranteRequest.getDorsal());
+        integrante.setCorreoInstitucional(integranteRequest.getCorreoInstitucional());
+
+        Rol rol = integranteVerificarExistenciaService.verificarRol(integranteRequest.getIdRol());
+        integrante.setRol(rol);
+
+        Seleccion seleccion = integranteVerificarExistenciaService.verificarSeleccion(integranteRequest.getIdSeleccion());
+        integrante.setSeleccion(seleccion);
+
+        Foto fotoAntigua = integranteVerificarExistenciaService.verificarFotoIntegrante(integrante.getFoto().getIdFoto());
+        fotoCommandService.eliminarFoto(fotoAntigua);
+        Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
+        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
+        integrante.setFoto(fotoCreada);
+
+        integranteRelacionService.eliminarRelacionesPosicion(integrante);
+        List<Posicion> posiciones = integranteVerificarExistenciaService.verificarPosiciones(integranteRequest.getIdPosiciones());
+        List<IntegrantePosicion> relacionesPosicion = integranteRelacionService.crearRelacionesPosicion(integrante, posiciones);
+
+        integrante.setPosiciones(relacionesPosicion);
+
+        integranteRepository.save(integrante);
+
+        return IntegranteMapper.integranteToResponse(integrante);
+    }
+
+    @Transactional()
     public void softDeleteIntegrante(Integer id) {
         Integrante integrante = integranteVerificarExistenciaService.verificarIntegrante(id);
 

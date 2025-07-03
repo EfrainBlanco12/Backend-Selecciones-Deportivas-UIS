@@ -5,6 +5,7 @@ import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
+import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.seleccion.dominio.Seleccion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,10 @@ public class FotoCommandService {
     @Transactional()
     public void eliminarFotosSeleccion(Seleccion seleccion) {
         fotoRepository.deleteAll(fotoRepository.findAllBySeleccion(seleccion));
+    }
+
+    @Transactional()
+    public void eliminarFoto(Foto foto) {
+        fotoRepository.delete(foto);
     }
 }

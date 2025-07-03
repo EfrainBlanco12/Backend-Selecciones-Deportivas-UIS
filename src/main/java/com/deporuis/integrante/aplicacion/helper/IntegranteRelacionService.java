@@ -29,4 +29,8 @@ public class IntegranteRelacionService {
                         .toList()
         );
     }
+
+    public void eliminarRelacionesPosicion(Integrante integrante) {
+        integrantePosicionRepository.deleteAll(integrantePosicionRepository.findAllByIntegrante(integrante));
+    }
 }

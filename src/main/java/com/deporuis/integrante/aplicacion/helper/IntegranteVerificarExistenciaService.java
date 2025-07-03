@@ -8,6 +8,7 @@ import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.excepciones.IntegranteDobleUniqueKeyException;
 import com.deporuis.integrante.excepciones.IntegranteNotFoundException;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
+import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.posicion.aplicacion.helper.PosicionVerificarExistenciaService;
 import com.deporuis.posicion.dominio.Posicion;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
@@ -38,18 +39,36 @@ public class IntegranteVerificarExistenciaService {
     @Autowired
     private PosicionVerificarExistenciaService posicionVerificarExistenciaService;
 
-    @Transactional(readOnly = true)
-    public void verificarCorreoCodigoIntegrante(Integrante integrante) {
+    public Integrante verificarCorreoCodigoIntegrante(Integrante integrante) {
+        integrante = verificarCodigoIntegrante(integrante);
+        integrante = verificarCorreoIntegrante(integrante);
+        return integrante;
+    }
+
+    @Transactional()
+    public Integrante verificarCodigoIntegrante(Integrante integrante) {
+        integrante.setCodigoUniversitario(integrante.getCodigoUniversitario().toUpperCase());
+
         Optional<Integrante> codigoDuplicado = integranteRepository.findByCodigoUniversitario(integrante.getCodigoUniversitario());
-        Optional<Integrante> correoDuplicado = integranteRepository.findByCorreoInstitucional(integrante.getCorreoInstitucional());
 
         if (codigoDuplicado.isPresent()) {
             throw new IntegranteDobleUniqueKeyException("El codigo universitario ya existe");
         }
 
+        return integrante;
+    }
+
+    @Transactional()
+    public Integrante verificarCorreoIntegrante(Integrante integrante) {
+        integrante.setCorreoInstitucional(integrante.getCorreoInstitucional().toUpperCase());
+
+        Optional<Integrante> correoDuplicado = integranteRepository.findByCorreoInstitucional(integrante.getCorreoInstitucional());
+
         if (correoDuplicado.isPresent()) {
             throw new IntegranteDobleUniqueKeyException("El correo institucional ya existe");
         }
+
+        return integrante;
     }
 
     public Rol verificarRol(Integer id) {
@@ -60,8 +79,8 @@ public class IntegranteVerificarExistenciaService {
         return seleccionVerificarExistenciaService.verificarSeleccion(id);
     }
 
-    public Foto verificarFotoIntegrante(Foto foto) {
-        return fotoVerificarExistenciaService.verificarFoto(foto.getIdFoto());
+    public Foto verificarFotoIntegrante(Integer id) {
+        return fotoVerificarExistenciaService.verificarFoto(id);
     }
 
     public List<Posicion> verificarPosiciones(List<Integer> idPosiciones) {
@@ -81,6 +100,27 @@ public class IntegranteVerificarExistenciaService {
         if (!Boolean.TRUE.equals(integrante.getVisibilidad())) {
             throw new IntegranteNotFoundException("El integrante no esta disponible");
         }
+
+        return integrante;
+    }
+
+    @Transactional()
+    public Integrante verificarActualizarCodigoCorreoIntegrante(IntegranteRequest integranteRequest, Integrante integrante) {
+        integrante.setCorreoInstitucional(integrante.getCorreoInstitucional().toUpperCase());
+        integrante.setCodigoUniversitario(integrante.getCodigoUniversitario().toUpperCase());
+        integranteRequest.setCorreoInstitucional(integranteRequest.getCorreoInstitucional().toUpperCase());
+        integranteRequest.setCodigoUniversitario(integranteRequest.getCodigoUniversitario().toUpperCase());
+
+        if (integranteRepository.existsByCodigoUniversitarioAndIdIntegranteNot(integranteRequest.getCodigoUniversitario(), integrante.getIdIntegrante())) {
+            throw new IntegranteDobleUniqueKeyException("El codigo universitario ya existe");
+        }
+
+        if (integranteRepository.existsByCorreoInstitucionalAndIdIntegranteNot(integranteRequest.getCorreoInstitucional(), integrante.getIdIntegrante())) {
+            throw new IntegranteDobleUniqueKeyException("El correo institucional ya existe");
+        }
+
+        integrante.setCodigoUniversitario(integranteRequest.getCodigoUniversitario());
+        integrante.setCorreoInstitucional(integranteRequest.getCorreoInstitucional());
 
         return integrante;
     }

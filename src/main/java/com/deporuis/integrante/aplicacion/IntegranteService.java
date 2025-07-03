@@ -35,4 +35,8 @@ public class IntegranteService {
     public void softDeleteIntegrante(Integer id) {
         integranteCommandService.softDeleteIntegrante(id);
     }
+
+    public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
+        return integranteCommandService.actualizarIntegrante(id, integranteRequest);
+    }
 }

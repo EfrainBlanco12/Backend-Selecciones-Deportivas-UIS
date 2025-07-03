@@ -68,4 +68,18 @@ public class IntegranteController {
         integranteService.softDeleteIntegrante(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Actualiza un integrante por su ID, cambiando su foto y relaciones correspondientes con horarios,
+     * posiciones, rol y seleccion
+     */
+    @PutMapping("/actualizar/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<IntegranteResponse> actualizarIntegrante(
+            @PathVariable Integer id,
+            @Valid @RequestBody IntegranteRequest integranteRequest
+    ) {
+        IntegranteResponse integranteActualizado = integranteService.actualizarIntegrante(id, integranteRequest);
+        return ResponseEntity.ok(integranteActualizado);
+    }
 }
