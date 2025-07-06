@@ -1,9 +1,11 @@
 package com.deporuis.excepcion;
 
+import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -77,5 +79,20 @@ public class GlobalExceptionHandler {
         error.put("detalle", ex.getOriginalMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AccesoDenegadoCreacionIntegrantesException.class)
+    public ResponseEntity<ErrorResponse> manejarAccesoDenegado(AccesoDenegadoCreacionIntegrantesException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+
+    // DTO interno para estandarizar el cuerpo de error
+    public record ErrorResponse(int status, String mensaje, long timestamp) {}
 }
 

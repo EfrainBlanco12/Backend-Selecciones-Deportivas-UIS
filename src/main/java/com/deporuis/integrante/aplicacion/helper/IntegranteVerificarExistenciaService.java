@@ -124,4 +124,9 @@ public class IntegranteVerificarExistenciaService {
 
         return integrante;
     }
+
+    @Transactional()
+    public void verificarPermisosCreacionIntegrantes(Integer idRol) {
+        rolVerificarExistenciaService.verificarPermisosCreacionIntegrantes(idRol);
+    }
 }

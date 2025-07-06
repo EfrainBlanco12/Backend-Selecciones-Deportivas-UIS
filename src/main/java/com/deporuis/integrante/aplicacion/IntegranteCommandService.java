@@ -36,12 +36,7 @@ public class IntegranteCommandService {
 
     @Transactional()
     public IntegranteResponse crearIntegrante(IntegranteRequest integranteRequest) {
-
-        /**
-         * TODO: Verificar los roles que pueden crear integrantes con otros roles,
-         *  admin crea todos, entrenador crea deportistas y el deportista no puede
-         *  acceder a este metodo
-         */
+        integranteVerificarExistenciaService.verificarPermisosCreacionIntegrantes(integranteRequest.getIdRol());
 
         Integrante integrante = IntegranteMapper.requestToIntegrante(integranteRequest);
 
@@ -70,11 +65,7 @@ public class IntegranteCommandService {
     @Transactional()
     public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
 
-        /**
-         * TODO: Verificar los roles que pueden crear integrantes con otros roles,
-         *  admin crea todos, entrenador crea deportistas y el deportista no puede
-         *  acceder a este metodo
-         */
+        integranteVerificarExistenciaService.verificarPermisosCreacionIntegrantes(integranteRequest.getIdRol());
 
         Integrante integrante = integranteVerificarExistenciaService.verificarIntegrante(id);
 
