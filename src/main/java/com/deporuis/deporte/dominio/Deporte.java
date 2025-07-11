@@ -25,9 +25,7 @@ public class Deporte {
     @Column(name = "descripcion_deporte", length = 500)
     private String descripcionDeporte;
 
-    // Inversa de Seleccion → Muchos Selecciones por un Deporte
-    @OneToMany(mappedBy = "deporte")
-    private List<Seleccion> selecciones;
+    private Boolean visibilidad;
 
     // Inversa de Posicion → Muchas Posiciones por un Deporte
     @OneToMany(mappedBy = "deporte")

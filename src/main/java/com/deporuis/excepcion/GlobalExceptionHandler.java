@@ -1,5 +1,6 @@
 package com.deporuis.excepcion;
 
+import com.deporuis.deporte.excepciones.DeporteNoExisteException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,14 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    // Valida deporte no existe
+    @ExceptionHandler(DeporteNoExisteException.class)
+    public ResponseEntity<Map<String, String>> handleDeporteNoEncontrado(DeporteNoExisteException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     // Valida datos de autenticacion

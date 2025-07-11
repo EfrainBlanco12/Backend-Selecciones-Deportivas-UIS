@@ -20,17 +20,17 @@ public class DeporteController {
     @Autowired
     private DeporteService deporteService;
 
-    @PostMapping
+    @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<DeporteResponse> crearDeporte(@Valid @RequestBody DeporteRequest deporteRequest){
         DeporteResponse deporteCreado = deporteService.crearDeporte(deporteRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(deporteCreado);
     };
 
-    @GetMapping
+    @GetMapping("/lista")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
-    public ResponseEntity<List<DeporteResponse>> obtenerTodosLosDeportes(){
-        List<DeporteResponse> deporteResponse = deporteService.obtenerTodosLosDeportes();
+    public ResponseEntity<List<DeporteResponse>> obtenerTodosLosDeportesVisibles(){
+        List<DeporteResponse> deporteResponse = deporteService.obtenerTodosLosDeportesVisibles();
         return ResponseEntity.status(HttpStatus.OK).body(deporteResponse);
     }
 
@@ -42,6 +42,13 @@ public class DeporteController {
 
         DeporteResponse deporteActualizado = deporteService.actualizarDeporte(idDeporte, deporteRequest);
         return ResponseEntity.status(HttpStatus.OK).body(deporteActualizado);
+    }
+
+    @PutMapping("/softdelete/{id_deporte}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<DeporteResponse> softDeleteDeporte(@PathVariable("id_deporte") Integer idDeporte){
+        DeporteResponse deporteEliminado = deporteService.softDeleteDeporte(idDeporte);
+        return ResponseEntity.status(HttpStatus.OK).body(deporteEliminado);
     }
 
 }
