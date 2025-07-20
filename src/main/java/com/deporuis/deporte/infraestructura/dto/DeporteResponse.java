@@ -2,7 +2,6 @@ package com.deporuis.deporte.infraestructura.dto;
 
 import com.deporuis.deporte.dominio.Deporte;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
