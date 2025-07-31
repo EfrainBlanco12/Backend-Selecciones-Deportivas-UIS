@@ -2,7 +2,10 @@ package com.deporuis.posicion.aplicacion.helper;
 
 import com.deporuis.posicion.dominio.Posicion;
 import com.deporuis.posicion.excepciones.PosicionNotFoundException;
+import com.deporuis.posicion.excepciones.PosicionYaExisteException;
 import com.deporuis.posicion.infraestructura.PosicionRepository;
+import com.deporuis.posicion.infraestructura.dto.PosicionRequest;
+import com.deporuis.shared.util.TextoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,31 +19,34 @@ public class PosicionVerificarExistenciaService {
     @Autowired
     private PosicionRepository posicionRepository;
 
-    @Transactional(readOnly = true)
-    public Posicion verificarPosicion(Integer id) {
-        Optional<Posicion> posicionOptional = posicionRepository.findById(id);
+    @Transactional
+    public Optional<Posicion> verificarPosicionNoExisteYReactivarSiAplica(PosicionRequest request) {
+        String nombreNormalizado = TextoUtil.quitarAcentos(request.getNombrePosicion()).toLowerCase();
 
-        if (posicionOptional.isEmpty()) {
-            throw new PosicionNotFoundException("No se encontro posicion con ID = " + id);
+        Optional<Posicion> posicionExistente = posicionRepository.findAllByDeporte_IdDeporte(request.getIdDeporte()).stream()
+                .filter(p -> TextoUtil.quitarAcentos(p.getNombrePosicion()).toLowerCase().equals(nombreNormalizado))
+                .findFirst();
+
+        if (posicionExistente.isPresent()) {
+            Posicion existente = posicionExistente.get();
+
+            if (Boolean.TRUE.equals(existente.getVisibilidad())) {
+                throw new PosicionYaExisteException("Ya existe una posición con el nombre '" + request.getNombrePosicion() + "' en el deporte especificado.");
+            } else {
+                existente.setVisibilidad(true);
+                return Optional.of(posicionRepository.save(existente));
+            }
         }
 
-        Posicion posicion = posicionOptional.get();
-
-        if (!Boolean.TRUE.equals(posicion.getVisibilidad())) {
-            throw new PosicionNotFoundException("La posicion no esta disponible");
-        }
-
-        return posicion;
+        return Optional.empty();
     }
 
     @Transactional(readOnly = true)
     public List<Posicion> verificarPosiciones(List<Integer> ids) {
         List<Posicion> posiciones = posicionRepository.findAllById(ids);
-
         if (posiciones.size() != ids.size()) {
             throw new PosicionNotFoundException("Alguna posicion no existe");
         }
-
         return posiciones;
     }
 }

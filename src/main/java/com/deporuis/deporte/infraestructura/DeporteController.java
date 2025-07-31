@@ -38,7 +38,6 @@ public class DeporteController {
         return ResponseEntity.status(HttpStatus.OK).body(deporteResponse);
     }
 
-
     @PutMapping("/actualizar/{id_deporte}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<DeporteResponse> actualizarDeporte(
@@ -48,6 +47,7 @@ public class DeporteController {
         DeporteResponse deporteActualizado = deporteService.actualizarDeporte(idDeporte, deporteRequest);
         return ResponseEntity.status(HttpStatus.OK).body(deporteActualizado);
     }
+
     @PutMapping("/softdelete/{id_deporte}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<DeporteResponse> softDeleteDeporte(@PathVariable("id_deporte") Integer idDeporte){
