@@ -4,6 +4,7 @@ import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
+import com.deporuis.posicion.excepciones.PosicionYaExisteException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -90,6 +91,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(error);
+    }
+
+    @ExceptionHandler(PosicionYaExisteException.class)
+    public ResponseEntity<?> handlePosicionYaExiste(PosicionYaExisteException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("error", ex.getMessage()));
     }
 
     // DTO interno para estandarizar el cuerpo de error
