@@ -3,12 +3,14 @@ package com.deporuis.seleccion.infraestructura.dto;
 import com.deporuis.seleccion.dominio.TipoSeleccion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SeleccionResponse {
     private Integer idSeleccion;
 
