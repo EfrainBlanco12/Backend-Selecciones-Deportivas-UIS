@@ -17,6 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,14 +32,44 @@ public class AuthSecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cfg = new CorsConfiguration();
+
+        // Usa allowedOriginPatterns cuando allowCredentials=true (no se permite "*" en allowedOrigins)
+        cfg.setAllowedOriginPatterns(List.of(
+                "http://localhost:4200",
+                "http://127.0.0.1:4200"
+                // En producción, se agregan aquí dominios y se eliminan wildcard.
+                // "https://app.deporuis.com",
+                // "https://*.deporuis.com"
+        ));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        cfg.setExposedHeaders(List.of("Authorization", "Location"));
+        cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L); // cache del preflight 1h
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Deja pasar preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // whitelist pública
                         .requestMatchers(EndpointWhitelist.PUBLIC_ENDPOINTS).permitAll()
+                        // GET a privados
                         .requestMatchers(HttpMethod.GET, EndpointWhitelist.PRIVATE_ENDPOINTS).permitAll()
+                        // Privados con rol
                         .requestMatchers(EndpointWhitelist.PRIVATE_ENDPOINTS).hasAnyRole("ADMINISTRADOR", "ENTRENADOR")
+                        // Resto autenticado
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()))
