@@ -1,5 +1,8 @@
 package com.deporuis.seleccion.infraestructura.dto;
 
+import com.deporuis.Foto.infraestructura.dto.FotoResponse;
+import com.deporuis.deporte.infraestructura.dto.DeporteResponse;
+import com.deporuis.horario.infraestructura.dto.HorarioResponse;
 import com.deporuis.seleccion.dominio.TipoSeleccion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,11 +27,9 @@ public class SeleccionResponse {
 
     private TipoSeleccion tipoSeleccion;
 
-    private Integer deporte;
+    private DeporteResponse deporte;
 
-    private List<Integer> fotos;
+    private List<FotoResponse> fotos;
 
-    private List<Integer> horarios;
+    private List<HorarioResponse> horarios;
 }
-
-

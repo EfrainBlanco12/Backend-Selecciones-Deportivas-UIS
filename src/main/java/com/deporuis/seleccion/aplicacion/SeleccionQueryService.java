@@ -22,12 +22,15 @@ public class SeleccionQueryService {
 
     @Transactional(readOnly = true)
     public Page<SeleccionResponse> obtenerSeleccionesPaginadas(Integer page, Integer size) {
+        // findByVisibilidadTrue tiene @EntityGraph: deporte, fotos, horarios.horario
         return seleccionRepository.findByVisibilidadTrue(PageRequest.of(page, size))
                 .map(SeleccionMapper::seleccionToResponse);
     }
 
     @Transactional(readOnly = true)
     public SeleccionResponse obtenerSeleccion(Integer id) {
+        // verificarSeleccion usa el repository; con nuestro @EntityGraph en findById,
+        // las relaciones están cargadas para el mapper.
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
         return SeleccionMapper.seleccionToResponse(seleccion);
     }

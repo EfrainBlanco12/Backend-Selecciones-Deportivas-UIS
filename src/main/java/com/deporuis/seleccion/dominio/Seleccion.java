@@ -5,6 +5,7 @@ import com.deporuis.deporte.dominio.Deporte;
 import com.deporuis.integrante.dominio.Integrante;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,9 +50,12 @@ public class Seleccion {
     @OneToMany(mappedBy = "seleccion")
     private List<SeleccionLogro> logros;
 
+    // en Seleccion.java
+    @BatchSize(size = 25)
     @OneToMany(mappedBy = "seleccion")
     private List<Foto> fotos = new ArrayList<>();
 
+    @BatchSize(size = 25)
     @OneToMany(mappedBy = "seleccion")
     private List<SeleccionHorario> horarios;
 
