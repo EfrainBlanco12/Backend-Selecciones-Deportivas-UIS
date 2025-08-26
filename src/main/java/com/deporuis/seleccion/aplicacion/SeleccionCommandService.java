@@ -56,6 +56,7 @@ public class SeleccionCommandService {
         seleccion.setFotos(fotos);
         seleccion.setHorarios(relacionesHorario);
 
+        // Con el nuevo mapper, esto ya devuelve objetos relacionados completos
         return SeleccionMapper.seleccionToResponse(seleccion);
     }
 
@@ -72,11 +73,13 @@ public class SeleccionCommandService {
         Deporte deporte = seleccionVerificarExistenciaService.verificarDeporte(seleccionRequest.getIdDeporte());
         seleccion.setDeporte(deporte);
 
+        // Fotos
         fotoCommandService.eliminarFotosSeleccion(seleccion);
         List<Foto> nuevasFotos = fotoCommandService.crearFotosSeleccion(seleccionRequest.getFotos(), seleccion);
         nuevasFotos = seleccionVerificarExistenciaService.verificarFotos(nuevasFotos);
         seleccion.setFotos(nuevasFotos);
 
+        // Horarios
         seleccionRelacionService.eliminarRelacionesSeleccion(seleccion);
         List<Horario> nuevosHorarios = horarioCommandService.obtenerOcrearHorariosSeleccion(seleccionRequest.getHorarios());
         nuevosHorarios = seleccionVerificarExistenciaService.verificarHorarios(nuevosHorarios);
@@ -85,26 +88,22 @@ public class SeleccionCommandService {
 
         Seleccion seleccionActualizada = seleccionRepository.save(seleccion);
 
+        // Con el nuevo mapper, esto ya devuelve objetos relacionados completos
         return SeleccionMapper.seleccionToResponse(seleccionActualizada);
     }
 
     @Transactional()
     public void eliminarSeleccion(Integer id) {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
-
         seleccionRelacionService.eliminarRelacionesSeleccion(seleccion);
         fotoCommandService.eliminarFotosSeleccion(seleccion);
-
         seleccionRepository.delete(seleccion);
     }
 
     @Transactional()
     public void softDeleteSeleccion(Integer id) {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
-
         seleccion.setVisibilidad(false);
         seleccionRepository.save(seleccion);
     }
-
-
 }

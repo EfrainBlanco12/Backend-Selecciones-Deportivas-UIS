@@ -6,84 +6,62 @@ import com.deporuis.seleccion.aplicacion.mapper.SeleccionMapper;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.data.domain.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class SeleccionQueryServiceTest {
 
-    @InjectMocks
-    private SeleccionQueryService queryService;
+    @InjectMocks private SeleccionQueryService service;
+    @Mock private SeleccionRepository repository;
+    @Mock private SeleccionVerificarExistenciaService verificar;
 
-    @Mock
-    private SeleccionRepository seleccionRepository;
+    @Test
+    void obtenerSeleccionesPaginadas_mapeaConMapperEstatico() {
+        Seleccion entidad = mock(Seleccion.class);
+        when(repository.findByVisibilidadTrue(PageRequest.of(0, 2)))
+                .thenReturn(new PageImpl<>(List.of(entidad)));
 
-    @Mock
-    private SeleccionVerificarExistenciaService verificarExistenciaService;
+        try (MockedStatic<SeleccionMapper> mocked = Mockito.mockStatic(SeleccionMapper.class)) {
+            mocked.when(() -> SeleccionMapper.seleccionToResponse(entidad))
+                  .thenReturn(new SeleccionResponse());
 
-    private AutoCloseable mocks;
+            Page<SeleccionResponse> page = service.obtenerSeleccionesPaginadas(0, 2);
+            assertEquals(1, page.getTotalElements());
+        }
 
-    @BeforeEach
-    void setUp() {
-        mocks = MockitoAnnotations.openMocks(this);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        mocks.close();
+        verify(repository).findByVisibilidadTrue(PageRequest.of(0, 2));
+        verifyNoMoreInteractions(repository, verificar);
     }
 
     @Test
-    void obtenerSeleccionesPaginadas_deberiaRetornarPageDeSeleccionResponse() {
-        // Arrange
-        int page = 0, size = 2;
-        Seleccion seleccion = new Seleccion();
-        Page<Seleccion> seleccionPage = new PageImpl<>(List.of(seleccion));
+    void obtenerSeleccion_mapeaConMapperEstatico() {
+        Seleccion entidad = mock(Seleccion.class);
+        when(verificar.verificarSeleccion(9)).thenReturn(entidad);
 
-        when(seleccionRepository.findByVisibilidadTrue(PageRequest.of(page, size)))
-                .thenReturn(seleccionPage);
+        try (MockedStatic<SeleccionMapper> mocked = Mockito.mockStatic(SeleccionMapper.class)) {
+            SeleccionResponse esperado = new SeleccionResponse();
+            mocked.when(() -> SeleccionMapper.seleccionToResponse(entidad))
+                  .thenReturn(esperado);
 
-        // Simulamos el mapeo manualmente (si el Mapper no es mockeable)
-        try (MockedStatic<SeleccionMapper> mockMapper = mockStatic(SeleccionMapper.class)) {
-            SeleccionResponse mapped = new SeleccionResponse();
-            mockMapper.when(() -> SeleccionMapper.seleccionToResponse(seleccion)).thenReturn(mapped);
-
-            // Act
-            Page<SeleccionResponse> resultado = queryService.obtenerSeleccionesPaginadas(page, size);
-
-            // Assert
-            assertEquals(1, resultado.getTotalElements());
-            assertEquals(mapped, resultado.getContent().get(0));
-            verify(seleccionRepository).findByVisibilidadTrue(PageRequest.of(page, size));
+            SeleccionResponse out = service.obtenerSeleccion(9);
+            assertSame(esperado, out);
         }
-    }
 
-    @Test
-    void obtenerSeleccion_deberiaVerificarYRetornarSeleccionResponse() {
-        // Arrange
-        int id = 10;
-        Seleccion seleccion = new Seleccion();
-
-        when(verificarExistenciaService.verificarSeleccion(id)).thenReturn(seleccion);
-
-        SeleccionResponse esperado = new SeleccionResponse();
-
-        try (MockedStatic<SeleccionMapper> mockMapper = mockStatic(SeleccionMapper.class)) {
-            mockMapper.when(() -> SeleccionMapper.seleccionToResponse(seleccion)).thenReturn(esperado);
-
-            // Act
-            SeleccionResponse resultado = queryService.obtenerSeleccion(id);
-
-            // Assert
-            assertEquals(esperado, resultado);
-            verify(verificarExistenciaService).verificarSeleccion(id);
-        }
+        verify(verificar).verificarSeleccion(9);
+        verifyNoMoreInteractions(repository, verificar);
     }
 }

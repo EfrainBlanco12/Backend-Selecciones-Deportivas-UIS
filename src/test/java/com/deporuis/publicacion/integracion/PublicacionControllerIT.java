@@ -30,19 +30,17 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// Fuerza perfil test y evita que entre "dev"
 @ActiveProfiles("test")
 @TestPropertySource(properties = "spring.profiles.active=test")
 
 @WebMvcTest(
         controllers = PublicacionController.class,
-        // Excluye cualquier bean de auth (JwtFilter, configs, etc.) del slice MVC
         excludeFilters = @ComponentScan.Filter(
                 type = FilterType.REGEX,
                 pattern = "com\\.deporuis\\.auth\\..*"
         )
 )
-@AutoConfigureMockMvc(addFilters = true) // mantenemos la cadena de seguridad
+@AutoConfigureMockMvc(addFilters = true)
 class PublicacionControllerIT {
 
     @Autowired private MockMvc mvc;
@@ -50,7 +48,6 @@ class PublicacionControllerIT {
 
     @MockBean private PublicacionService service;
 
-    // Por si algún bean de auth se cuela por config
     @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
     @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
 
@@ -67,7 +64,6 @@ class PublicacionControllerIT {
         return r;
     }
 
-    // POST /crear (protegido) -> requiere rol válido + CSRF
     @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
     void crear_retorna200_ok() throws Exception {
@@ -82,7 +78,6 @@ class PublicacionControllerIT {
                 .andExpect(status().isOk()); // <- tu controller devuelve 200
     }
 
-    // GET /lista (bajo /private: autenticamos)
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test
     void lista_retorna200() throws Exception {
@@ -97,7 +92,6 @@ class PublicacionControllerIT {
                 .andExpect(status().isOk());
     }
 
-    // GET /obtener/{id} (bajo /private: autenticamos)
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test
     void obtenerPorId_retorna200() throws Exception {
@@ -109,7 +103,6 @@ class PublicacionControllerIT {
                 .andExpect(status().isOk());
     }
 
-    // PUT /actualizar/{id} (protegido) -> requiere rol + CSRF
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test
     void actualizar_retorna200() throws Exception {
@@ -117,27 +110,25 @@ class PublicacionControllerIT {
                 .thenReturn(new PublicacionResponse(3, "T2", "D2", "L2", LocalDateTime.now(), "30m", TipoPublicacion.NOTICIA, List.of(), List.of()));
 
         mvc.perform(put("/private/publicacion/actualizar/3")
-                        .with(csrf()) // CSRF requerido
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(buildReq())))
                 .andExpect(status().isOk());
     }
 
-    // DELETE /eliminar/{id} (protegido) -> requiere rol + CSRF
     @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
     void eliminar_retorna200_ok() throws Exception {
         mvc.perform(delete("/private/publicacion/eliminar/11")
-                        .with(csrf())) // CSRF requerido
-                .andExpect(status().isOk()); // <- tu controller devuelve 200
+                        .with(csrf()))
+                .andExpect(status().isOk());
     }
 
-    // PATCH /softdelete/{id} (protegido) -> requiere rol + CSRF
     @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
     void softdelete_retorna200_ok() throws Exception {
         mvc.perform(patch("/private/publicacion/softdelete/12")
-                        .with(csrf())) // CSRF requerido
-                .andExpect(status().isOk()); // <- tu controller devuelve 200
+                        .with(csrf()))
+                .andExpect(status().isOk());
     }
 }

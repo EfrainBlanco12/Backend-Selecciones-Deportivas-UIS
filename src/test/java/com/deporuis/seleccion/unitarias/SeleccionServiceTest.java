@@ -7,7 +7,10 @@ import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -16,86 +19,68 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class SeleccionServiceTest {
 
-    @InjectMocks
-    private SeleccionService seleccionService;
+    @InjectMocks private SeleccionService service;
+    @Mock private SeleccionCommandService commandService;
+    @Mock private SeleccionQueryService queryService;
 
-    @Mock
-    private SeleccionCommandService seleccionCommandService;
-
-    @Mock
-    private SeleccionQueryService seleccionQueryService;
+    private SeleccionRequest request;
+    private SeleccionResponse response;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setup() {
+        request = new SeleccionRequest();
+        response = new SeleccionResponse();
     }
 
     @Test
-    void crearSeleccion_deberiaDelegarEnCommandService() {
-        SeleccionRequest request = new SeleccionRequest();
-        SeleccionResponse responseEsperado = new SeleccionResponse();
-        when(seleccionCommandService.crearSeleccion(request)).thenReturn(responseEsperado);
-
-        SeleccionResponse response = seleccionService.crearSeleccion(request);
-
-        assertEquals(responseEsperado, response);
-        verify(seleccionCommandService).crearSeleccion(request);
+    void crearSeleccion_delegaEnCommand() {
+        when(commandService.crearSeleccion(request)).thenReturn(response);
+        assertSame(response, service.crearSeleccion(request));
+        verify(commandService).crearSeleccion(request);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
-    void obtenerSeleccionesPaginadas_deberiaDelegarEnQueryService() {
-        int page = 0, size = 10;
-        Page<SeleccionResponse> pagina = new PageImpl<>(List.of(new SeleccionResponse()));
-        when(seleccionQueryService.obtenerSeleccionesPaginadas(page, size)).thenReturn(pagina);
-
-        Page<SeleccionResponse> resultado = seleccionService.obtenerSeleccionesPaginadas(page, size);
-
-        assertEquals(pagina, resultado);
-        verify(seleccionQueryService).obtenerSeleccionesPaginadas(page, size);
+    void obtenerSeleccionesPaginadas_delegaEnQuery() {
+        Page<SeleccionResponse> page = new PageImpl<>(List.of(new SeleccionResponse()));
+        when(queryService.obtenerSeleccionesPaginadas(0, 5)).thenReturn(page);
+        assertSame(page, service.obtenerSeleccionesPaginadas(0, 5));
+        verify(queryService).obtenerSeleccionesPaginadas(0, 5);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
-    void obtenerSeleccion_deberiaDelegarEnQueryService() {
-        int id = 1;
-        SeleccionResponse esperado = new SeleccionResponse();
-        when(seleccionQueryService.obtenerSeleccion(id)).thenReturn(esperado);
-
-        SeleccionResponse resultado = seleccionService.obtenerSeleccion(id);
-
-        assertEquals(esperado, resultado);
-        verify(seleccionQueryService).obtenerSeleccion(id);
+    void obtenerSeleccion_delegaEnQuery() {
+        when(queryService.obtenerSeleccion(42)).thenReturn(response);
+        assertSame(response, service.obtenerSeleccion(42));
+        verify(queryService).obtenerSeleccion(42);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
-    void eliminarSeleccion_deberiaDelegarEnCommandService() {
-        int id = 1;
-
-        seleccionService.eliminarSeleccion(id);
-
-        verify(seleccionCommandService).eliminarSeleccion(id);
+    void eliminarSeleccion_delegaEnCommand() {
+        doNothing().when(commandService).eliminarSeleccion(11);
+        service.eliminarSeleccion(11);
+        verify(commandService).eliminarSeleccion(11);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
-    void softDeleteSeleccion_deberiaDelegarEnCommandService() {
-        int id = 1;
-
-        seleccionService.softDeleteSeleccion(id);
-
-        verify(seleccionCommandService).softDeleteSeleccion(id);
+    void softDeleteSeleccion_delegaEnCommand() {
+        doNothing().when(commandService).softDeleteSeleccion(9);
+        service.softDeleteSeleccion(9);
+        verify(commandService).softDeleteSeleccion(9);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
-    void actualizarSeleccion_deberiaDelegarEnCommandService() {
-        int id = 1;
-        SeleccionRequest request = new SeleccionRequest();
-        SeleccionResponse esperado = new SeleccionResponse();
-        when(seleccionCommandService.actualizarSeleccion(id, request)).thenReturn(esperado);
-
-        SeleccionResponse resultado = seleccionService.actualizarSeleccion(id, request);
-
-        assertEquals(esperado, resultado);
-        verify(seleccionCommandService).actualizarSeleccion(id, request);
+    void actualizarSeleccion_delegaEnCommand() {
+        when(commandService.actualizarSeleccion(7, request)).thenReturn(response);
+        assertSame(response, service.actualizarSeleccion(7, request));
+        verify(commandService).actualizarSeleccion(7, request);
+        verifyNoMoreInteractions(commandService, queryService);
     }
 }
