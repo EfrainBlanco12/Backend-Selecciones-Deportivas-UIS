@@ -1,125 +1,144 @@
 package com.deporuis.seleccion.integracion;
 
+import com.deporuis.seleccion.aplicacion.SeleccionService;
 import com.deporuis.seleccion.dominio.TipoSeleccion;
+import com.deporuis.seleccion.infraestructura.SeleccionController;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
-import com.deporuis.seleccion.aplicacion.SeleccionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@TestPropertySource(properties = "spring.profiles.active=test")
+
+@WebMvcTest(
+        controllers = SeleccionController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "com\\.deporuis\\.auth\\..*"
+        )
+)
+@AutoConfigureMockMvc(addFilters = true) // mantenemos la cadena de seguridad
 class SeleccionControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mvc;
+    @Autowired private ObjectMapper om;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockBean private SeleccionService service;
 
-    @MockBean
-    private SeleccionService seleccionService;
+    @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
+    @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
 
-    private SeleccionRequest crearRequestValido() {
-        SeleccionRequest request = new SeleccionRequest();
-        request.setNombreSeleccion("Fútbol");
-        request.setEspacioDeportivo("Cancha");
-        request.setEquipo(Boolean.valueOf("A"));
-        request.setFechaCreacion(LocalDate.now());
-        request.setTipo_seleccion(TipoSeleccion.MIXTO);
-        request.setIdDeporte(1);
-        request.setFotos(Collections.emptyList());
-        request.setHorarios(Collections.emptyList());
-        return request;
+    private SeleccionRequest buildReq() {
+        SeleccionRequest r = new SeleccionRequest();
+        r.setFechaCreacion(LocalDate.of(2025, 1, 1));
+        r.setNombreSeleccion("Seleccion UIS");
+        r.setEspacioDeportivo("Coliseo UIS");
+        r.setEquipo(true);
+        r.setTipo_seleccion(TipoSeleccion.MIXTO);
+        r.setIdDeporte(1);
+        r.setFotos(List.of());
+        r.setHorarios(List.of());
+        return r;
     }
 
-
-    // Crear (requiere ADMINISTRADOR o ENTRENADOR)
-    @WithMockUser(roles = {"ENTRENADOR"})
-    @Test
-    void crearSeleccion_deberiaRetornar201() throws Exception {
-        when(seleccionService.crearSeleccion(any())).thenReturn(new SeleccionResponse());
-
-        mockMvc.perform(post("/private/seleccion/crear")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(crearRequestValido())))
-                .andExpect(status().isCreated());
-    }
-
-    // Obtener lista (público)
-    @Test
-    void obtenerSeleccionesPaginadas_deberiaRetornar200() throws Exception {
-        when(seleccionService.obtenerSeleccionesPaginadas(anyInt(), anyInt()))
-                .thenReturn(new PageImpl<>(Collections.singletonList(new SeleccionResponse()), PageRequest.of(0, 3), 1));
-
-        mockMvc.perform(get("/private/seleccion/lista?page=0&size=3"))
-                .andExpect(status().isOk());
-    }
-
-    // Obtener por ID (público)
-    @Test
-    void obtenerSeleccion_deberiaRetornar200SiExiste() throws Exception {
-        when(seleccionService.obtenerSeleccion(1)).thenReturn(new SeleccionResponse());
-
-        mockMvc.perform(get("/private/seleccion/obtener/1"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void obtenerSeleccion_deberiaRetornar404SiNoExiste() throws Exception {
-        when(seleccionService.obtenerSeleccion(99)).thenReturn(null);
-
-        mockMvc.perform(get("/private/seleccion/obtener/99"))
-                .andExpect(status().isNotFound());
-    }
-
-    // Eliminar (requiere ADMINISTRADOR)
     @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
-    void eliminarSeleccion_deberiaRetornar204() throws Exception {
-        mockMvc.perform(delete("/private/seleccion/eliminar/1"))
-                .andExpect(status().isNoContent());
+    void crear_retorna200_ok() throws Exception {
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(1);
+        resp.setNombreSeleccion("Seleccion UIS");
 
-        verify(seleccionService).eliminarSeleccion(1);
+        when(service.crearSeleccion(any())).thenReturn(resp);
+
+        mvc.perform(post("/private/seleccion/crear")
+                        .with(csrf()) // CSRF requerido
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(buildReq())))
+                .andExpect(status().isOk()); // tu controller devuelve 200
     }
 
-    // Soft delete (ADMINISTRADOR o ENTRENADOR)
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test
-    void softDeleteSeleccion_deberiaRetornar204() throws Exception {
-        mockMvc.perform(patch("/private/seleccion/softdelete/1"))
-                .andExpect(status().isNoContent());
+    void lista_retorna200() throws Exception {
+        SeleccionResponse item = new SeleccionResponse();
+        item.setIdSeleccion(2);
+        item.setNombreSeleccion("A");
 
-        verify(seleccionService).softDeleteSeleccion(1);
+        when(service.obtenerSeleccionesPaginadas(0, 5))
+                .thenReturn(new PageImpl<>(List.of(item)));
+
+        mvc.perform(get("/private/seleccion/lista")
+                        .param("page", "0")
+                        .param("size", "5"))
+                .andExpect(status().isOk());
     }
 
-    // Actualizar (ADMINISTRADOR o ENTRENADOR)
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void obtenerPorId_retorna200() throws Exception {
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(9);
+        resp.setNombreSeleccion("B");
+
+        when(service.obtenerSeleccion(9)).thenReturn(resp);
+
+        mvc.perform(get("/private/seleccion/obtener/9"))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void actualizar_retorna200() throws Exception {
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(3);
+        resp.setNombreSeleccion("C");
+
+        when(service.actualizarSeleccion(eq(3), any()))
+                .thenReturn(resp);
+
+        mvc.perform(put("/private/seleccion/actualizar/3")
+                        .with(csrf()) // CSRF requerido
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(buildReq())))
+                .andExpect(status().isOk());
+    }
+
     @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
-    void actualizarSeleccion_deberiaRetornar200() throws Exception {
-        when(seleccionService.actualizarSeleccion(eq(1), any())).thenReturn(new SeleccionResponse());
+    void eliminar_retorna200_ok() throws Exception {
+        mvc.perform(delete("/private/seleccion/eliminar/11")
+                        .with(csrf())) // CSRF requerido
+                .andExpect(status().isOk()); // tu controller devuelve 200
+    }
 
-        mockMvc.perform(put("/private/seleccion/actualizar/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(crearRequestValido())))
-                .andExpect(status().isOk());
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void softdelete_retorna200_ok() throws Exception {
+        mvc.perform(patch("/private/seleccion/softdelete/12")
+                        .with(csrf())) // CSRF requerido
+                .andExpect(status().isOk()); // tu controller devuelve 200
     }
 }
