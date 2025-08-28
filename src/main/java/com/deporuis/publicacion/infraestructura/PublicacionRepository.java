@@ -1,12 +1,32 @@
 package com.deporuis.publicacion.infraestructura;
 
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.publicacion.dominio.TipoPublicacion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PublicacionRepository extends JpaRepository<Publicacion, Integer> {
     Page<Publicacion> findByVisibilidadTrue(Pageable pageable);
+
+    Page<Publicacion> findByVisibilidadTrueAndTipoPublicacion(TipoPublicacion tipo, Pageable pageable);
+
+    Optional<Publicacion> findByIdPublicacionAndVisibilidadTrue(Integer idPublicacion);
+
+    // Trae TODOS los idSeleccion asociados a una publicación
+    @Query("""
+           select s.idSeleccion
+           from com.deporuis.seleccion.dominio.SeleccionPublicacion sp
+           join sp.seleccion s
+           where sp.publicacion.idPublicacion = :pubId
+           """)
+    List<Integer> findSeleccionIdsByPublicacionId(@Param("pubId") Integer pubId);
 }

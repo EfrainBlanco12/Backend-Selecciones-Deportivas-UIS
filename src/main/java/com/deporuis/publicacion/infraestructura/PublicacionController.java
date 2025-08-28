@@ -42,6 +42,30 @@ public class PublicacionController {
     }
 
     /**
+     * Obtener publicaciones de tipo NOTICIA (GET /private/publicacion/lista/noticias)
+     */
+    @GetMapping("/lista/noticias")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerNoticiasPaginadas(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size
+    ) {
+        Page<PublicacionResponse> pagina = publicacionService.obtenerNoticiasPaginadas(page, size);
+        return ResponseEntity.ok(pagina);
+    }
+
+    /**
+     * Obtener publicaciones de tipo EVENTO (GET /private/publicacion/lista/evento)
+     */
+    @GetMapping("/lista/eventos")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerEventosPaginados(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size
+    ) {
+        Page<PublicacionResponse> pagina = publicacionService.obtenerEventosPaginados(page, size);
+        return ResponseEntity.ok(pagina);
+    }
+
+    /**
      * Obtener una sola publicación por su ID (GET /publicacion/{id})
      */
     @GetMapping("/obtener/{id}")
