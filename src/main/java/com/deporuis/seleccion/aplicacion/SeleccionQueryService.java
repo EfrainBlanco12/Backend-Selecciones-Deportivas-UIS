@@ -4,6 +4,10 @@ import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
+import com.deporuis.logro.aplicacion.mapper.LogroMapper;
+import com.deporuis.logro.dominio.Logro;
+import com.deporuis.logro.infraestructura.LogroRepository;
+import com.deporuis.logro.infraestructura.dto.LogroResponse;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.aplicacion.mapper.SeleccionMapper;
@@ -30,6 +34,9 @@ public class SeleccionQueryService {
     @Autowired
     private IntegranteRepository integranteRepository;
 
+    @Autowired
+    private LogroRepository logroRepository;
+
     @Transactional(readOnly = true)
     public Page<SeleccionResponse> obtenerSeleccionesPaginadas(Integer page, Integer size) {
         // findByVisibilidadTrue tiene @EntityGraph: deporte, fotos, horarios.horario
@@ -45,7 +52,6 @@ public class SeleccionQueryService {
         return SeleccionMapper.seleccionToResponse(seleccion);
     }
 
-    // 🔹 NUEVO: integrantes de una selección (paginado)
     @Transactional(readOnly = true)
     public Page<IntegranteResponse> obtenerIntegrantesDeSeleccion(Integer idSeleccion, int page, int size) {
         seleccionVerificarExistenciaService.verificarSeleccion(idSeleccion);
@@ -55,6 +61,14 @@ public class SeleccionQueryService {
                 integranteRepository.findByVisibilidadTrueAndSeleccion_IdSeleccion(idSeleccion, pageable);
 
         return pageEntities.map(IntegranteMapper::integranteToResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LogroResponse> obtenerLogrosDeSeleccion(Integer idSeleccion, int page, int size) {
+        seleccionVerificarExistenciaService.verificarSeleccion(idSeleccion);
+        var pageable = PageRequest.of(page, size, Sort.by("idLogro").descending());
+        var pageEntities = logroRepository.findLogrosBySeleccion(idSeleccion, pageable);
+        return pageEntities.map(LogroMapper::toResponse);
     }
 
 }
