@@ -2,6 +2,7 @@ package com.deporuis.seleccion.infraestructura;
 
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.logro.infraestructura.dto.LogroResponse;
+import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/private/seleccion")
@@ -93,5 +96,13 @@ public class SeleccionController {
     ) {
         var result = seleccionService.obtenerLogrosSeleccion(idSeleccion, page, size);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{idSeleccion}/eventos")
+    public ResponseEntity<List<PublicacionResponse>> obtenerUltimosEventos(
+            @PathVariable Integer idSeleccion
+    ) {
+        var body = seleccionService.ultimosEventos(idSeleccion);
+        return ResponseEntity.ok(body);
     }
 }

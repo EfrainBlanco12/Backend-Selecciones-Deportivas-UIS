@@ -22,7 +22,6 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Intege
 
     Optional<Publicacion> findByIdPublicacionAndVisibilidadTrue(Integer idPublicacion);
 
-    // Trae TODOS los idSeleccion asociados a una publicación
     @Query("""
            select s.idSeleccion
            from com.deporuis.seleccion.dominio.SeleccionPublicacion sp
@@ -38,4 +37,19 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Intege
            where sp.publicacion.idPublicacion = :pubId
            """)
     List<SeleccionPublicacionResponse> findSeleccionDtosByPublicacionId(@Param("pubId") Integer pubId);
+
+    @Query("""
+        SELECT p
+        FROM Publicacion p
+        JOIN SeleccionPublicacion sp ON sp.publicacion.id = p.id
+        WHERE sp.seleccion.id = :idSeleccion
+          AND p.tipoPublicacion = :tipo
+          AND p.visibilidad = true
+        ORDER BY p.fecha DESC
+    """)
+    Page<Publicacion> findBySeleccionAndTipoOrderByFechaDesc(
+            @Param("idSeleccion") Integer idSeleccion,
+            @Param("tipo") TipoPublicacion tipo,
+            Pageable pageable
+    );
 }
