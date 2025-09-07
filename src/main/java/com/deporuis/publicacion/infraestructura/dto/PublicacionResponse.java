@@ -2,6 +2,7 @@ package com.deporuis.publicacion.infraestructura.dto;
 
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,5 +27,5 @@ public class PublicacionResponse {
     private LocalDateTime fechaCreacion;
 
     private List<FotoResponse> fotos;
-    private List<Integer> idSelecciones;
+    private List<SeleccionPublicacionResponse> idSelecciones;
 }

@@ -1,5 +1,6 @@
 package com.deporuis.seleccion.infraestructura;
 
+import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
@@ -89,5 +90,16 @@ public class SeleccionController {
     ){
         SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccion(id, seleccionRequest);
         return ResponseEntity.ok(seleccionActualizada);
+    }
+
+    @GetMapping("/{idSeleccion}/integrantes")
+    public ResponseEntity<Page<IntegranteResponse>> obtenerIntegrantesDeSeleccion(
+            @PathVariable Integer idSeleccion,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<IntegranteResponse> result =
+                seleccionService.obtenerIntegrantesSeleccion(idSeleccion, page, size);
+        return ResponseEntity.ok(result);
     }
 }

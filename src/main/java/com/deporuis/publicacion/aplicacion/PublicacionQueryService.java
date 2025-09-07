@@ -26,7 +26,7 @@ public class PublicacionQueryService {
         var content = pubs.getContent().stream()
                 .map(p -> {
                     var dto = PublicacionMapper.toResponse(p);
-                    dto.setIdSelecciones(obtenerIdsSeleccionDesdeRepo(p.getIdPublicacion())); // ← AQUÍ
+                    dto.setIdSelecciones(obtenerSeleccionesDesdeRepo(p.getIdPublicacion()));
                     return dto;
                 })
                 .toList();
@@ -42,7 +42,7 @@ public class PublicacionQueryService {
         var content = pubs.getContent().stream()
                 .map(p -> {
                     var dto = PublicacionMapper.toResponse(p);
-                    dto.setIdSelecciones(obtenerIdsSeleccionDesdeRepo(p.getIdPublicacion())); // ← AQUÍ
+                    dto.setIdSelecciones(obtenerSeleccionesDesdeRepo(p.getIdPublicacion()));
                     return dto;
                 })
                 .toList();
@@ -53,14 +53,16 @@ public class PublicacionQueryService {
     @Transactional(readOnly = true)
     public PublicacionResponse obtenerPublicacion(Integer id) {
         var pub = publicacionRepository.findByIdPublicacionAndVisibilidadTrue(id)
-                .orElseThrow(() -> new EntityNotFoundException("Publicación no encontrada"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Publicación no encontrada"));
 
         var dto = PublicacionMapper.toResponse(pub);
-        dto.setIdSelecciones(obtenerIdsSeleccionDesdeRepo(id));
+        dto.setIdSelecciones(obtenerSeleccionesDesdeRepo(id));
         return dto;
     }
 
-    private List<Integer> obtenerIdsSeleccionDesdeRepo(Integer pubId) {
-        return publicacionRepository.findSeleccionIdsByPublicacionId(pubId);
+    private java.util.List<com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse>
+    obtenerSeleccionesDesdeRepo(Integer pubId) {
+        return publicacionRepository.findSeleccionDtosByPublicacionId(pubId);
     }
 }
+

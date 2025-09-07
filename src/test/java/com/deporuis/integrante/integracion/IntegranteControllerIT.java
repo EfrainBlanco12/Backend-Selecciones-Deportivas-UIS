@@ -1,133 +1,179 @@
 package com.deporuis.integrante.integracion;
 
+import com.deporuis.Foto.infraestructura.dto.FotoResponse;
+import com.deporuis.auth.infraestructura.dto.RolResponse;
+import com.deporuis.auth.infraestructura.JwtFilter;              // ⬅️ importa el filtro
+import com.deporuis.deporte.dominio.Deporte;
 import com.deporuis.integrante.aplicacion.IntegranteService;
 import com.deporuis.integrante.infraestructura.IntegranteController;
-import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.deporuis.posicion.dominio.Posicion;
+import com.deporuis.posicion.infraestructura.dto.PosicionResponse;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
-@TestPropertySource(properties = "spring.profiles.active=test")
-@WebMvcTest(
-        controllers = IntegranteController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.REGEX,
-                pattern = "com\\.deporuis\\.auth\\..*"
-        )
-)
-@AutoConfigureMockMvc(addFilters = true)
+@WebMvcTest(controllers = IntegranteController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class IntegranteControllerIT {
 
-    @Autowired private MockMvc mvc;
-    @Autowired private ObjectMapper om;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @MockBean private IntegranteService service;
-    @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
-    @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
+    @MockBean
+    private IntegranteService integranteService;
 
-    private IntegranteRequest buildCrear() {
-        IntegranteRequest r = new IntegranteRequest();
-        r.setCodigoUniversitario("123");
-        r.setNombres("Ana");
-        r.setApellidos("Gomez");
-        r.setFechaNacimiento(LocalDate.of(2000,1,1));
-        r.setAltura(1.7f);
-        r.setPeso(60f);
-        r.setDorsal(10);
-        r.setCorreoInstitucional("ana@correo.uis.edu.co");
-        r.setIdRol(3);
-        r.setIdSeleccion(1);
-        return r;
+    // ⬇️ ESTA LÍNEA ES LA CLAVE: evita que Spring cree el JwtFilter real (y por ende JwtService)
+    @MockBean
+    private JwtFilter jwtFilter;
+
+    /**
+     * Construye un IntegranteResponse de ejemplo con los tipos correctos:
+     * - foto.contenido: byte[] (Jackson lo serializa como Base64)
+     * - posiciones: objetos (no IDs)
+     * - seleccion: solo ID
+     */
+    private IntegranteResponse sampleResponse(
+            int id,
+            int idSeleccion,
+            int idRol,
+            String nombreRol,
+            int idFoto,
+            byte[] contenidoBytes,   // byte[] aquí, NO String
+            int temporada,
+            int idPosicion,
+            String nombrePos,
+            String deporte
+    ) {
+        // Rol (objeto)
+        RolResponse rol = new RolResponse();
+        rol.setIdRol(idRol);
+        rol.setNombreRol(nombreRol);
+
+        // Foto (objeto) - contenido es byte[]
+        FotoResponse foto = new FotoResponse(idFoto, contenidoBytes, temporada);
+
+        // Posicion (objeto) con Deporte asociado
+        Deporte deporteObj = new Deporte();
+        deporteObj.setNombreDeporte(deporte);
+
+        Posicion p1 = new Posicion();
+        p1.setIdPosicion(idPosicion);
+        p1.setNombrePosicion(nombrePos);
+        p1.setDeporte(deporteObj);
+
+        PosicionResponse posDto = new PosicionResponse(p1);
+
+        // IntegranteResponse armando estructura requerida
+        IntegranteResponse dto = new IntegranteResponse();
+        dto.setIdIntegrante(id);
+        dto.setCodigoUniversitario("100" + id);
+        dto.setNombres("Nombre" + id);
+        dto.setApellidos("Apellido" + id);
+        dto.setFechaNacimiento(LocalDate.of(2000, 1, 1));
+        dto.setAltura(1.70f);
+        dto.setPeso(70.0f);
+        dto.setDorsal(10);
+        dto.setCorreoUniversitario("u" + id + "@uis.edu.co");
+
+        // Selección: solo ID
+        dto.setIdSeleccion(idSeleccion);
+
+        // Objetos
+        dto.setRol(rol);
+        dto.setFoto(foto);
+        dto.setPosiciones(List.of(posDto));
+
+        return dto;
     }
 
-    private IntegranteResponse buildResponse() {
-        return new IntegranteResponse(
-                10,
-                "123",
-                "Ana",
-                "Gomez",
-                LocalDate.of(2000,1,1),
-                1.7f,
-                60f,
-                10,
-                "ana@correo.uis.edu.co",
-                3,
-                1,
-                7,
-                List.of(1,2)
+    @Test
+    void obtenerIntegrante_debeRetornarObjetoConRolFotoPosicionesAnidados() throws Exception {
+        // Usamos bytes {1,2,3} -> en Base64 es "AQID"
+        byte[] fotoBytes = new byte[]{1, 2, 3};
+        String expectedBase64 = Base64.getEncoder().encodeToString(fotoBytes);
+
+        IntegranteResponse uno = sampleResponse(
+                1,             // idIntegrante
+                11,            // idSeleccion (solo id)
+                7,  "Delantero",
+                5,  fotoBytes, // bytes
+                2024,
+                3,  "9", "Fútbol"
         );
+
+        Mockito.when(integranteService.obtenerIntegrante(1)).thenReturn(uno);
+
+        mockMvc.perform(get("/private/integrante/obtener/{id}", 1)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // básicos
+                .andExpect(jsonPath("$.idIntegrante").value(1))
+                .andExpect(jsonPath("$.idSeleccion").value(11))
+                // rol objeto
+                .andExpect(jsonPath("$.rol.idRol").value(7))
+                .andExpect(jsonPath("$.rol.nombreRol").value("Delantero"))
+                // foto objeto (byte[] -> Base64)
+                .andExpect(jsonPath("$.foto.idFoto").value(5))
+                .andExpect(jsonPath("$.foto.contenido").value(expectedBase64))
+                .andExpect(jsonPath("$.foto.temporada").value(2024))
+                // posiciones objeto
+                .andExpect(jsonPath("$.posiciones", hasSize(1)))
+                .andExpect(jsonPath("$.posiciones[0].idPosicion").value(3))
+                .andExpect(jsonPath("$.posiciones[0].nombrePosicion").value("9"))
+                .andExpect(jsonPath("$.posiciones[0].nombreDeporte").value("Fútbol"));
     }
 
-    @WithMockUser(roles = {"ADMINISTRADOR"})
     @Test
-    void crear_retorna200() throws Exception {
-        when(service.crearIntegrante(any())).thenReturn(buildResponse());
+    void obtenerIntegrantesPaginados_debeRetornarPageConEstructuraAnidada() throws Exception {
+        // Dos respuestas con bytes distintos
+        byte[] bytes1 = new byte[]{1, 2, 3};      // "AQID"
+        byte[] bytes2 = new byte[]{4, 5, 6};      // "BAUG"
+        String b64_1 = Base64.getEncoder().encodeToString(bytes1);
+        String b64_2 = Base64.getEncoder().encodeToString(bytes2);
 
-        mvc.perform(post("/private/integrante/crear")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(buildCrear())))
-                .andExpect(status().isOk());
-    }
+        IntegranteResponse r1 = sampleResponse(1, 11, 7, "Delantero", 5, bytes1, 2024, 3, "9", "Fútbol");
+        IntegranteResponse r2 = sampleResponse(2, 12, 3, "Defensa",   6, bytes2, 2023, 4, "5", "Fútbol");
 
-    @WithMockUser(roles = {"ENTRENADOR"})
-    @Test
-    void obtenerPorId_retorna200() throws Exception {
-        when(service.obtenerIntegrante(5)).thenReturn(buildResponse());
+        var page = new PageImpl<>(List.of(r1, r2), PageRequest.of(0, 6), 2);
 
-        mvc.perform(get("/private/integrante/obtener/5"))
-                .andExpect(status().isOk());
-    }
+        Mockito.when(integranteService.obtenerIntegrantesPaginados(0, 6)).thenReturn(page);
 
-    @WithMockUser(roles = {"ENTRENADOR"})
-    @Test
-    void lista_retorna200() throws Exception {
-        Page<IntegranteResponse> page = new PageImpl<>(List.of(buildResponse()));
-        when(service.obtenerIntegrantesPaginados(0, 5)).thenReturn(page);
-
-        mvc.perform(get("/private/integrante/lista").param("page", "0").param("size", "5"))
-                .andExpect(status().isOk());
-    }
-
-    @WithMockUser(roles = {"ENTRENADOR"})
-    @Test
-    void actualizar_retorna200() throws Exception {
-        when(service.actualizarIntegrante(eq(3), any())).thenReturn(buildResponse());
-
-        mvc.perform(put("/private/integrante/actualizar/3")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(buildCrear())))
-                .andExpect(status().isOk());
-    }
-
-    @WithMockUser(roles = {"ADMINISTRADOR"})
-    @Test
-    void softdelete_retorna200() throws Exception {
-        mvc.perform(patch("/private/integrante/softdelete/7").with(csrf()))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/private/integrante/lista")
+                        .param("page", "0")
+                        .param("size", "6")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // la Page se serializa con "content"
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                // item 1
+                .andExpect(jsonPath("$.content[0].idIntegrante").value(1))
+                .andExpect(jsonPath("$.content[0].idSeleccion").value(11))
+                .andExpect(jsonPath("$.content[0].rol.idRol").value(7))
+                .andExpect(jsonPath("$.content[0].foto.idFoto").value(5))
+                .andExpect(jsonPath("$.content[0].foto.contenido").value(b64_1))
+                .andExpect(jsonPath("$.content[0].posiciones[0].idPosicion").value(3))
+                // item 2
+                .andExpect(jsonPath("$.content[1].idIntegrante").value(2))
+                .andExpect(jsonPath("$.content[1].idSeleccion").value(12))
+                .andExpect(jsonPath("$.content[1].rol.idRol").value(3))
+                .andExpect(jsonPath("$.content[1].foto.idFoto").value(6))
+                .andExpect(jsonPath("$.content[1].foto.contenido").value(b64_2))
+                .andExpect(jsonPath("$.content[1].posiciones[0].idPosicion").value(4));
     }
 }

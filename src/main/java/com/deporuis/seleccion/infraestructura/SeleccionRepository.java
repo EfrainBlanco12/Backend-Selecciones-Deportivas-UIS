@@ -17,5 +17,7 @@ public interface SeleccionRepository extends JpaRepository<Seleccion,Integer> {
 
     @EntityGraph(attributePaths = { "deporte", "fotos", "horarios", "horarios.horario" })
     Optional<Seleccion> findById(Integer id);
+
+    boolean existsByIdSeleccion(Integer idSeleccion);
 }
 

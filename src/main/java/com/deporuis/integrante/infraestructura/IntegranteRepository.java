@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -19,4 +21,6 @@ public interface IntegranteRepository extends JpaRepository<Integrante, Integer>
 
 
     Page<Integrante> findByVisibilidadTrue(Pageable pageable);
+
+    Page<Integrante> findByVisibilidadTrueAndSeleccion_IdSeleccion(Integer idSeleccion, Pageable pageable);
 }

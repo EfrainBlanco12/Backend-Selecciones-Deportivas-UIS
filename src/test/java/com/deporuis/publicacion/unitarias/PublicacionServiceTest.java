@@ -3,70 +3,157 @@ package com.deporuis.publicacion.unitarias;
 import com.deporuis.publicacion.aplicacion.PublicacionCommandService;
 import com.deporuis.publicacion.aplicacion.PublicacionQueryService;
 import com.deporuis.publicacion.aplicacion.PublicacionService;
+import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Pruebas unitarias de la fachada PublicacionService.
+ * Verifica que delega correctamente en CommandService y QueryService.
+ */
+@ExtendWith(MockitoExtension.class)
 class PublicacionServiceTest {
 
-    @InjectMocks private PublicacionService service;
-    @Mock private PublicacionCommandService command;
-    @Mock private PublicacionQueryService query;
+    @Mock private PublicacionCommandService commandService;
+    @Mock private PublicacionQueryService queryService;
 
-    @BeforeEach void open() { MockitoAnnotations.openMocks(this); }
+    @InjectMocks
+    private PublicacionService service; // fachada real
 
-    @Test
-    void crear_delegaEnCommand() {
-        PublicacionRequest req = new PublicacionRequest();
-        PublicacionResponse resp = new PublicacionResponse(1, "t", "d", "l", null, "x", null, List.of(), List.of());
-        when(command.crearPublicacion(req)).thenReturn(resp);
+    private PublicacionRequest req;
+    private PublicacionResponse resp;
 
-        assertEquals(resp, service.crearPublicacion(req));
-        verify(command).crearPublicacion(req);
+    @BeforeEach
+    void setUp() {
+        req = new PublicacionRequest();
+        req.setTitulo("Inicio");
+        req.setDescripcion("Desc");
+        req.setLugar("Cancha A");
+        req.setFecha(LocalDateTime.of(2024,1,1,9,0));
+        req.setDuracion("2h");
+        req.setTipoPublicacion(TipoPublicacion.NOTICIA);
+
+        resp = new PublicacionResponse();
+        resp.setIdPublicacion(1);
+        resp.setTitulo("Inicio");
+        resp.setDescripcion("Desc");
+        resp.setLugar("Cancha A");
+        resp.setFecha(LocalDateTime.of(2024,1,1,9,0));
+        resp.setDuracion("2h");
+        resp.setVisibilidad(true);
+        resp.setTipoPublicacion(TipoPublicacion.NOTICIA.name());
+        resp.setFechaCreacion(LocalDateTime.of(2024,1,1,9,0));
+        resp.setIdSelecciones(List.of(10,20));
     }
 
     @Test
-    void obtenerPorId_delegaEnQuery() {
-        PublicacionResponse r = new PublicacionResponse(1, "t", "d", "l", null, "x", null, List.of(), List.of());
-        when(query.obtenerPublicacion(1)).thenReturn(r);
+    void crearPublicacion_delegaEnCommandService_yRetornaResponse() {
+        when(commandService.crearPublicacion(any(PublicacionRequest.class))).thenReturn(resp);
 
-        assertEquals(r, service.obtenerPublicacion(1));
-        verify(query).obtenerPublicacion(1);
+        PublicacionResponse out = service.crearPublicacion(req);
+
+        assertNotNull(out);
+        assertEquals(1, out.getIdPublicacion());
+        verify(commandService).crearPublicacion(eq(req));
+        verifyNoInteractions(queryService);
     }
 
     @Test
-    void obtenerPaginadas_delegaEnQuery() {
-        Page<PublicacionResponse> page = new PageImpl<>(List.of(
-                new PublicacionResponse(1, "t", "d", "l", null, "x", null, List.of(), List.of())
-        ));
-        when(query.obtenerPublicacionesPaginadas(0, 5)).thenReturn(page);
+    void actualizarPublicacion_delegaEnCommandService_yRetornaResponse() {
+        when(commandService.actualizarPublicacion(eq(7), any(PublicacionRequest.class))).thenReturn(resp);
 
-        assertEquals(page, service.obtenerPublicacionesPaginadas(0, 5));
-        verify(query).obtenerPublicacionesPaginadas(0, 5);
+        PublicacionResponse out = service.actualizarPublicacion(7, req);
+
+        assertNotNull(out);
+        assertEquals(1, out.getIdPublicacion());
+        verify(commandService).actualizarPublicacion(eq(7), eq(req));
+        verifyNoInteractions(queryService);
     }
 
     @Test
-    void actualizar_eliminar_softDelete_deleganEnCommand() {
-        PublicacionRequest req = new PublicacionRequest();
-        PublicacionResponse resp = new PublicacionResponse(1, "t", "d", "l", null, "x", null, List.of(), List.of());
+    void obtenerPublicacion_delegaEnQueryService_yRetornaResponse() {
+        when(queryService.obtenerPublicacion(5)).thenReturn(resp);
 
-        when(command.actualizarPublicacion(2, req)).thenReturn(resp);
-        assertEquals(resp, service.actualizarPublicacion(2, req));
-        verify(command).actualizarPublicacion(2, req);
+        PublicacionResponse out = service.obtenerPublicacion(5);
 
-        service.eliminarPublicacion(3);
-        verify(command).eliminarPublicacion(3);
+        assertNotNull(out);
+        assertEquals(1, out.getIdPublicacion());
+        verify(queryService).obtenerPublicacion(5);
+        verifyNoInteractions(commandService);
+    }
 
-        service.softDeletePublicacion(4);
-        verify(command).softDeletePublicacion(4);
+    @Test
+    void obtenerPublicacionesPaginadas_delegaEnQueryService() {
+        PageImpl<PublicacionResponse> page =
+                new PageImpl<>(List.of(resp), PageRequest.of(0,5, Sort.by("fecha").descending()), 1);
+
+        when(queryService.obtenerPublicacionesPaginadas(0,5)).thenReturn(page);
+
+        Page<PublicacionResponse> out = service.obtenerPublicacionesPaginadas(0,5);
+
+        assertEquals(1, out.getTotalElements());
+        assertEquals(1, out.getContent().get(0).getIdPublicacion());
+        verify(queryService).obtenerPublicacionesPaginadas(0,5);
+        verifyNoInteractions(commandService);
+    }
+
+    @Test
+    void obtenerNoticiasPaginadas_delegaEnQueryService() {
+        PageImpl<PublicacionResponse> page =
+                new PageImpl<>(List.of(resp), PageRequest.of(0,5), 1);
+
+        when(queryService.obtenerPublicacionesPorTipoPaginadas(eq(TipoPublicacion.NOTICIA), eq(0), eq(5)))
+                .thenReturn(page);
+
+        Page<PublicacionResponse> out = service.obtenerNoticiasPaginadas(0,5);
+
+        assertEquals(1, out.getTotalElements());
+        verify(queryService).obtenerPublicacionesPorTipoPaginadas(eq(TipoPublicacion.NOTICIA), eq(0), eq(5));
+        verifyNoInteractions(commandService);
+    }
+
+    @Test
+    void obtenerEventosPaginados_delegaEnQueryService() {
+        PageImpl<PublicacionResponse> page =
+                new PageImpl<>(List.of(resp), PageRequest.of(1, 10), 11);
+
+        when(queryService.obtenerPublicacionesPorTipoPaginadas(eq(TipoPublicacion.EVENTO), eq(1), eq(10)))
+                .thenReturn(page);
+
+        Page<PublicacionResponse> out = service.obtenerEventosPaginados(1, 10);
+
+        assertEquals(1, out.getContent().size());
+        assertEquals(11, out.getTotalElements());
+
+        verify(queryService).obtenerPublicacionesPorTipoPaginadas(eq(TipoPublicacion.EVENTO), eq(1), eq(10));
+        verifyNoInteractions(commandService);
+    }
+
+
+    @Test
+    void softDeletePublicacion_delegaEnCommandService() {
+        service.softDeletePublicacion(12);
+        verify(commandService).softDeletePublicacion(12);
+        verifyNoInteractions(queryService);
+    }
+
+    @Test
+    void eliminarPublicacion_delegaEnCommandService() {
+        service.eliminarPublicacion(33);
+        verify(commandService).eliminarPublicacion(33);
+        verifyNoInteractions(queryService);
     }
 }

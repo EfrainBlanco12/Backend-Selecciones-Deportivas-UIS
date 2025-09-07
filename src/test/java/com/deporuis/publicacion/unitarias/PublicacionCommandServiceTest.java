@@ -2,141 +2,151 @@ package com.deporuis.publicacion.unitarias;
 
 import com.deporuis.Foto.aplicacion.FotoCommandService;
 import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.publicacion.aplicacion.PublicacionCommandService;
 import com.deporuis.publicacion.aplicacion.helper.PublicacionRelacionService;
 import com.deporuis.publicacion.aplicacion.helper.PublicacionVerificarExistenciaService;
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
-import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionPublicacion;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class PublicacionCommandServiceTest {
 
     @InjectMocks private PublicacionCommandService service;
-    @Mock private PublicacionRepository repo;
-    @Mock private PublicacionVerificarExistenciaService verificar;
-    @Mock private PublicacionRelacionService relacion;
-    @Mock private FotoCommandService fotoSvc;
+    @Mock private PublicacionRepository publicacionRepository;
+    @Mock private PublicacionVerificarExistenciaService verificarExistenciaService;
+    @Mock private PublicacionRelacionService relacionService;
+    @Mock private FotoCommandService fotoCommandService;
 
-    AutoCloseable mocks;
+    @BeforeEach
+    void init() {
+        MockitoAnnotations.openMocks(this);
+    }
 
-    @BeforeEach void open() { mocks = MockitoAnnotations.openMocks(this); }
-    @AfterEach  void close() throws Exception { mocks.close(); }
+    private PublicacionRequest requestSample() {
+        var fr = new FotoRequest();
+        fr.setContenido(new byte[]{1,2,3});
+        fr.setTemporada(2024);
 
-    private PublicacionRequest reqBase() {
-        PublicacionRequest r = new PublicacionRequest();
-        r.setTitulo("T");
-        r.setDescripcion("D");
-        r.setLugar("L");
-        r.setFecha(LocalDateTime.of(2025, 3, 3, 12, 0));
-        r.setDuracion("60m");
-        r.setTipoPublicacion(TipoPublicacion.NOTICIA);
-        r.setSelecciones(List.of(1, 2));     // IDs
-        r.setFotos(List.of());               // FotoRequest list; para el flujo feliz usamos vacío
-        return r;
+        var req = new PublicacionRequest();
+        req.setTitulo("Inicio");
+        req.setDescripcion("Desc");
+        req.setLugar("Cancha A");
+        req.setFecha(LocalDateTime.of(2024,1,1,9,0));
+        req.setDuracion("2h");
+        req.setTipoPublicacion(TipoPublicacion.NOTICIA);
+        req.setSelecciones(List.of(1,2));
+        req.setFotos(List.of(fr));
+        return req;
     }
 
     @Test
-    void crearPublicacion_flujoFeliz() {
-        PublicacionRequest req = reqBase();
+    void crearPublicacion_deberiaGuardarEntidad_CrearRelacionesYFotos_YRetornarResponse() {
+        var req = requestSample();
 
-        Publicacion persisted = new Publicacion();
-        persisted.setIdPublicacion(100);
-        when(repo.save(any(Publicacion.class))).thenReturn(persisted);
+        // al guardar debe quedar con id
+        when(publicacionRepository.save(any(Publicacion.class))).thenAnswer(inv -> {
+            Publicacion p = inv.getArgument(0);
+            p.setIdPublicacion(99);
+            return p;
+        });
 
-        Seleccion s1 = new Seleccion(); s1.setIdSeleccion(1);
-        Seleccion s2 = new Seleccion(); s2.setIdSeleccion(2);
-        when(verificar.verificarSelecciones(List.of(1, 2))).thenReturn(List.of(s1, s2));
+        // selecciones verificadas
+        var s1 = new Seleccion(); s1.setIdSeleccion(1);
+        var s2 = new Seleccion(); s2.setIdSeleccion(2);
+        when(verificarExistenciaService.verificarSelecciones(List.of(1,2))).thenReturn(List.of(s1, s2));
 
-        List<SeleccionPublicacion> rel = List.of(
-                new SeleccionPublicacion(null, s1, persisted),
-                new SeleccionPublicacion(null, s2, persisted)
-        );
-        when(relacion.crearRelacionesSeleccion(persisted, List.of(s1, s2))).thenReturn(rel);
+        // relaciones creadas
+        when(relacionService.crearRelacionesSeleccion(any(Publicacion.class), eq(List.of(s1, s2))))
+                .thenAnswer(inv -> {
+                    Publicacion p = inv.getArgument(0);
+                    return List.of(new SeleccionPublicacion(null, s1, p),
+                            new SeleccionPublicacion(null, s2, p));
+                });
 
-        when(fotoSvc.crearFotosPublicacion(eq(req.getFotos()), eq(persisted))).thenReturn(Collections.emptyList());
-        when(verificar.verificarFotos(Collections.emptyList())).thenReturn(Collections.emptyList());
+        // fotos creadas/verificadas
+        var foto = new Foto(new byte[]{1,2,3}, 2024);
+        when(fotoCommandService.crearFotosPublicacion(eq(req.getFotos()), any(Publicacion.class)))
+                .thenReturn(List.of(foto));
+        when(verificarExistenciaService.verificarFotos(List.of(foto))).thenReturn(List.of(foto));
 
-        PublicacionResponse out = service.crearPublicacion(req);
+        PublicacionResponse resp = service.crearPublicacion(req);
 
-        assertNotNull(out);
-        verify(repo).save(any(Publicacion.class));
-        verify(relacion).crearRelacionesSeleccion(eq(persisted), anyList());
-        verify(fotoSvc).crearFotosPublicacion(anyList(), eq(persisted));
-        verify(verificar).verificarFotos(anyList());
+        assertNotNull(resp);
+        assertEquals(99, resp.getIdPublicacion());
+        assertEquals(List.of(1,2), resp.getIdSelecciones());
+        verify(publicacionRepository).save(any(Publicacion.class));
+        verify(relacionService).crearRelacionesSeleccion(any(Publicacion.class), anyList());
+        verify(fotoCommandService).crearFotosPublicacion(eq(req.getFotos()), any(Publicacion.class));
     }
 
     @Test
-    void actualizarPublicacion_actualizaCampos_relacionesYfotos() {
-        int id = 7;
-        Publicacion existente = new Publicacion();
-        existente.setIdPublicacion(id);
-        when(verificar.verificarPublicacion(id)).thenReturn(existente);
+    void actualizarPublicacion_deberiaActualizarCampos_YActualizarRelaciones_YGuardar() {
+        var req = requestSample();
+        var existente = new Publicacion();
+        existente.setIdPublicacion(50);
 
-        PublicacionRequest req = reqBase();
-        req.setSelecciones(List.of(3, 4));
+        when(verificarExistenciaService.verificarPublicacion(50)).thenReturn(existente);
 
-        Seleccion n1 = new Seleccion(); n1.setIdSeleccion(3);
-        Seleccion n2 = new Seleccion(); n2.setIdSeleccion(4);
-        when(verificar.verificarSelecciones(List.of(3, 4))).thenReturn(List.of(n1, n2));
+        var s1 = new Seleccion(); s1.setIdSeleccion(1);
+        var s2 = new Seleccion(); s2.setIdSeleccion(2);
+        when(verificarExistenciaService.verificarSelecciones(List.of(1,2))).thenReturn(List.of(s1, s2));
 
-        when(relacion.actualizarRelacionesSeleccion(eq(existente), eq(List.of(n1, n2)), eq(List.of(3, 4))))
-                .thenReturn(Collections.emptyList());
+        when(relacionService.actualizarRelacionesSeleccion(eq(existente), eq(List.of(s1, s2)), eq(List.of(1,2))))
+                .thenReturn(List.of(new SeleccionPublicacion(null, s1, existente),
+                        new SeleccionPublicacion(null, s2, existente)));
 
-        when(fotoSvc.crearFotosPublicacion(eq(req.getFotos()), eq(existente))).thenReturn(Collections.emptyList());
-        when(verificar.verificarFotos(Collections.emptyList())).thenReturn(Collections.emptyList());
+        when(publicacionRepository.save(existente)).thenReturn(existente);
 
-        when(repo.save(existente)).thenReturn(existente);
+        PublicacionResponse resp = service.actualizarPublicacion(50, req);
 
-        PublicacionResponse out = service.actualizarPublicacion(id, req);
-
-        assertNotNull(out);
-        verify(verificar).verificarPublicacion(id);
-        verify(relacion).actualizarRelacionesSeleccion(eq(existente), anyList(), eq(List.of(3, 4)));
-        verify(fotoSvc).eliminarFotosPublicacion(existente);
-        verify(fotoSvc).crearFotosPublicacion(anyList(), eq(existente));
-        verify(verificar).verificarFotos(anyList());
-        verify(repo).save(existente);
+        assertNotNull(resp);
+        verify(publicacionRepository).save(existente);
+        verify(relacionService).actualizarRelacionesSeleccion(eq(existente), eq(List.of(s1, s2)), eq(List.of(1,2)));
     }
 
     @Test
-    void eliminarPublicacion_eliminaRelaciones_fotos_yEntidad() {
-        int id = 5;
-        Publicacion p = new Publicacion();
-        p.setIdPublicacion(id);
-        when(verificar.verificarPublicacion(id)).thenReturn(p);
+    void eliminarPublicacion_deberiaEliminarRelaciones_Fotos_YEntidad() {
+        var existente = new Publicacion();
+        existente.setIdPublicacion(10);
+        when(verificarExistenciaService.verificarPublicacion(10)).thenReturn(existente);
 
-        service.eliminarPublicacion(id);
+        service.eliminarPublicacion(10);
 
-        verify(relacion).eliminarRelacionesSeleccion(p);
-        verify(fotoSvc).eliminarFotosPublicacion(p);
-        verify(repo).delete(p);
+        verify(relacionService).eliminarRelacionesSeleccion(existente);
+        verify(fotoCommandService).eliminarFotosPublicacion(existente);
+        verify(publicacionRepository).delete(existente);
     }
 
     @Test
-    void softDeletePublicacion_cambiaVisibilidad_yGuarda() {
-        int id = 9;
-        Publicacion p = new Publicacion();
-        p.setIdPublicacion(id);
-        p.setVisibilidad(true);
-        when(verificar.verificarPublicacion(id)).thenReturn(p);
+    void softDeletePublicacion_deberiaMarcarVisibilidadFalseYGuardar() {
+        var existente = new Publicacion();
+        existente.setIdPublicacion(10);
+        existente.setVisibilidad(true);
 
-        service.softDeletePublicacion(id);
+        when(verificarExistenciaService.verificarPublicacion(10)).thenReturn(existente);
 
-        assertFalse(p.getVisibilidad());
-        verify(repo).save(p);
+        service.softDeletePublicacion(10);
+
+        ArgumentCaptor<Publicacion> captor = ArgumentCaptor.forClass(Publicacion.class);
+        verify(publicacionRepository).save(captor.capture());
+        assertFalse(captor.getValue().getVisibilidad());
     }
 }

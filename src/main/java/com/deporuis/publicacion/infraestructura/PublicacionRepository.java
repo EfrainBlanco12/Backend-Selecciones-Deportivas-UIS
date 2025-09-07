@@ -2,6 +2,7 @@ package com.deporuis.publicacion.infraestructura;
 
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -29,4 +30,12 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Intege
            where sp.publicacion.idPublicacion = :pubId
            """)
     List<Integer> findSeleccionIdsByPublicacionId(@Param("pubId") Integer pubId);
+
+    @Query("""
+           select new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(s.idSeleccion, s.nombreSeleccion)
+           from com.deporuis.seleccion.dominio.SeleccionPublicacion sp
+           join sp.seleccion s
+           where sp.publicacion.idPublicacion = :pubId
+           """)
+    List<SeleccionPublicacionResponse> findSeleccionDtosByPublicacionId(@Param("pubId") Integer pubId);
 }
