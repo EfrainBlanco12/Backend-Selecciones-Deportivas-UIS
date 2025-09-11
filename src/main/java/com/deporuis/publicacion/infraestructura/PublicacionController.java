@@ -28,7 +28,7 @@ public class PublicacionController {
         PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(publicacionCreada);
     }
-    @GetMapping("/evento/{idPublicacion}")
+    @GetMapping("/{idPublicacion}")
     public ResponseEntity<PublicacionResponse> obtenerEventoPorId(
             @PathVariable Integer idPublicacion) {
         var resp = publicacionService.obtenerPublicacion(idPublicacion);
