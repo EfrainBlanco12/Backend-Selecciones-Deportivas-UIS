@@ -36,7 +36,18 @@ public class IntegranteService {
         integranteCommandService.softDeleteIntegrante(id);
     }
 
+    @Transactional()
     public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
         return integranteCommandService.actualizarIntegrante(id, integranteRequest);
+    }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerEntrenadorPorSeleccion(Integer idSeleccion) {
+        return integranteQueryService.obtenerEntrenadorPorSeleccion(idSeleccion);
+    }
+
+    @Transactional(readOnly = true)
+    public long contarIntegrantesPorSeleccion(Integer idSeleccion) {
+        return integranteQueryService.contarIntegrantesPorSeleccion(idSeleccion);
     }
 }

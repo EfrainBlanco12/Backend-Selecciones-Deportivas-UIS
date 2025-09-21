@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/private/integrante")
 public class IntegranteController {
@@ -81,5 +84,21 @@ public class IntegranteController {
     ) {
         IntegranteResponse integranteActualizado = integranteService.actualizarIntegrante(id, integranteRequest);
         return ResponseEntity.ok(integranteActualizado);
+    }
+
+    @GetMapping("/{idSeleccion}/entrenador")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','ENTRENADOR')")
+    public ResponseEntity<IntegranteResponse> obtenerEntrenador(
+            @PathVariable Integer idSeleccion
+    ) {
+        return ResponseEntity.ok(integranteService.obtenerEntrenadorPorSeleccion(idSeleccion));
+    }
+
+    @GetMapping("/{idSeleccion}/conteo")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','ENTRENADOR')")
+    public ResponseEntity<Long> contarIntegrantes(
+            @PathVariable Integer idSeleccion
+    ) {
+        return ResponseEntity.ok(integranteService.contarIntegrantesPorSeleccion(idSeleccion));
     }
 }

@@ -4,6 +4,7 @@ import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
+import com.deporuis.integrante.excepciones.IntegranteEntrenadorSeleccionExists;
 import com.deporuis.posicion.excepciones.PosicionYaExisteException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.Getter;
@@ -98,6 +99,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(IntegranteEntrenadorSeleccionExists.class)
+    public ResponseEntity<Map<String, Object>> handleEntrenadorSeleccionExists(IntegranteEntrenadorSeleccionExists ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());// 409 Conflict es semánticamente correcto
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     // DTO interno para estandarizar el cuerpo de error

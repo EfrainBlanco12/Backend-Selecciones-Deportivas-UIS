@@ -8,6 +8,7 @@ import com.deporuis.integrante.aplicacion.helper.IntegranteVerificarExistenciaSe
 import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.dominio.IntegrantePosicion;
+import com.deporuis.integrante.excepciones.IntegranteEntrenadorSeleccionExists;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
@@ -46,6 +47,17 @@ public class IntegranteCommandService {
         integrante.setRol(rol);
 
         Seleccion seleccion = integranteVerificarExistenciaService.verificarSeleccion(integranteRequest.getIdSeleccion());
+
+        // 🚨 Nueva validación: si el rol es ENTRENADOR, verificar que la selección no tenga ya otro
+        if ("ENTRENADOR".equalsIgnoreCase(rol.getNombreRol())) {
+            boolean yaTieneEntrenador = integranteRepository
+                    .existsBySeleccion_IdSeleccionAndRol_NombreRolAndVisibilidadTrue(seleccion.getIdSeleccion(), "ENTRENADOR");
+
+            if (yaTieneEntrenador) {
+                throw new IntegranteEntrenadorSeleccionExists("La selección " + seleccion.getIdSeleccion() + " ya tiene un entrenador asignado");
+            }
+        }
+
         integrante.setSeleccion(seleccion);
 
         Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
@@ -62,7 +74,8 @@ public class IntegranteCommandService {
         return IntegranteMapper.integranteToResponse(integrante);
     }
 
-    @Transactional()
+
+    @Transactional
     public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
 
         integranteVerificarExistenciaService.verificarPermisosCreacionIntegrantes(integranteRequest.getIdRol());
@@ -84,6 +97,21 @@ public class IntegranteCommandService {
         integrante.setRol(rol);
 
         Seleccion seleccion = integranteVerificarExistenciaService.verificarSeleccion(integranteRequest.getIdSeleccion());
+
+        // 🚨 Nueva validación: si el rol es ENTRENADOR, asegurarse que no haya otro en la selección
+        if ("ENTRENADOR".equalsIgnoreCase(rol.getNombreRol())) {
+            boolean yaTieneOtroEntrenador = integranteRepository
+                    .existsBySeleccion_IdSeleccionAndRol_NombreRolAndVisibilidadTrueAndIdIntegranteNot(
+                            seleccion.getIdSeleccion(), "ENTRENADOR", integrante.getIdIntegrante()
+                    );
+
+            if (yaTieneOtroEntrenador) {
+                throw new IntegranteEntrenadorSeleccionExists(
+                        "La selección " + seleccion.getIdSeleccion() + " ya tiene un entrenador asignado"
+                );
+            }
+        }
+
         integrante.setSeleccion(seleccion);
 
         Foto fotoAntigua = integranteVerificarExistenciaService.verificarFotoIntegrante(integrante.getFoto().getIdFoto());
@@ -102,6 +130,7 @@ public class IntegranteCommandService {
 
         return IntegranteMapper.integranteToResponse(integrante);
     }
+
 
     @Transactional()
     public void softDeleteIntegrante(Integer id) {
