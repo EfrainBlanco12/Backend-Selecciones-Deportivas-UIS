@@ -2,6 +2,7 @@ package com.deporuis.seleccion.unitarias;
 
 import com.deporuis.seleccion.infraestructura.SeleccionController;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,18 @@ class SeleccionControllerTest {
         assertNotNull(resp);
         assertSame(actualizado, resp.getBody());
         verify(service).actualizarSeleccion(9, request);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void actualizarSeleccionParcial_ok() {
+        SeleccionPatchRequest patchRequest = new SeleccionPatchRequest();
+        SeleccionResponse actualizado = new SeleccionResponse();
+        when(service.actualizarSeleccionParcial(10, patchRequest)).thenReturn(actualizado);
+        ResponseEntity<SeleccionResponse> resp = controller.actualizarSeleccionParcial(10, patchRequest);
+        assertNotNull(resp);
+        assertSame(actualizado, resp.getBody());
+        verify(service).actualizarSeleccionParcial(10, patchRequest);
         verifyNoMoreInteractions(service);
     }
 }

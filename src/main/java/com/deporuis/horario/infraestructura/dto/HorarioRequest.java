@@ -1,7 +1,6 @@
 package com.deporuis.horario.infraestructura.dto;
 
 import com.deporuis.horario.dominio.DiaHorario;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -19,4 +18,7 @@ public class HorarioRequest {
 
     @NotNull(message = "La hora de fin del horario es obligatoria")
     private LocalTime horaFin;
+
+    // IDs de selecciones a las que se asociará este horario
+    private List<Integer> idSelecciones;
 }

@@ -91,4 +91,84 @@ class HorarioControllerIT {
         mvc.perform(get("/private/horario/lista").param("page", "0").param("size", "5"))
                 .andExpect(status().isOk());
     }
+
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void crear_conSelecciones_retorna200() throws Exception {
+        HorarioRequest request = buildCrear();
+        request.setIdSelecciones(List.of(1, 2, 3));
+
+        HorarioResponse response = buildResponse();
+        when(service.crearHorario(any())).thenReturn(response);
+
+        mvc.perform(post("/private/horario/crear")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void crear_conUnaSeleccion_retorna200() throws Exception {
+        HorarioRequest request = buildCrear();
+        request.setIdSelecciones(List.of(5));
+
+        HorarioResponse response = buildResponse();
+        when(service.crearHorario(any())).thenReturn(response);
+
+        mvc.perform(post("/private/horario/crear")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void actualizar_retorna200() throws Exception {
+        HorarioRequest request = buildCrear();
+        request.setDia(DiaHorario.VIERNES);
+
+        HorarioResponse response = buildResponse();
+        when(service.actualizarHorario(eq(10), any())).thenReturn(response);
+
+        mvc.perform(put("/private/horario/actualizar/10")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void actualizar_conSelecciones_retorna200() throws Exception {
+        HorarioRequest request = buildCrear();
+        request.setIdSelecciones(List.of(1, 2, 3));
+
+        HorarioResponse response = buildResponse();
+        when(service.actualizarHorario(eq(15), any())).thenReturn(response);
+
+        mvc.perform(put("/private/horario/actualizar/15")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void eliminar_retorna204() throws Exception {
+        mvc.perform(delete("/private/horario/eliminar/10")
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void eliminar_sinRolAdministrador_retorna403() throws Exception {
+        mvc.perform(delete("/private/horario/eliminar/10")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+    }
 }

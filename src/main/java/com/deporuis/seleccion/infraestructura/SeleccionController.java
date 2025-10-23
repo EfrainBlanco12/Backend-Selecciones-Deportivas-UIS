@@ -4,6 +4,7 @@ import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.logro.infraestructura.dto.LogroResponse;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import jakarta.validation.Valid;
@@ -74,6 +75,16 @@ public class SeleccionController {
             @Valid @RequestBody SeleccionRequest seleccionRequest
     ){
         SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccion(id, seleccionRequest);
+        return ResponseEntity.ok(seleccionActualizada);
+    }
+
+    @PatchMapping("/actualizar-parcial/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<SeleccionResponse> actualizarSeleccionParcial(
+            @PathVariable Integer id,
+            @RequestBody SeleccionPatchRequest patchRequest
+    ){
+        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccionParcial(id, patchRequest);
         return ResponseEntity.ok(seleccionActualizada);
     }
 

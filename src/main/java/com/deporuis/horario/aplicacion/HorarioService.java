@@ -30,4 +30,14 @@ public class HorarioService {
     public Page<HorarioResponse> obtenerHorariosPaginados(Integer page, Integer size) {
         return horarioQueryService.obtenerHorariosPaginados(page, size);
     }
+
+    @Transactional()
+    public HorarioResponse actualizarHorario(Integer id, HorarioRequest horarioRequest) {
+        return horarioCommandService.actualizarHorario(id, horarioRequest);
+    }
+
+    @Transactional()
+    public void eliminarHorario(Integer id) {
+        horarioCommandService.eliminarHorario(id);
+    }
 }

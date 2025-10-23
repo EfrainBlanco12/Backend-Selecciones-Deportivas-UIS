@@ -4,6 +4,7 @@ package com.deporuis.seleccion.aplicacion;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.logro.infraestructura.dto.LogroResponse;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,11 @@ public class SeleccionService {
     @Transactional()
     public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest) {
         return seleccionCommandService.actualizarSeleccion(id, seleccionRequest);
+    }
+
+    @Transactional()
+    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest) {
+        return seleccionCommandService.actualizarSeleccionParcial(id, patchRequest);
     }
 
     @Transactional(readOnly = true)

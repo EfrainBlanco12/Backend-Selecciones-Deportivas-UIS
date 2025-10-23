@@ -3,6 +3,7 @@ package com.deporuis.seleccion.integracion;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
 import com.deporuis.seleccion.dominio.TipoSeleccion;
 import com.deporuis.seleccion.infraestructura.SeleccionController;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -140,5 +141,69 @@ class SeleccionControllerIT {
         mvc.perform(patch("/private/seleccion/softdelete/12")
                         .with(csrf())) // CSRF requerido
                 .andExpect(status().isOk()); // tu controller devuelve 200
+    }
+
+    @WithMockUser(roles = {"ENTRENADOR"})
+    @Test
+    void actualizarParcial_soloNombre_retorna200() throws Exception {
+        SeleccionPatchRequest patchReq = new SeleccionPatchRequest();
+        patchReq.setNombreSeleccion("Nombre Actualizado");
+
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(15);
+        resp.setNombreSeleccion("Nombre Actualizado");
+
+        when(service.actualizarSeleccionParcial(eq(15), any()))
+                .thenReturn(resp);
+
+        mvc.perform(patch("/private/seleccion/actualizar-parcial/15")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(patchReq)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombreSeleccion").value("Nombre Actualizado"));
+    }
+
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void actualizarParcial_soloCamposBasicos_retorna200() throws Exception {
+        SeleccionPatchRequest patchReq = new SeleccionPatchRequest();
+        patchReq.setNombreSeleccion("Nuevo nombre");
+        patchReq.setEspacioDeportivo("Nueva cancha");
+        patchReq.setEquipo(false);
+
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(20);
+        resp.setNombreSeleccion("Nuevo nombre");
+
+        when(service.actualizarSeleccionParcial(eq(20), any()))
+                .thenReturn(resp);
+
+        mvc.perform(patch("/private/seleccion/actualizar-parcial/20")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(patchReq)))
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    @Test
+    void actualizarParcial_sinDatos_retorna200() throws Exception {
+        // Enviar un request vacío, debería devolver la selección sin cambios
+        SeleccionPatchRequest patchReq = new SeleccionPatchRequest();
+
+        SeleccionResponse resp = new SeleccionResponse();
+        resp.setIdSeleccion(25);
+        resp.setNombreSeleccion("Sin cambios");
+
+        when(service.actualizarSeleccionParcial(eq(25), any()))
+                .thenReturn(resp);
+
+        mvc.perform(patch("/private/seleccion/actualizar-parcial/25")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(patchReq)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombreSeleccion").value("Sin cambios"));
     }
 }
