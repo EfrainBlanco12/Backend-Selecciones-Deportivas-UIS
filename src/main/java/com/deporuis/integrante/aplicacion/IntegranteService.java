@@ -50,4 +50,9 @@ public class IntegranteService {
     public long contarIntegrantesPorSeleccion(Integer idSeleccion) {
         return integranteQueryService.contarIntegrantesPorSeleccion(idSeleccion);
     }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerIntegrantePorCodigoUniversitario(String codigoUniversitario) {
+        return integranteQueryService.obtenerIntegrantePorCodigoUniversitario(codigoUniversitario);
+    }
 }

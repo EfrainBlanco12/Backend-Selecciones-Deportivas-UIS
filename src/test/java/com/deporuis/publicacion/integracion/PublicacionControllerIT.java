@@ -64,7 +64,10 @@ class PublicacionControllerIT {
         r.setVisibilidad(true);
         r.setTipoPublicacion(TipoPublicacion.NOTICIA.name()); // en tu DTO es String
         r.setFechaCreacion(LocalDateTime.of(2024,1,1,9,0));
-        r.setIdSelecciones(List.of(10, 20));
+        
+        var sel1 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(10, "Selección 1");
+        var sel2 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(20, "Selección 2");
+        r.setIdSelecciones(List.of(sel1, sel2));
         return r;
     }
 

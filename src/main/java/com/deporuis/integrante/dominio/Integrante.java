@@ -58,9 +58,8 @@ public class Integrante {
     @JoinColumn(name = "id_seleccion", nullable = false)
     private Seleccion seleccion;
 
-    @OneToOne
-    @JoinColumn(name = "id_foto", nullable = false)
-    private Foto foto;
+    @OneToMany(mappedBy = "integrante")
+    private List<Foto> fotos = new ArrayList<>();
 
     @OneToMany(mappedBy = "integrante")
     private List<IntegrantePosicion> posiciones = new ArrayList<>();

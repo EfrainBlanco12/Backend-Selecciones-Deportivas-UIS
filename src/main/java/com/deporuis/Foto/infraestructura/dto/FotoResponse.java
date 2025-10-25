@@ -14,4 +14,10 @@ public class FotoResponse {
     private byte[] contenido;
 
     private Integer temporada;
+
+    private Integer idIntegrante;
+
+    private Integer idSeleccion;
+
+    private Integer idPublicacion;
 }

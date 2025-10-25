@@ -59,10 +59,14 @@ public class IntegranteMapper {
                 integrante.getRol() != null ? new RolResponse(integrante.getRol()) : null
         );
 
-        // Objeto completo para foto
-        dto.setFoto(
-                integrante.getFoto() != null ? FotoMapper.toResponse(integrante.getFoto()) : null
-        );
+        // Lista de fotos
+        List<com.deporuis.Foto.infraestructura.dto.FotoResponse> fotos = (integrante.getFotos() == null || integrante.getFotos().isEmpty())
+                ? List.of()
+                : integrante.getFotos().stream()
+                .filter(Objects::nonNull)
+                .map(FotoMapper::toResponse)
+                .toList();
+        dto.setFotos(fotos);
 
         // Lista de objetos para posiciones (NO IDs)
         List<PosicionResponse> posiciones = (integrante.getPosiciones() == null)

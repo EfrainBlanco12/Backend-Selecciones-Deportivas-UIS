@@ -62,7 +62,7 @@ class IntegranteMapperTest {
         integrante.setIdIntegrante(1);
         integrante.setRol(rol);
         integrante.setSeleccion(seleccion);
-        integrante.setFoto(foto);
+        integrante.setFotos(List.of(foto));
         integrante.setPosiciones(List.of(ip1));
 
         // Act
@@ -88,11 +88,12 @@ class IntegranteMapperTest {
         assertEquals(7, dto.getRol().getIdRol());
         assertEquals("Delantero", dto.getRol().getNombreRol());
 
-        // Foto objeto -> comparar bytes (no String)
-        assertNotNull(dto.getFoto());
-        assertEquals(5, dto.getFoto().getIdFoto());
-        assertArrayEquals(bytes, dto.getFoto().getContenido());
-        assertEquals(2024, dto.getFoto().getTemporada());
+        // Fotos lista de objetos -> comparar bytes (no String)
+        assertNotNull(dto.getFotos());
+        assertEquals(1, dto.getFotos().size());
+        assertEquals(5, dto.getFotos().get(0).getIdFoto());
+        assertArrayEquals(bytes, dto.getFotos().get(0).getContenido());
+        assertEquals(2024, dto.getFotos().get(0).getTemporada());
 
         // Posiciones objeto
         assertNotNull(dto.getPosiciones());

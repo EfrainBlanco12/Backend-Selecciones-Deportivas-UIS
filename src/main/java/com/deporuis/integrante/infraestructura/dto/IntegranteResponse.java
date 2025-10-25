@@ -35,6 +35,6 @@ public class IntegranteResponse {
     private Integer idSeleccion;
 
     private RolResponse rol;
-    private FotoResponse foto;
+    private List<FotoResponse> fotos;
     private List<PosicionResponse> posiciones;
 }

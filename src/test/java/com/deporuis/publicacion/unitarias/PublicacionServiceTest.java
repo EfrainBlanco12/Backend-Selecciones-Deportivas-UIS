@@ -56,7 +56,10 @@ class PublicacionServiceTest {
         resp.setVisibilidad(true);
         resp.setTipoPublicacion(TipoPublicacion.NOTICIA.name());
         resp.setFechaCreacion(LocalDateTime.of(2024,1,1,9,0));
-        resp.setIdSelecciones(List.of(10,20));
+        
+        var sel1 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(10, "Selección 1");
+        var sel2 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(20, "Selección 2");
+        resp.setIdSelecciones(List.of(sel1, sel2));
     }
 
     @Test

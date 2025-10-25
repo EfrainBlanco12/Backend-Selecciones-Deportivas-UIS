@@ -14,4 +14,6 @@ public interface FotoRepository extends JpaRepository<Foto,Integer> {
     List<Foto> findAllByPublicacion(Publicacion publicacion);
 
     List<Foto> findAllBySeleccion(Seleccion seleccion);
+
+    List<Foto> findAllByIntegrante(Integrante integrante);
 }

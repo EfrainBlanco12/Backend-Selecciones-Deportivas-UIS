@@ -60,9 +60,11 @@ public class IntegranteCommandService {
 
         integrante.setSeleccion(seleccion);
 
-        Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
-        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
-        integrante.setFoto(fotoCreada);
+        // Crear fotos si se proporcionaron
+        if (integranteRequest.getFotos() != null && !integranteRequest.getFotos().isEmpty()) {
+            List<com.deporuis.Foto.dominio.Foto> fotos = fotoCommandService.crearFotosIntegrante(integranteRequest.getFotos(), integrante);
+            integrante.setFotos(fotos);
+        }
 
         integrante = integranteRepository.save(integrante);
 
@@ -114,11 +116,13 @@ public class IntegranteCommandService {
 
         integrante.setSeleccion(seleccion);
 
-        Foto fotoAntigua = integranteVerificarExistenciaService.verificarFotoIntegrante(integrante.getFoto().getIdFoto());
-        fotoCommandService.eliminarFoto(fotoAntigua);
-        Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
-        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
-        integrante.setFoto(fotoCreada);
+        // Eliminar fotos antiguas y crear nuevas si se proporcionaron
+        fotoCommandService.eliminarFotosIntegrante(integrante);
+        
+        if (integranteRequest.getFotos() != null && !integranteRequest.getFotos().isEmpty()) {
+            List<com.deporuis.Foto.dominio.Foto> fotosNuevas = fotoCommandService.crearFotosIntegrante(integranteRequest.getFotos(), integrante);
+            integrante.setFotos(fotosNuevas);
+        }
 
         integranteRelacionService.eliminarRelacionesPosicion(integrante);
         List<Posicion> posiciones = integranteVerificarExistenciaService.verificarPosiciones(integranteRequest.getIdPosiciones());

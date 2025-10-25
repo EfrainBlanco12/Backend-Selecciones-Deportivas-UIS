@@ -1,6 +1,7 @@
 package com.deporuis.integrante.unitarias;
 
 import com.deporuis.auth.dominio.Rol;
+import com.deporuis.excepcion.common.ResourceNotFoundException;
 import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.posicion.dominio.Posicion;
@@ -18,8 +19,10 @@ import org.springframework.data.domain.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -45,11 +48,22 @@ class IntegranteQueryServiceTest {
         i.setSeleccion(sel);
         Foto f = new Foto();
         f.setIdFoto(7);
-        i.setFoto(f);
+        i.setFotos(List.of(f));
+        
+        // Crear deporte para las posiciones
+        com.deporuis.deporte.dominio.Deporte deporte = new com.deporuis.deporte.dominio.Deporte();
+        deporte.setNombreDeporte("Fútbol");
+        
         Posicion p1 = new Posicion();
         p1.setIdPosicion(1);
+        p1.setNombrePosicion("9");
+        p1.setDeporte(deporte);
+        
         Posicion p2 = new Posicion();
         p2.setIdPosicion(2);
+        p2.setNombrePosicion("5");
+        p2.setDeporte(deporte);
+        
         List<IntegrantePosicion> ips = new ArrayList<>();
         ips.add(new IntegrantePosicion(null, i, p1));
         ips.add(new IntegrantePosicion(null, i, p2));
@@ -72,5 +86,28 @@ class IntegranteQueryServiceTest {
         when(verificar.verificarIntegrante(8)).thenReturn(i);
         IntegranteResponse out = service.obtenerIntegrante(8);
         assertEquals(8, out.getIdIntegrante());
+    }
+
+    @Test
+    void obtenerPorCodigoUniversitario_ok() {
+        Integrante i = entity(10);
+        i.setCodigoUniversitario("2025001");
+        when(repo.findByCodigoUniversitario("2025001")).thenReturn(Optional.of(i));
+        
+        IntegranteResponse out = service.obtenerIntegrantePorCodigoUniversitario("2025001");
+        
+        assertEquals(10, out.getIdIntegrante());
+        assertEquals("2025001", out.getCodigoUniversitario());
+        verify(repo).findByCodigoUniversitario("2025001");
+    }
+
+    @Test
+    void obtenerPorCodigoUniversitario_noExiste_lanzaExcepcion() {
+        when(repo.findByCodigoUniversitario("NOEXISTE")).thenReturn(Optional.empty());
+        
+        assertThrows(ResourceNotFoundException.class, 
+            () -> service.obtenerIntegrantePorCodigoUniversitario("NOEXISTE"));
+        
+        verify(repo).findByCodigoUniversitario("NOEXISTE");
     }
 }

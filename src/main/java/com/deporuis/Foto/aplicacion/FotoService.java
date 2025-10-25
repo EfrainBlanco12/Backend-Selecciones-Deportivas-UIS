@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 @Service
 public class FotoService {
@@ -30,5 +31,15 @@ public class FotoService {
     @Transactional(readOnly = true)
     public FotoResponse obtenerFoto(Integer id) {
         return fotoQueryService.obtenerFoto(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FotoResponse> obtenerFotosPorIntegrante(Integer idIntegrante) {
+        return fotoQueryService.obtenerFotosPorIntegrante(idIntegrante);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FotoResponse> obtenerFotosPorSeleccion(Integer idSeleccion) {
+        return fotoQueryService.obtenerFotosPorSeleccion(idSeleccion);
     }
 }

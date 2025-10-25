@@ -18,11 +18,24 @@ public class FotoMapper {
 
 
     public static FotoResponse toResponse(Foto foto) {
-        return new FotoResponse(
-                foto.getIdFoto(),
-                foto.getContenido(),
-                foto.getTemporada()
-        );
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(foto.getIdFoto());
+        response.setContenido(foto.getContenido());
+        response.setTemporada(foto.getTemporada());
+        
+        if (foto.getIntegrante() != null) {
+            response.setIdIntegrante(foto.getIntegrante().getIdIntegrante());
+        }
+        
+        if (foto.getSeleccion() != null) {
+            response.setIdSeleccion(foto.getSeleccion().getIdSeleccion());
+        }
+        
+        if (foto.getPublicacion() != null) {
+            response.setIdPublicacion(foto.getPublicacion().getIdPublicacion());
+        }
+        
+        return response;
     }
 
     public static List<Foto> requestToFotosPublicacion(List<FotoRequest> fotoRequest, Publicacion publicacion){

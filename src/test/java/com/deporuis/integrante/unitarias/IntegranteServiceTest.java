@@ -87,9 +87,9 @@ class IntegranteServiceTest {
         rol.setNombreRol("Volante");
         dto.setRol(rol);
 
-        // Objeto para foto (byte[]; Jackson lo serializa a Base64)
+        // Lista de objetos para fotos (byte[]; Jackson lo serializa a Base64)
         byte[] bytes = new byte[]{1,2,3}; // "AQID"
-        dto.setFoto(new FotoResponse(7, bytes, 2024));
+        dto.setFotos(List.of(new FotoResponse(7, bytes, 2024, id, 1, null)));
 
         // Lista de objetos para posiciones
         dto.setPosiciones(List.of(
@@ -138,5 +138,13 @@ class IntegranteServiceTest {
         IntegranteResponse out = service.actualizarIntegrante(3, req());
         assertEquals(3, out.getIdIntegrante());
         verify(command).actualizarIntegrante(eq(3), any());
+    }
+
+    @Test
+    void obtenerPorCodigoUniversitario_delegaEnQuery() {
+        when(query.obtenerIntegrantePorCodigoUniversitario("2025001")).thenReturn(resp(10));
+        IntegranteResponse out = service.obtenerIntegrantePorCodigoUniversitario("2025001");
+        assertEquals(10, out.getIdIntegrante());
+        verify(query).obtenerIntegrantePorCodigoUniversitario("2025001");
     }
 }

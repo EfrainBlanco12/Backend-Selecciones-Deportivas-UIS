@@ -5,7 +5,10 @@ import com.deporuis.Foto.aplicacion.mapper.FotoMapper;
 import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
-import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.integrante.dominio.Integrante;
+import com.deporuis.integrante.infraestructura.IntegranteRepository;
+import com.deporuis.seleccion.dominio.Seleccion;
+import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FotoQueryService {
@@ -22,6 +26,12 @@ public class FotoQueryService {
 
     @Autowired
     private FotoVerificarExistenciaService verificarExistenciaService;
+
+    @Autowired
+    private IntegranteRepository integranteRepository;
+
+    @Autowired
+    private SeleccionRepository seleccionRepository;
 
     @Transactional(readOnly = true)
     public Page<FotoResponse> obtenerFotosPaginadas(Integer page, Integer size) {
@@ -33,5 +43,25 @@ public class FotoQueryService {
     public FotoResponse obtenerFoto(Integer id) {
         Foto foto = verificarExistenciaService.verificarFoto(id);
         return FotoMapper.toResponse(foto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FotoResponse> obtenerFotosPorIntegrante(Integer idIntegrante) {
+        Integrante integrante = integranteRepository.findById(idIntegrante)
+                .orElseThrow(() -> new RuntimeException("Integrante no encontrado"));
+        
+        return fotoRepository.findAllByIntegrante(integrante).stream()
+                .map(FotoMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<FotoResponse> obtenerFotosPorSeleccion(Integer idSeleccion) {
+        Seleccion seleccion = seleccionRepository.findById(idSeleccion)
+                .orElseThrow(() -> new RuntimeException("Selección no encontrada"));
+        
+        return fotoRepository.findAllBySeleccion(seleccion).stream()
+                .map(FotoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

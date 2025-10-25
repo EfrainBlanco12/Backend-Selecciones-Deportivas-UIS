@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("/private/foto")
 @Controller
 public class FotoController {
@@ -20,7 +22,7 @@ public class FotoController {
     private FotoService fotoService;
 
     /**
-     * Crear fotos (POST /foto)
+     * Crear fotos (POST /foto/crear)
      */
     @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
@@ -30,7 +32,7 @@ public class FotoController {
     }
 
     /**
-     * Obtener una sola foto por su ID (GET /foto/{id})
+     * Obtener una sola foto por su ID (GET /foto/obtener/{id})
      */
     @GetMapping("/obtener/{id}")
     public ResponseEntity<FotoResponse> obtenerFoto(
@@ -44,7 +46,7 @@ public class FotoController {
     }
 
     /**
-     * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto)
+     * Obtener fotos por paginas, definiendo el numero de la pagina y su tamaño (GET /foto/lista)
      */
     @GetMapping("/lista")
     public ResponseEntity<Page<FotoResponse>> obtenerFotosPaginadas(
@@ -55,4 +57,25 @@ public class FotoController {
         return ResponseEntity.ok(pagina);
     }
 
+    /**
+     * Obtener fotos por integrante (GET /foto/integrante/{idIntegrante})
+     */
+    @GetMapping("/integrante/{idIntegrante}")
+    public ResponseEntity<List<FotoResponse>> obtenerFotosPorIntegrante(
+            @PathVariable Integer idIntegrante
+    ) {
+        List<FotoResponse> fotos = fotoService.obtenerFotosPorIntegrante(idIntegrante);
+        return ResponseEntity.ok(fotos);
+    }
+
+    /**
+     * Obtener fotos por selección (GET /foto/seleccion/{idSeleccion})
+     */
+    @GetMapping("/seleccion/{idSeleccion}")
+    public ResponseEntity<List<FotoResponse>> obtenerFotosPorSeleccion(
+            @PathVariable Integer idSeleccion
+    ) {
+        List<FotoResponse> fotos = fotoService.obtenerFotosPorSeleccion(idSeleccion);
+        return ResponseEntity.ok(fotos);
+    }
 }

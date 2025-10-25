@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/private/integrante")
 public class IntegranteController {
@@ -57,6 +54,17 @@ public class IntegranteController {
         if (integrante == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        return ResponseEntity.ok(integrante);
+    }
+
+    /**
+     * Obtener un integrante por su código universitario (GET /integrante/codigo/{codigoUniversitario})
+     */
+    @GetMapping("/codigo/{codigoUniversitario}")
+    public ResponseEntity<IntegranteResponse> obtenerIntegrantePorCodigoUniversitario(
+            @PathVariable String codigoUniversitario
+    ) {
+        IntegranteResponse integrante = integranteService.obtenerIntegrantePorCodigoUniversitario(codigoUniversitario);
         return ResponseEntity.ok(integrante);
     }
 

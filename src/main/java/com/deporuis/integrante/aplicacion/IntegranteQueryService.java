@@ -51,4 +51,13 @@ public class IntegranteQueryService {
         seleccionVerificarExistenciaService.verificarSeleccion(idSeleccion);
         return integranteRepository.countBySeleccion_IdSeleccionAndVisibilidadTrue(idSeleccion);
     }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerIntegrantePorCodigoUniversitario(String codigoUniversitario) {
+        Integrante integrante = integranteRepository.findByCodigoUniversitario(codigoUniversitario)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontró integrante con código universitario: " + codigoUniversitario
+                ));
+        return IntegranteMapper.integranteToResponse(integrante);
+    }
 }

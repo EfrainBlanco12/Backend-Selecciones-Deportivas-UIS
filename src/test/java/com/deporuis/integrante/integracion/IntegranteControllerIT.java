@@ -4,6 +4,7 @@ import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.auth.infraestructura.dto.RolResponse;
 import com.deporuis.auth.infraestructura.JwtFilter;              // ⬅️ importa el filtro
 import com.deporuis.deporte.dominio.Deporte;
+import com.deporuis.excepcion.common.ResourceNotFoundException;
 import com.deporuis.integrante.aplicacion.IntegranteService;
 import com.deporuis.integrante.infraestructura.IntegranteController;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
@@ -66,7 +67,7 @@ class IntegranteControllerIT {
         rol.setNombreRol(nombreRol);
 
         // Foto (objeto) - contenido es byte[]
-        FotoResponse foto = new FotoResponse(idFoto, contenidoBytes, temporada);
+        FotoResponse foto = new FotoResponse(idFoto, contenidoBytes, temporada, null, null, null);
 
         // Posicion (objeto) con Deporte asociado
         Deporte deporteObj = new Deporte();
@@ -96,7 +97,7 @@ class IntegranteControllerIT {
 
         // Objetos
         dto.setRol(rol);
-        dto.setFoto(foto);
+        dto.setFotos(List.of(foto));
         dto.setPosiciones(List.of(posDto));
 
         return dto;
@@ -175,5 +176,37 @@ class IntegranteControllerIT {
                 .andExpect(jsonPath("$.content[1].foto.idFoto").value(6))
                 .andExpect(jsonPath("$.content[1].foto.contenido").value(b64_2))
                 .andExpect(jsonPath("$.content[1].posiciones[0].idPosicion").value(4));
+    }
+
+    @Test
+    void obtenerIntegrantePorCodigoUniversitario_debeRetornarIntegrante() throws Exception {
+        byte[] fotoBytes = new byte[]{1, 2, 3};
+        String expectedBase64 = Base64.getEncoder().encodeToString(fotoBytes);
+
+        IntegranteResponse response = sampleResponse(
+                15,            // idIntegrante
+                20,            // idSeleccion
+                7,  "Delantero",
+                8,  fotoBytes,
+                2024,
+                5,  "10", "Fútbol"
+        );
+        response.setCodigoUniversitario("2025001");
+
+        Mockito.when(integranteService.obtenerIntegrantePorCodigoUniversitario("2025001"))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/private/integrante/codigo/{codigoUniversitario}", "2025001")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idIntegrante").value(15))
+                .andExpect(jsonPath("$.codigoUniversitario").value("2025001"))
+                .andExpect(jsonPath("$.idSeleccion").value(20))
+                .andExpect(jsonPath("$.rol.idRol").value(7))
+                .andExpect(jsonPath("$.rol.nombreRol").value("Delantero"))
+                .andExpect(jsonPath("$.foto.idFoto").value(8))
+                .andExpect(jsonPath("$.foto.contenido").value(expectedBase64))
+                .andExpect(jsonPath("$.posiciones", hasSize(1)))
+                .andExpect(jsonPath("$.posiciones[0].idPosicion").value(5));
     }
 }
