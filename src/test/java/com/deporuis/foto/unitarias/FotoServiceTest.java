@@ -76,4 +76,39 @@ class FotoServiceTest {
         assertEquals(responseEsperado, resultado);
         verify(fotoQueryService).obtenerFoto(id);
     }
+
+    @Test
+    void actualizarFoto_deberiaLlamarAFotoCommandServiceYRetornarResponse() {
+        Integer idFoto = 1;
+        FotoRequest request = new FotoRequest();
+        request.setContenido("foto_actualizada".getBytes());
+        request.setTemporada(2026);
+
+        FotoResponse responseEsperado = new FotoResponse();
+        responseEsperado.setIdFoto(idFoto);
+        responseEsperado.setContenido("foto_actualizada".getBytes());
+        responseEsperado.setTemporada(2026);
+
+        when(fotoCommandService.actualizarFoto(idFoto, request)).thenReturn(responseEsperado);
+
+        FotoResponse resultado = fotoService.actualizarFoto(idFoto, request);
+
+        assertNotNull(resultado);
+        assertEquals(responseEsperado, resultado);
+        assertEquals(idFoto, resultado.getIdFoto());
+        assertArrayEquals("foto_actualizada".getBytes(), resultado.getContenido());
+        assertEquals(2026, resultado.getTemporada());
+        verify(fotoCommandService).actualizarFoto(idFoto, request);
+    }
+
+    @Test
+    void eliminarFoto_deberiaLlamarAFotoCommandService() {
+        Integer idFoto = 1;
+
+        doNothing().when(fotoCommandService).eliminarFotoPorId(idFoto);
+
+        fotoService.eliminarFoto(idFoto);
+
+        verify(fotoCommandService).eliminarFotoPorId(idFoto);
+    }
 }

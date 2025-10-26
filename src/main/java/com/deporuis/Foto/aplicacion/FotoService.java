@@ -42,4 +42,14 @@ public class FotoService {
     public List<FotoResponse> obtenerFotosPorSeleccion(Integer idSeleccion) {
         return fotoQueryService.obtenerFotosPorSeleccion(idSeleccion);
     }
+
+    @Transactional()
+    public FotoResponse actualizarFoto(Integer idFoto, FotoRequest fotoRequest) {
+        return fotoCommandService.actualizarFoto(idFoto, fotoRequest);
+    }
+
+    @Transactional()
+    public void eliminarFoto(Integer idFoto) {
+        fotoCommandService.eliminarFotoPorId(idFoto);
+    }
 }

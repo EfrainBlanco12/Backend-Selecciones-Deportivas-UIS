@@ -78,4 +78,27 @@ public class FotoController {
         List<FotoResponse> fotos = fotoService.obtenerFotosPorSeleccion(idSeleccion);
         return ResponseEntity.ok(fotos);
     }
+
+    /**
+     * Actualizar una foto existente (PUT /foto/actualizar/{idFoto})
+     */
+    @PutMapping("/actualizar/{idFoto}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<FotoResponse> actualizarFoto(
+            @PathVariable Integer idFoto,
+            @Valid @RequestBody FotoRequest fotoRequest
+    ) {
+        FotoResponse fotoActualizada = fotoService.actualizarFoto(idFoto, fotoRequest);
+        return ResponseEntity.ok(fotoActualizada);
+    }
+
+    /**
+     * Eliminar una foto (DELETE /foto/eliminar/{idFoto})
+     */
+    @DeleteMapping("/eliminar/{idFoto}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Void> eliminarFoto(@PathVariable Integer idFoto) {
+        fotoService.eliminarFoto(idFoto);
+        return ResponseEntity.noContent().build();
+    }
 }

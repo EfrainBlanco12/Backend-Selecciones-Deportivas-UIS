@@ -120,4 +120,52 @@ public class FotoCommandService {
     public void eliminarFoto(Foto foto) {
         fotoRepository.delete(foto);
     }
+
+    @Transactional()
+    public FotoResponse actualizarFoto(Integer idFoto, FotoRequest fotoRequest) {
+        // Verificar que la foto existe
+        Foto fotoExistente = fotoRepository.findById(idFoto)
+                .orElseThrow(() -> new RuntimeException("Foto no encontrada con id: " + idFoto));
+
+        // Actualizar campos básicos
+        fotoExistente.setContenido(fotoRequest.getContenido());
+        fotoExistente.setTemporada(fotoRequest.getTemporada());
+
+        // Actualizar relaciones según los IDs proporcionados
+        if (fotoRequest.getIdIntegrante() != null) {
+            Integrante integrante = integranteRepository.findById(fotoRequest.getIdIntegrante())
+                    .orElseThrow(() -> new RuntimeException("Integrante no encontrado"));
+            fotoExistente.setIntegrante(integrante);
+        } else {
+            fotoExistente.setIntegrante(null);
+        }
+
+        if (fotoRequest.getIdSeleccion() != null) {
+            Seleccion seleccion = seleccionRepository.findById(fotoRequest.getIdSeleccion())
+                    .orElseThrow(() -> new RuntimeException("Selección no encontrada"));
+            fotoExistente.setSeleccion(seleccion);
+        } else {
+            fotoExistente.setSeleccion(null);
+        }
+
+        if (fotoRequest.getIdPublicacion() != null) {
+            Publicacion publicacion = publicacionRepository.findById(fotoRequest.getIdPublicacion())
+                    .orElseThrow(() -> new RuntimeException("Publicación no encontrada"));
+            fotoExistente.setPublicacion(publicacion);
+        } else {
+            fotoExistente.setPublicacion(null);
+        }
+
+        Foto fotoActualizada = fotoRepository.save(fotoExistente);
+        return FotoMapper.toResponse(fotoActualizada);
+    }
+
+    @Transactional()
+    public void eliminarFotoPorId(Integer idFoto) {
+        // Verificar que la foto existe
+        Foto foto = fotoRepository.findById(idFoto)
+                .orElseThrow(() -> new RuntimeException("Foto no encontrada con id: " + idFoto));
+        
+        fotoRepository.delete(foto);
+    }
 }

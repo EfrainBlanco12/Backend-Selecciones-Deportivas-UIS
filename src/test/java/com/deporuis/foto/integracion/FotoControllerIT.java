@@ -105,4 +105,134 @@ class FotoControllerIT {
 
         verify(fotoService).obtenerFotosPaginadas(0, 1);
     }
+
+    @Test
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    void actualizarFoto_deberiaRetornarOkYFotoActualizada() throws Exception {
+        Integer idFoto = 1;
+        FotoRequest request = new FotoRequest();
+        request.setContenido("foto_actualizada".getBytes());
+        request.setTemporada(2026);
+        request.setIdIntegrante(10);
+
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(idFoto);
+        response.setContenido("foto_actualizada".getBytes());
+        response.setTemporada(2026);
+        response.setIdIntegrante(10);
+
+        when(fotoService.actualizarFoto(eq(idFoto), any(FotoRequest.class))).thenReturn(response);
+
+        mockMvc.perform(put("/private/foto/actualizar/" + idFoto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idFoto").value(idFoto))
+                .andExpect(jsonPath("$.temporada").value(2026))
+                .andExpect(jsonPath("$.idIntegrante").value(10));
+
+        verify(fotoService).actualizarFoto(eq(idFoto), any(FotoRequest.class));
+    }
+
+    @Test
+    @WithMockUser(roles = {"ENTRENADOR"})
+    void actualizarFoto_conRolEntrenador_deberiaPermitirAcceso() throws Exception {
+        Integer idFoto = 2;
+        FotoRequest request = new FotoRequest();
+        request.setContenido("nueva_foto".getBytes());
+        request.setTemporada(2027);
+
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(idFoto);
+        response.setContenido("nueva_foto".getBytes());
+        response.setTemporada(2027);
+
+        when(fotoService.actualizarFoto(eq(idFoto), any(FotoRequest.class))).thenReturn(response);
+
+        mockMvc.perform(put("/private/foto/actualizar/" + idFoto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idFoto").value(idFoto));
+
+        verify(fotoService).actualizarFoto(eq(idFoto), any(FotoRequest.class));
+    }
+
+    @Test
+    void actualizarFoto_sinAutenticacion_deberiaRetornarUnauthorized() throws Exception {
+        Integer idFoto = 1;
+        FotoRequest request = new FotoRequest();
+        request.setContenido("foto".getBytes());
+        request.setTemporada(2025);
+
+        mockMvc.perform(put("/private/foto/actualizar/" + idFoto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+
+        verify(fotoService, never()).actualizarFoto(anyInt(), any());
+    }
+
+    @Test
+    @WithMockUser(roles = {"DEPORTISTA"})
+    void actualizarFoto_conRolDeportista_deberiaDenegarAcceso() throws Exception {
+        Integer idFoto = 1;
+        FotoRequest request = new FotoRequest();
+        request.setContenido("foto".getBytes());
+        request.setTemporada(2025);
+
+        mockMvc.perform(put("/private/foto/actualizar/" + idFoto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        verify(fotoService, never()).actualizarFoto(anyInt(), any());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    void eliminarFoto_deberiaRetornarNoContent() throws Exception {
+        Integer idFoto = 1;
+
+        doNothing().when(fotoService).eliminarFoto(idFoto);
+
+        mockMvc.perform(delete("/private/foto/eliminar/" + idFoto))
+                .andExpect(status().isNoContent());
+
+        verify(fotoService).eliminarFoto(idFoto);
+    }
+
+    @Test
+    @WithMockUser(roles = {"ENTRENADOR"})
+    void eliminarFoto_conRolEntrenador_deberiaPermitirAcceso() throws Exception {
+        Integer idFoto = 1;
+
+        doNothing().when(fotoService).eliminarFoto(idFoto);
+
+        mockMvc.perform(delete("/private/foto/eliminar/" + idFoto))
+                .andExpect(status().isNoContent());
+
+        verify(fotoService).eliminarFoto(idFoto);
+    }
+
+    @Test
+    void eliminarFoto_sinAutenticacion_deberiaRetornarUnauthorized() throws Exception {
+        Integer idFoto = 1;
+
+        mockMvc.perform(delete("/private/foto/eliminar/" + idFoto))
+                .andExpect(status().isUnauthorized());
+
+        verify(fotoService, never()).eliminarFoto(anyInt());
+    }
+
+    @Test
+    @WithMockUser(roles = {"DEPORTISTA"})
+    void eliminarFoto_conRolDeportista_deberiaDenegarAcceso() throws Exception {
+        Integer idFoto = 1;
+
+        mockMvc.perform(delete("/private/foto/eliminar/" + idFoto))
+                .andExpect(status().isForbidden());
+
+        verify(fotoService, never()).eliminarFoto(anyInt());
+    }
 }

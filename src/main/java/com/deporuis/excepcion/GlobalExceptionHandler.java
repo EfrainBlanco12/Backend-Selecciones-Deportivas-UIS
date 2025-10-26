@@ -4,10 +4,11 @@ import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
+import com.deporuis.Foto.excepciones.FotoEnUsoException;
 import com.deporuis.integrante.excepciones.IntegranteEntrenadorSeleccionExists;
 import com.deporuis.posicion.excepciones.PosicionYaExisteException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import lombok.Getter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -106,6 +107,31 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());// 409 Conflict es semánticamente correcto
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(FotoEnUsoException.class)
+    public ResponseEntity<Map<String, String>> handleFotoEnUso(FotoEnUsoException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        Map<String, String> error = new HashMap<>();
+        
+        // Detectar si es un error de foreign key relacionado con foto
+        String mensaje = ex.getMessage();
+        if (mensaje != null && mensaje.contains("id_foto") && mensaje.contains("Cannot delete")) {
+            error.put("error", "No se puede eliminar la foto porque está siendo utilizada por otros registros");
+            error.put("detalle", "La foto está asociada a uno o más integrantes, selecciones o publicaciones");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+        
+        // Otros errores de integridad
+        error.put("error", "Error de integridad de datos");
+        error.put("detalle", "La operación viola una restricción de base de datos");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     // DTO interno para estandarizar el cuerpo de error
