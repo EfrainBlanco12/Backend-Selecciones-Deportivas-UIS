@@ -80,6 +80,17 @@ public class FotoController {
     }
 
     /**
+     * Obtener la primera foto de una selección (GET /foto/getByIdSeleccion/{idSeleccion})
+     */
+    @GetMapping("/getByIdSeleccion/{idSeleccion}")
+    public ResponseEntity<FotoResponse> obtenerPrimeraFotoPorIdSeleccion(
+            @PathVariable Integer idSeleccion
+    ) {
+        FotoResponse foto = fotoService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+        return ResponseEntity.ok(foto);
+    }
+
+    /**
      * Actualizar una foto existente (PUT /foto/actualizar/{idFoto})
      */
     @PutMapping("/actualizar/{idFoto}")

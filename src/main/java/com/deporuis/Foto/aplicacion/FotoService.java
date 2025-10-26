@@ -43,6 +43,11 @@ public class FotoService {
         return fotoQueryService.obtenerFotosPorSeleccion(idSeleccion);
     }
 
+    @Transactional(readOnly = true)
+    public FotoResponse obtenerPrimeraFotoPorIdSeleccion(Integer idSeleccion) {
+        return fotoQueryService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+    }
+
     @Transactional()
     public FotoResponse actualizarFoto(Integer idFoto, FotoRequest fotoRequest) {
         return fotoCommandService.actualizarFoto(idFoto, fotoRequest);

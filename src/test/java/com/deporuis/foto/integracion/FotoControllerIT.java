@@ -235,4 +235,60 @@ class FotoControllerIT {
 
         verify(fotoService, never()).eliminarFoto(anyInt());
     }
+
+    @Test
+    @WithMockUser(roles = {"ADMINISTRADOR"})
+    void obtenerPrimeraFotoPorIdSeleccion_deberiaRetornarFoto() throws Exception {
+        Integer idSeleccion = 1;
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(10);
+        response.setIdSeleccion(idSeleccion);
+        response.setContenido("foto".getBytes());
+        response.setTemporada(2025);
+
+        when(fotoService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion)).thenReturn(response);
+
+        mockMvc.perform(get("/private/foto/getByIdSeleccion/" + idSeleccion))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idFoto").value(10))
+                .andExpect(jsonPath("$.idSeleccion").value(idSeleccion))
+                .andExpect(jsonPath("$.temporada").value(2025));
+
+        verify(fotoService).obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+    }
+
+    @Test
+    @WithMockUser(roles = {"ENTRENADOR"})
+    void obtenerPrimeraFotoPorIdSeleccion_conRolEntrenador_deberiaRetornarFoto() throws Exception {
+        Integer idSeleccion = 2;
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(5);
+        response.setIdSeleccion(idSeleccion);
+
+        when(fotoService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion)).thenReturn(response);
+
+        mockMvc.perform(get("/private/foto/getByIdSeleccion/" + idSeleccion))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idFoto").value(5))
+                .andExpect(jsonPath("$.idSeleccion").value(idSeleccion));
+
+        verify(fotoService).obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+    }
+
+    @Test
+    @WithMockUser(roles = {"DEPORTISTA"})
+    void obtenerPrimeraFotoPorIdSeleccion_conRolDeportista_deberiaRetornarFoto() throws Exception {
+        Integer idSeleccion = 3;
+        FotoResponse response = new FotoResponse();
+        response.setIdFoto(15);
+        response.setIdSeleccion(idSeleccion);
+
+        when(fotoService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion)).thenReturn(response);
+
+        mockMvc.perform(get("/private/foto/getByIdSeleccion/" + idSeleccion))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idFoto").value(15));
+
+        verify(fotoService).obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+    }
 }

@@ -64,4 +64,17 @@ public class FotoQueryService {
                 .map(FotoMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public FotoResponse obtenerPrimeraFotoPorIdSeleccion(Integer idSeleccion) {
+        // Verificar que la selección existe
+        seleccionRepository.findById(idSeleccion)
+                .orElseThrow(() -> new RuntimeException("Selección no encontrada con id: " + idSeleccion));
+        
+        // Buscar la primera foto de la selección
+        Foto foto = fotoRepository.findFirstBySeleccionIdOrderByIdFotoAsc(idSeleccion)
+                .orElseThrow(() -> new RuntimeException("No se encontró ninguna foto para la selección con id: " + idSeleccion));
+        
+        return FotoMapper.toResponse(foto);
+    }
 }

@@ -111,4 +111,22 @@ class FotoServiceTest {
 
         verify(fotoCommandService).eliminarFotoPorId(idFoto);
     }
+
+    @Test
+    void obtenerPrimeraFotoPorIdSeleccion_deberiaDelegarEnFotoQueryService() {
+        Integer idSeleccion = 1;
+        FotoResponse responseEsperado = new FotoResponse();
+        responseEsperado.setIdFoto(10);
+        responseEsperado.setIdSeleccion(idSeleccion);
+
+        when(fotoQueryService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion)).thenReturn(responseEsperado);
+
+        FotoResponse resultado = fotoService.obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+
+        assertNotNull(resultado);
+        assertEquals(responseEsperado, resultado);
+        assertEquals(10, resultado.getIdFoto());
+        assertEquals(idSeleccion, resultado.getIdSeleccion());
+        verify(fotoQueryService).obtenerPrimeraFotoPorIdSeleccion(idSeleccion);
+    }
 }
