@@ -60,4 +60,14 @@ public class IntegranteQueryService {
                 ));
         return IntegranteMapper.integranteToResponse(integrante);
     }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCodigoUniversitarioExiste(String codigoUniversitario) {
+        return integranteRepository.existsByCodigoUniversitario(codigoUniversitario);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCorreoInstitucionalExiste(String correoInstitucional) {
+        return integranteRepository.existsByCorreoInstitucional(correoInstitucional);
+    }
 }

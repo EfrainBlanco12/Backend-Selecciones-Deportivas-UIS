@@ -147,4 +147,20 @@ class IntegranteServiceTest {
         assertEquals(10, out.getIdIntegrante());
         verify(query).obtenerIntegrantePorCodigoUniversitario("2025001");
     }
+
+    @Test
+    void verificarCodigoUniversitarioExiste_delegaEnQuery() {
+        when(query.verificarCodigoUniversitarioExiste("2025001")).thenReturn(true);
+        Boolean resultado = service.verificarCodigoUniversitarioExiste("2025001");
+        assertEquals(true, resultado);
+        verify(query).verificarCodigoUniversitarioExiste("2025001");
+    }
+
+    @Test
+    void verificarCorreoInstitucionalExiste_delegaEnQuery() {
+        when(query.verificarCorreoInstitucionalExiste("ana@correo.uis.edu.co")).thenReturn(true);
+        Boolean resultado = service.verificarCorreoInstitucionalExiste("ana@correo.uis.edu.co");
+        assertEquals(true, resultado);
+        verify(query).verificarCorreoInstitucionalExiste("ana@correo.uis.edu.co");
+    }
 }

@@ -110,4 +110,44 @@ class IntegranteQueryServiceTest {
         
         verify(repo).findByCodigoUniversitario("NOEXISTE");
     }
+
+    @Test
+    void verificarCodigoUniversitarioExiste_codigoExiste_retornaTrue() {
+        when(repo.existsByCodigoUniversitario("2025001")).thenReturn(true);
+        
+        Boolean resultado = service.verificarCodigoUniversitarioExiste("2025001");
+        
+        assertEquals(true, resultado);
+        verify(repo).existsByCodigoUniversitario("2025001");
+    }
+
+    @Test
+    void verificarCodigoUniversitarioExiste_codigoNoExiste_retornaFalse() {
+        when(repo.existsByCodigoUniversitario("NUEVO123")).thenReturn(false);
+        
+        Boolean resultado = service.verificarCodigoUniversitarioExiste("NUEVO123");
+        
+        assertEquals(false, resultado);
+        verify(repo).existsByCodigoUniversitario("NUEVO123");
+    }
+
+    @Test
+    void verificarCorreoInstitucionalExiste_correoExiste_retornaTrue() {
+        when(repo.existsByCorreoInstitucional("ana@correo.uis.edu.co")).thenReturn(true);
+        
+        Boolean resultado = service.verificarCorreoInstitucionalExiste("ana@correo.uis.edu.co");
+        
+        assertEquals(true, resultado);
+        verify(repo).existsByCorreoInstitucional("ana@correo.uis.edu.co");
+    }
+
+    @Test
+    void verificarCorreoInstitucionalExiste_correoNoExiste_retornaFalse() {
+        when(repo.existsByCorreoInstitucional("nuevo@correo.uis.edu.co")).thenReturn(false);
+        
+        Boolean resultado = service.verificarCorreoInstitucionalExiste("nuevo@correo.uis.edu.co");
+        
+        assertEquals(false, resultado);
+        verify(repo).existsByCorreoInstitucional("nuevo@correo.uis.edu.co");
+    }
 }

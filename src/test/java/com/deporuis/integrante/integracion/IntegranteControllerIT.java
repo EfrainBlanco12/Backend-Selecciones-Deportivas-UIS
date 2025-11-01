@@ -209,4 +209,48 @@ class IntegranteControllerIT {
                 .andExpect(jsonPath("$.posiciones", hasSize(1)))
                 .andExpect(jsonPath("$.posiciones[0].idPosicion").value(5));
     }
+
+    @Test
+    void verificarCodigoUniversitario_codigoExiste_debeRetornarTrue() throws Exception {
+        Mockito.when(integranteService.verificarCodigoUniversitarioExiste("2025001"))
+                .thenReturn(true);
+
+        mockMvc.perform(get("/private/integrante/verificar-codigo/{codigoUniversitario}", "2025001")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(true));
+    }
+
+    @Test
+    void verificarCodigoUniversitario_codigoNoExiste_debeRetornarFalse() throws Exception {
+        Mockito.when(integranteService.verificarCodigoUniversitarioExiste("NUEVO123"))
+                .thenReturn(false);
+
+        mockMvc.perform(get("/private/integrante/verificar-codigo/{codigoUniversitario}", "NUEVO123")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(false));
+    }
+
+    @Test
+    void verificarCorreoInstitucional_correoExiste_debeRetornarTrue() throws Exception {
+        Mockito.when(integranteService.verificarCorreoInstitucionalExiste("ana@correo.uis.edu.co"))
+                .thenReturn(true);
+
+        mockMvc.perform(get("/private/integrante/verificar-correo/{correoInstitucional}", "ana@correo.uis.edu.co")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(true));
+    }
+
+    @Test
+    void verificarCorreoInstitucional_correoNoExiste_debeRetornarFalse() throws Exception {
+        Mockito.when(integranteService.verificarCorreoInstitucionalExiste("nuevo@correo.uis.edu.co"))
+                .thenReturn(false);
+
+        mockMvc.perform(get("/private/integrante/verificar-correo/{correoInstitucional}", "nuevo@correo.uis.edu.co")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(false));
+    }
 }

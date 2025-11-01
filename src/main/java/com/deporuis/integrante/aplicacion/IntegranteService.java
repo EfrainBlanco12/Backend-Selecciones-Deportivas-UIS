@@ -55,4 +55,14 @@ public class IntegranteService {
     public IntegranteResponse obtenerIntegrantePorCodigoUniversitario(String codigoUniversitario) {
         return integranteQueryService.obtenerIntegrantePorCodigoUniversitario(codigoUniversitario);
     }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCodigoUniversitarioExiste(String codigoUniversitario) {
+        return integranteQueryService.verificarCodigoUniversitarioExiste(codigoUniversitario);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCorreoInstitucionalExiste(String correoInstitucional) {
+        return integranteQueryService.verificarCorreoInstitucionalExiste(correoInstitucional);
+    }
 }

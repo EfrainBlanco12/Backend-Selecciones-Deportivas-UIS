@@ -109,4 +109,28 @@ public class IntegranteController {
     ) {
         return ResponseEntity.ok(integranteService.contarIntegrantesPorSeleccion(idSeleccion));
     }
+
+    /**
+     * Verificar si un código universitario ya existe (GET /integrante/verificar-codigo/{codigoUniversitario})
+     */
+    @GetMapping("/verificar-codigo/{codigoUniversitario}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Boolean> verificarCodigoUniversitario(
+            @PathVariable String codigoUniversitario
+    ) {
+        Boolean existe = integranteService.verificarCodigoUniversitarioExiste(codigoUniversitario);
+        return ResponseEntity.ok(existe);
+    }
+
+    /**
+     * Verificar si un correo institucional ya existe (GET /integrante/verificar-correo/{correoInstitucional})
+     */
+    @GetMapping("/verificar-correo/{correoInstitucional}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Boolean> verificarCorreoInstitucional(
+            @PathVariable String correoInstitucional
+    ) {
+        Boolean existe = integranteService.verificarCorreoInstitucionalExiste(correoInstitucional);
+        return ResponseEntity.ok(existe);
+    }
 }
