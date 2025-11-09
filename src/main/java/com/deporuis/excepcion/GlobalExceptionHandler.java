@@ -1,6 +1,7 @@
 package com.deporuis.excepcion;
 
 import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
+import com.deporuis.auth.excepciones.LoginYaExisteException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
@@ -111,6 +112,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FotoEnUsoException.class)
     public ResponseEntity<Map<String, String>> handleFotoEnUso(FotoEnUsoException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(LoginYaExisteException.class)
+    public ResponseEntity<Map<String, String>> handleLoginYaExiste(LoginYaExisteException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

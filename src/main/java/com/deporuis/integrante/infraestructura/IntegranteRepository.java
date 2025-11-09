@@ -50,4 +50,13 @@ public interface IntegranteRepository extends JpaRepository<Integrante, Integer>
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Seleccion s where s.idSeleccion = :id")
     Optional<Seleccion> lockById(@Param("id") Integer id);
+
+    @Query("SELECT i FROM Integrante i WHERE EXISTS " +
+            "(SELECT 1 FROM Login l WHERE l.codigoUniversitario = i.codigoUniversitario) " +
+            "AND i.visibilidad = true " +
+            "ORDER BY CASE " +
+            "WHEN i.rol.nombreRol = 'ADMINISTRADOR' THEN 1 " +
+            "WHEN i.rol.nombreRol = 'ENTRENADOR' THEN 2 " +
+            "ELSE 3 END, i.apellidos ASC, i.nombres ASC")
+    Page<Integrante> findIntegrantesConLogin(Pageable pageable);
 }
