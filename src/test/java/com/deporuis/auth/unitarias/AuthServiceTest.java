@@ -167,6 +167,41 @@ class AuthServiceTest {
         verify(loginRepository, never()).save(any(Login.class));
     }
 
+    @Test
+    void eliminarLogin_loginExiste_debeEliminarLogin() {
+        // Arrange
+        String codigoUniversitario = "2200001";
+        String passwordEncriptada = "$2a$10$encrypted";
+        Login login = new Login(codigoUniversitario, passwordEncriptada);
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.of(login));
+
+        // Act
+        authService.eliminarLogin(codigoUniversitario);
+
+        // Assert
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(loginRepository, times(1)).delete(login);
+    }
+
+    @Test
+    void eliminarLogin_loginNoExiste_debeLanzarExcepcion() {
+        // Arrange
+        String codigoUniversitario = "9999999";
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            authService.eliminarLogin(codigoUniversitario);
+        });
+
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(loginRepository, never()).delete(any(Login.class));
+    }
+
     private Integrante crearIntegrante(Integer id, String codigoUniversitario) {
         Integrante integrante = new Integrante(
                 codigoUniversitario,

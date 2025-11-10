@@ -3,6 +3,7 @@ package com.deporuis.auth.infraestructura;
 import com.deporuis.auth.aplicacion.AuthService;
 import com.deporuis.auth.aplicacion.JwtService;
 import com.deporuis.auth.dominio.Login;
+import com.deporuis.auth.infraestructura.dto.EliminarLoginResponse;
 import com.deporuis.auth.infraestructura.dto.LoginRequest;
 import com.deporuis.auth.infraestructura.dto.LoginResponse;
 import com.deporuis.auth.infraestructura.dto.RegistrarLoginRequest;
@@ -94,6 +95,7 @@ public class AuthController {
      * Verifica si un código universitario ya tiene login creado
      */
     @GetMapping("/verificar-login/{codigoUniversitario}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<VerificarLoginResponse> verificarLogin(
             @PathVariable String codigoUniversitario) {
         
@@ -102,6 +104,24 @@ public class AuthController {
         VerificarLoginResponse response = new VerificarLoginResponse(
                 codigoUniversitario,
                 tieneLogin
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Elimina un login por código universitario
+     */
+    @DeleteMapping("/private/eliminar-login/{codigoUniversitario}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<EliminarLoginResponse> eliminarLogin(
+            @PathVariable String codigoUniversitario) {
+        
+        authService.eliminarLogin(codigoUniversitario);
+        
+        EliminarLoginResponse response = new EliminarLoginResponse(
+                codigoUniversitario,
+                "Login eliminado exitosamente"
         );
         
         return ResponseEntity.ok(response);

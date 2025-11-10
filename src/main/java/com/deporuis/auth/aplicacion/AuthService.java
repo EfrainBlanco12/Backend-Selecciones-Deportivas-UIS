@@ -37,6 +37,21 @@ public class AuthService {
     }
 
     /**
+     * Elimina un login por código universitario
+     */
+    @Transactional
+    public void eliminarLogin(String codigoUniversitario) {
+        // Verificar que el login exista
+        Login login = authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe un login para el código universitario: " + codigoUniversitario
+                ));
+
+        // Eliminar el login
+        loginRepository.delete(login);
+    }
+
+    /**
      * Registra un nuevo login para un integrante
      */
     @Transactional

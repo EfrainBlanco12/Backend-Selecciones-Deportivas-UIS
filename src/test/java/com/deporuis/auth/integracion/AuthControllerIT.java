@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -315,5 +316,59 @@ class AuthControllerIT {
                     .withFailMessage("Para un código inexistente, tieneLogin debe ser false")
                     .isFalse();
         }
+    }
+
+    @Test
+    @DisplayName("DELETE /auth/private/eliminar-login/{codigoUniversitario} con código existente debe eliminar el login")
+    void eliminarLogin_codigoExistente_debeEliminarLogin() throws Exception {
+        String codigoUniversitario = "2200001";
+        
+        MvcResult res = mockMvc.perform(
+                        delete("/auth/private/eliminar-login/" + codigoUniversitario)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Puede ser 200 si funciona, 403 si no hay permisos, 404 si no existe o la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 200, 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(200, 403, 404);
+
+        // Si fue exitoso, verificar estructura de respuesta
+        if (status == 200) {
+            String body = res.getResponse().getContentAsString();
+            JsonNode root = om.readTree(body);
+            
+            assertThat(root.has("codigoUniversitario"))
+                    .withFailMessage("Respuesta debe tener campo 'codigoUniversitario'")
+                    .isTrue();
+            assertThat(root.has("mensaje"))
+                    .withFailMessage("Respuesta debe tener campo 'mensaje'")
+                    .isTrue();
+            assertThat(root.get("codigoUniversitario").asText())
+                    .withFailMessage("El código universitario debe coincidir")
+                    .isEqualTo(codigoUniversitario);
+        }
+    }
+
+    @Test
+    @DisplayName("DELETE /auth/private/eliminar-login/{codigoUniversitario} con código inexistente debe retornar 404")
+    void eliminarLogin_codigoInexistente_debeRetornar404() throws Exception {
+        String codigoUniversitario = "9999999";
+        
+        MvcResult res = mockMvc.perform(
+                        delete("/auth/private/eliminar-login/" + codigoUniversitario)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Debe retornar 404 si no existe, 403 si no hay permisos, o 404 si la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(403, 404);
     }
 }

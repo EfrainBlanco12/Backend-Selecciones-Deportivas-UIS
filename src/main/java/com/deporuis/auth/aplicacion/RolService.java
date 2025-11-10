@@ -17,4 +17,9 @@ public class RolService {
     public List<RolResponse> obtenerRolesExceptoAdministrador() {
         return rolQueryService.obtenerRolesExceptoAdministrador();
     }
+
+    @Transactional(readOnly = true)
+    public List<RolResponse> obtenerTodosLosRoles() {
+        return rolQueryService.obtenerTodosLosRoles();
+    }
 }

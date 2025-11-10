@@ -24,4 +24,12 @@ public class RolQueryService {
                 .map(RolMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<RolResponse> obtenerTodosLosRoles() {
+        List<Rol> roles = rolRepository.findAll();
+        return roles.stream()
+                .map(RolMapper::toResponse)
+                .collect(Collectors.toList());
+    }
 }

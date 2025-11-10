@@ -27,4 +27,14 @@ public class RolController {
         List<RolResponse> roles = rolService.obtenerRolesExceptoAdministrador();
         return ResponseEntity.ok(roles);
     }
+
+    /**
+     * Obtener todos los roles incluyendo ADMINISTRADOR (GET /rol/todos)
+     */
+    @GetMapping("/todos")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<List<RolResponse>> obtenerTodosLosRoles() {
+        List<RolResponse> roles = rolService.obtenerTodosLosRoles();
+        return ResponseEntity.ok(roles);
+    }
 }
