@@ -8,6 +8,7 @@ import com.deporuis.integrante.aplicacion.helper.IntegranteVerificarExistenciaSe
 import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.dominio.IntegrantePosicion;
+import com.deporuis.integrante.excepciones.IntegranteEntrenadorSeleccionExists;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
@@ -46,11 +47,24 @@ public class IntegranteCommandService {
         integrante.setRol(rol);
 
         Seleccion seleccion = integranteVerificarExistenciaService.verificarSeleccion(integranteRequest.getIdSeleccion());
+
+        // 🚨 Nueva validación: si el rol es ENTRENADOR, verificar que la selección no tenga ya otro
+        if ("ENTRENADOR".equalsIgnoreCase(rol.getNombreRol())) {
+            boolean yaTieneEntrenador = integranteRepository
+                    .existsBySeleccion_IdSeleccionAndRol_NombreRolAndVisibilidadTrue(seleccion.getIdSeleccion(), "ENTRENADOR");
+
+            if (yaTieneEntrenador) {
+                throw new IntegranteEntrenadorSeleccionExists("La selección " + seleccion.getIdSeleccion() + " ya tiene un entrenador asignado");
+            }
+        }
+
         integrante.setSeleccion(seleccion);
 
-        Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
-        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
-        integrante.setFoto(fotoCreada);
+        // Crear fotos si se proporcionaron
+        if (integranteRequest.getFotos() != null && !integranteRequest.getFotos().isEmpty()) {
+            List<com.deporuis.Foto.dominio.Foto> fotos = fotoCommandService.crearFotosIntegrante(integranteRequest.getFotos(), integrante);
+            integrante.setFotos(fotos);
+        }
 
         integrante = integranteRepository.save(integrante);
 
@@ -62,7 +76,8 @@ public class IntegranteCommandService {
         return IntegranteMapper.integranteToResponse(integrante);
     }
 
-    @Transactional()
+
+    @Transactional
     public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
 
         integranteVerificarExistenciaService.verificarPermisosCreacionIntegrantes(integranteRequest.getIdRol());
@@ -84,13 +99,30 @@ public class IntegranteCommandService {
         integrante.setRol(rol);
 
         Seleccion seleccion = integranteVerificarExistenciaService.verificarSeleccion(integranteRequest.getIdSeleccion());
+
+        // 🚨 Nueva validación: si el rol es ENTRENADOR, asegurarse que no haya otro en la selección
+        if ("ENTRENADOR".equalsIgnoreCase(rol.getNombreRol())) {
+            boolean yaTieneOtroEntrenador = integranteRepository
+                    .existsBySeleccion_IdSeleccionAndRol_NombreRolAndVisibilidadTrueAndIdIntegranteNot(
+                            seleccion.getIdSeleccion(), "ENTRENADOR", integrante.getIdIntegrante()
+                    );
+
+            if (yaTieneOtroEntrenador) {
+                throw new IntegranteEntrenadorSeleccionExists(
+                        "La selección " + seleccion.getIdSeleccion() + " ya tiene un entrenador asignado"
+                );
+            }
+        }
+
         integrante.setSeleccion(seleccion);
 
-        Foto fotoAntigua = integranteVerificarExistenciaService.verificarFotoIntegrante(integrante.getFoto().getIdFoto());
-        fotoCommandService.eliminarFoto(fotoAntigua);
-        Foto fotoCreada = fotoCommandService.crearFotoIntegrante(integranteRequest.getFoto());
-        fotoCreada = integranteVerificarExistenciaService.verificarFotoIntegrante(fotoCreada.getIdFoto());
-        integrante.setFoto(fotoCreada);
+        // Eliminar fotos antiguas y crear nuevas si se proporcionaron
+        fotoCommandService.eliminarFotosIntegrante(integrante);
+        
+        if (integranteRequest.getFotos() != null && !integranteRequest.getFotos().isEmpty()) {
+            List<com.deporuis.Foto.dominio.Foto> fotosNuevas = fotoCommandService.crearFotosIntegrante(integranteRequest.getFotos(), integrante);
+            integrante.setFotos(fotosNuevas);
+        }
 
         integranteRelacionService.eliminarRelacionesPosicion(integrante);
         List<Posicion> posiciones = integranteVerificarExistenciaService.verificarPosiciones(integranteRequest.getIdPosiciones());
@@ -102,6 +134,7 @@ public class IntegranteCommandService {
 
         return IntegranteMapper.integranteToResponse(integrante);
     }
+
 
     @Transactional()
     public void softDeleteIntegrante(Integer id) {

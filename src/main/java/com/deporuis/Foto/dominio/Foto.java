@@ -25,16 +25,17 @@ public class Foto {
     @Column(name = "temporada")
     private Integer temporada;
 
-    // Relación inversa con Integrantes
-    @OneToOne(mappedBy = "foto")
+    // Relación con Integrante (Foto tiene id_integrante como FK)
+    @ManyToOne
+    @JoinColumn(name = "id_integrante")
     private Integrante integrante;
 
-    // Relación con Selección
+    // Relación con Selección (Foto tiene id_seleccion como FK)
     @ManyToOne
     @JoinColumn(name = "id_seleccion")
     private Seleccion seleccion;
 
-    // Relación con Publicación
+    // Relación con Publicación (Foto tiene id_publicacion como FK)
     @ManyToOne
     @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;

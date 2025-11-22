@@ -36,7 +36,33 @@ public class IntegranteService {
         integranteCommandService.softDeleteIntegrante(id);
     }
 
+    @Transactional()
     public IntegranteResponse actualizarIntegrante(Integer id, IntegranteRequest integranteRequest) {
         return integranteCommandService.actualizarIntegrante(id, integranteRequest);
+    }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerEntrenadorPorSeleccion(Integer idSeleccion) {
+        return integranteQueryService.obtenerEntrenadorPorSeleccion(idSeleccion);
+    }
+
+    @Transactional(readOnly = true)
+    public long contarIntegrantesPorSeleccion(Integer idSeleccion) {
+        return integranteQueryService.contarIntegrantesPorSeleccion(idSeleccion);
+    }
+
+    @Transactional(readOnly = true)
+    public IntegranteResponse obtenerIntegrantePorCodigoUniversitario(String codigoUniversitario) {
+        return integranteQueryService.obtenerIntegrantePorCodigoUniversitario(codigoUniversitario);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCodigoUniversitarioExiste(String codigoUniversitario) {
+        return integranteQueryService.verificarCodigoUniversitarioExiste(codigoUniversitario);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean verificarCorreoInstitucionalExiste(String correoInstitucional) {
+        return integranteQueryService.verificarCorreoInstitucionalExiste(correoInstitucional);
     }
 }

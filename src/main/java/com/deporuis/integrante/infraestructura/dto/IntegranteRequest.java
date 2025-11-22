@@ -39,8 +39,7 @@ public class IntegranteRequest {
     @NotNull(message = "La seleccion del integrante es obligatoria")
     private Integer idSeleccion;
 
-    @NotNull(message = "La foto es obligatoria")
-    private FotoRequest foto;
+    private List<FotoRequest> fotos = new ArrayList<>();
 
     private List<Integer> idPosiciones = new ArrayList<>();
 }

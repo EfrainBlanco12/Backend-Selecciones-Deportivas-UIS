@@ -48,7 +48,7 @@ class IntegranteCommandServiceTest {
         r.setCorreoInstitucional("ana@correo.uis.edu.co");
         r.setIdRol(3);
         r.setIdSeleccion(1);
-        r.setFoto(new FotoRequest());
+        r.setFotos(List.of(new FotoRequest()));
         r.setIdPosiciones(List.of(1,2));
         return r;
     }
@@ -68,8 +68,7 @@ class IntegranteCommandServiceTest {
         Rol rol = new Rol(); rol.setIdRol(3); when(verificar.verificarRol(anyInt())).thenReturn(rol);
         Seleccion sel = new Seleccion(); sel.setIdSeleccion(1); when(verificar.verificarSeleccion(anyInt())).thenReturn(sel);
         Foto foto = new Foto(); foto.setIdFoto(7);
-        when(fotoCmd.crearFotoIntegrante(any())).thenReturn(foto);
-        when(verificar.verificarFotoIntegrante(anyInt())).thenReturn(foto);
+        when(fotoCmd.crearFotosIntegrante(anyList(), any())).thenReturn(List.of(foto));
         when(repo.save(any(Integrante.class))).thenAnswer(inv -> { Integrante i = inv.getArgument(0); i.setIdIntegrante(9); return i; });
         Posicion p1 = new Posicion(); p1.setIdPosicion(1);
         Posicion p2 = new Posicion(); p2.setIdPosicion(2);
@@ -93,16 +92,14 @@ class IntegranteCommandServiceTest {
     void actualizarIntegrante_ok() {
         doNothing().when(verificar).verificarPermisosCreacionIntegrantes(anyInt());
         Integrante existente = buildIntegrante(3);
-        Foto old = new Foto(); old.setIdFoto(5); existente.setFoto(old);
+        Foto old = new Foto(); old.setIdFoto(5); existente.setFotos(List.of(old));
         when(verificar.verificarIntegrante(3)).thenReturn(existente);
         when(verificar.verificarActualizarCodigoCorreoIntegrante(any(), any())).thenReturn(existente);
         Rol rol = new Rol(); rol.setIdRol(3); when(verificar.verificarRol(anyInt())).thenReturn(rol);
         Seleccion sel = new Seleccion(); sel.setIdSeleccion(1); when(verificar.verificarSeleccion(anyInt())).thenReturn(sel);
-        when(verificar.verificarFotoIntegrante(anyInt())).thenReturn(old);
-        doNothing().when(fotoCmd).eliminarFoto(any());
+        doNothing().when(fotoCmd).eliminarFotosIntegrante(any());
         Foto nueva = new Foto(); nueva.setIdFoto(8);
-        when(fotoCmd.crearFotoIntegrante(any())).thenReturn(nueva);
-        when(verificar.verificarFotoIntegrante(eq(8))).thenReturn(nueva);
+        when(fotoCmd.crearFotosIntegrante(anyList(), any())).thenReturn(List.of(nueva));
         doNothing().when(relacion).eliminarRelacionesPosicion(any());
         Posicion p1 = new Posicion(); p1.setIdPosicion(1);
         when(verificar.verificarPosiciones(anyList())).thenReturn(List.of(p1));

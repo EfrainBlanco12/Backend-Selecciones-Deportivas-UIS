@@ -51,4 +51,29 @@ public class HorarioController {
         Page<HorarioResponse> pagina = horarioService.obtenerHorariosPaginados(page, size);
         return ResponseEntity.ok(pagina);
     }
+
+    /**
+     * Actualizar un horario por su ID (PUT /horario/actualizar/{id})
+     */
+    @PutMapping("/actualizar/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<HorarioResponse> actualizarHorario(
+            @PathVariable Integer id,
+            @Valid @RequestBody HorarioRequest horarioRequest
+    ) {
+        HorarioResponse horarioActualizado = horarioService.actualizarHorario(id, horarioRequest);
+        return ResponseEntity.ok(horarioActualizado);
+    }
+
+    /**
+     * Eliminar un horario por su ID (DELETE /horario/eliminar/{id})
+     */
+    @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Void> eliminarHorario(
+            @PathVariable Integer id
+    ) {
+        horarioService.eliminarHorario(id);
+        return ResponseEntity.noContent().build();
+    }
 }

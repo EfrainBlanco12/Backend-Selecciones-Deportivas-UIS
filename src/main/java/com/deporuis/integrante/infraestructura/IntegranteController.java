@@ -58,6 +58,17 @@ public class IntegranteController {
     }
 
     /**
+     * Obtener un integrante por su código universitario (GET /integrante/codigo/{codigoUniversitario})
+     */
+    @GetMapping("/codigo/{codigoUniversitario}")
+    public ResponseEntity<IntegranteResponse> obtenerIntegrantePorCodigoUniversitario(
+            @PathVariable String codigoUniversitario
+    ) {
+        IntegranteResponse integrante = integranteService.obtenerIntegrantePorCodigoUniversitario(codigoUniversitario);
+        return ResponseEntity.ok(integrante);
+    }
+
+    /**
      * Hace softdelete de un integrante por su ID (PATCH /integrante)
      */
     @PatchMapping("/softdelete/{id}")
@@ -81,5 +92,45 @@ public class IntegranteController {
     ) {
         IntegranteResponse integranteActualizado = integranteService.actualizarIntegrante(id, integranteRequest);
         return ResponseEntity.ok(integranteActualizado);
+    }
+
+    @GetMapping("/{idSeleccion}/entrenador")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','ENTRENADOR')")
+    public ResponseEntity<IntegranteResponse> obtenerEntrenador(
+            @PathVariable Integer idSeleccion
+    ) {
+        return ResponseEntity.ok(integranteService.obtenerEntrenadorPorSeleccion(idSeleccion));
+    }
+
+    @GetMapping("/{idSeleccion}/conteo")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','ENTRENADOR')")
+    public ResponseEntity<Long> contarIntegrantes(
+            @PathVariable Integer idSeleccion
+    ) {
+        return ResponseEntity.ok(integranteService.contarIntegrantesPorSeleccion(idSeleccion));
+    }
+
+    /**
+     * Verificar si un código universitario ya existe (GET /integrante/verificar-codigo/{codigoUniversitario})
+     */
+    @GetMapping("/verificar-codigo/{codigoUniversitario}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Boolean> verificarCodigoUniversitario(
+            @PathVariable String codigoUniversitario
+    ) {
+        Boolean existe = integranteService.verificarCodigoUniversitarioExiste(codigoUniversitario);
+        return ResponseEntity.ok(existe);
+    }
+
+    /**
+     * Verificar si un correo institucional ya existe (GET /integrante/verificar-correo/{correoInstitucional})
+     */
+    @GetMapping("/verificar-correo/{correoInstitucional}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
+    public ResponseEntity<Boolean> verificarCorreoInstitucional(
+            @PathVariable String correoInstitucional
+    ) {
+        Boolean existe = integranteService.verificarCorreoInstitucionalExiste(correoInstitucional);
+        return ResponseEntity.ok(existe);
     }
 }

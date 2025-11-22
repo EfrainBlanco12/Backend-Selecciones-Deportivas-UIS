@@ -65,4 +65,39 @@ class HorarioServiceTest {
         assertEquals(1, out.getTotalElements());
         verify(query).obtenerHorariosPaginados(0,5);
     }
+
+    @Test
+    void crear_conSelecciones_delegaEnCommand() {
+        HorarioRequest request = req();
+        request.setIdSelecciones(List.of(1, 2));
+
+        HorarioResponse response = resp();
+        when(command.crearHorario(request)).thenReturn(response);
+
+        HorarioResponse out = service.crearHorario(request);
+
+        assertEquals(5, out.getIdHorario());
+        verify(command).crearHorario(request);
+    }
+
+    @Test
+    void actualizar_delegaEnCommand() {
+        HorarioRequest request = req();
+        HorarioResponse response = resp();
+        when(command.actualizarHorario(10, request)).thenReturn(response);
+
+        HorarioResponse out = service.actualizarHorario(10, request);
+
+        assertEquals(5, out.getIdHorario());
+        verify(command).actualizarHorario(10, request);
+    }
+
+    @Test
+    void eliminar_delegaEnCommand() {
+        doNothing().when(command).eliminarHorario(10);
+
+        service.eliminarHorario(10);
+
+        verify(command).eliminarHorario(10);
+    }
 }

@@ -1,5 +1,6 @@
 package com.deporuis.publicacion.aplicacion;
 
+import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +67,15 @@ public class PublicacionService {
     @Transactional()
     public void softDeletePublicacion(Integer id) {
         publicacionCommandService.softDeletePublicacion(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PublicacionResponse> obtenerNoticiasPaginadas(Integer page, Integer size) {
+        return publicacionQueryService.obtenerPublicacionesPorTipoPaginadas(TipoPublicacion.NOTICIA, page, size);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PublicacionResponse> obtenerEventosPaginados(Integer page, Integer size) {
+        return publicacionQueryService.obtenerPublicacionesPorTipoPaginadas(TipoPublicacion.EVENTO, page, size);
     }
 }

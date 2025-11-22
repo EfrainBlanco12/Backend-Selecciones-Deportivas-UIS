@@ -28,6 +28,12 @@ public class PublicacionController {
         PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(publicacionCreada);
     }
+    @GetMapping("/{idPublicacion}")
+    public ResponseEntity<PublicacionResponse> obtenerEventoPorId(
+            @PathVariable Integer idPublicacion) {
+        var resp = publicacionService.obtenerPublicacion(idPublicacion);
+        return ResponseEntity.ok(resp);
+    }
 
     /**
      * Obtener publicaciones por paginas, definiendo el numero de la pagina y su tamaño (GET /publicacion)
@@ -42,18 +48,34 @@ public class PublicacionController {
     }
 
     /**
+     * Obtener publicaciones de tipo NOTICIA (GET /private/publicacion/lista/noticias)
+     */
+    @GetMapping("/lista/noticias")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerNoticiasPaginadas(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size
+    ) {
+        Page<PublicacionResponse> pagina = publicacionService.obtenerNoticiasPaginadas(page, size);
+        return ResponseEntity.ok(pagina);
+    }
+
+    /**
+     * Obtener publicaciones de tipo EVENTO (GET /private/publicacion/lista/evento)
+     */
+    @GetMapping("/lista/eventos")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerEventosPaginados(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size
+    ) {
+        Page<PublicacionResponse> pagina = publicacionService.obtenerEventosPaginados(page, size);
+        return ResponseEntity.ok(pagina);
+    }
+
+    /**
      * Obtener una sola publicación por su ID (GET /publicacion/{id})
      */
-    @GetMapping("/obtener/{id}")
-    public ResponseEntity<PublicacionResponse> obtenerPublicacion(
-            @PathVariable Integer id
-    ) {
-        PublicacionResponse publicacion = publicacionService.obtenerPublicacion(id);
-        if(publicacion == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(publicacion);
-    }
+
+
 
     /**
      * Actualizar una publicación existente (PUT /publicacion/{id})

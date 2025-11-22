@@ -6,8 +6,11 @@ import com.deporuis.Foto.infraestructura.FotoRepository;
 import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.integrante.dominio.Integrante;
+import com.deporuis.integrante.infraestructura.IntegranteRepository;
 import com.deporuis.publicacion.dominio.Publicacion;
+import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.seleccion.dominio.Seleccion;
+import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +23,37 @@ public class FotoCommandService {
     @Autowired
     private FotoRepository fotoRepository;
 
+    @Autowired
+    private IntegranteRepository integranteRepository;
+
+    @Autowired
+    private SeleccionRepository seleccionRepository;
+
+    @Autowired
+    private PublicacionRepository publicacionRepository;
+
     @Transactional()
     public FotoResponse crearFoto(FotoRequest fotoRequest) {
         Foto nuevaFoto = FotoMapper.requestToFoto(fotoRequest);
+
+        // Asignar relaciones según los IDs proporcionados
+        if (fotoRequest.getIdIntegrante() != null) {
+            Integrante integrante = integranteRepository.findById(fotoRequest.getIdIntegrante())
+                    .orElseThrow(() -> new RuntimeException("Integrante no encontrado"));
+            nuevaFoto.setIntegrante(integrante);
+        }
+
+        if (fotoRequest.getIdSeleccion() != null) {
+            Seleccion seleccion = seleccionRepository.findById(fotoRequest.getIdSeleccion())
+                    .orElseThrow(() -> new RuntimeException("Selección no encontrada"));
+            nuevaFoto.setSeleccion(seleccion);
+        }
+
+        if (fotoRequest.getIdPublicacion() != null) {
+            Publicacion publicacion = publicacionRepository.findById(fotoRequest.getIdPublicacion())
+                    .orElseThrow(() -> new RuntimeException("Publicación no encontrada"));
+            nuevaFoto.setPublicacion(publicacion);
+        }
 
         Foto fotoGuardada = fotoRepository.save(nuevaFoto);
         return FotoMapper.toResponse(fotoGuardada);
@@ -31,8 +62,34 @@ public class FotoCommandService {
     @Transactional()
     public Foto crearFotoIntegrante(FotoRequest fotoRequest) {
         Foto nuevaFoto = FotoMapper.requestToFoto(fotoRequest);
+        
+        if (fotoRequest.getIdIntegrante() != null) {
+            Integrante integrante = integranteRepository.findById(fotoRequest.getIdIntegrante())
+                    .orElseThrow(() -> new RuntimeException("Integrante no encontrado"));
+            nuevaFoto.setIntegrante(integrante);
+        }
 
         return fotoRepository.save(nuevaFoto);
+    }
+
+    @Transactional()
+    public List<Foto> crearFotosIntegrante(List<FotoRequest> fotoRequest, Integrante integrante) {
+        List<Foto> nuevasFotos = fotoRequest.stream()
+                .map(fotoReq -> {
+                    Foto foto = new Foto();
+                    foto.setContenido(fotoReq.getContenido());
+                    foto.setTemporada(fotoReq.getTemporada());
+                    foto.setIntegrante(integrante);
+                    return foto;
+                })
+                .toList();
+
+        return fotoRepository.saveAll(nuevasFotos);
+    }
+
+    @Transactional()
+    public void eliminarFotosIntegrante(Integrante integrante) {
+        fotoRepository.deleteAll(fotoRepository.findAllByIntegrante(integrante));
     }
 
     @Transactional()
@@ -61,6 +118,54 @@ public class FotoCommandService {
 
     @Transactional()
     public void eliminarFoto(Foto foto) {
+        fotoRepository.delete(foto);
+    }
+
+    @Transactional()
+    public FotoResponse actualizarFoto(Integer idFoto, FotoRequest fotoRequest) {
+        // Verificar que la foto existe
+        Foto fotoExistente = fotoRepository.findById(idFoto)
+                .orElseThrow(() -> new RuntimeException("Foto no encontrada con id: " + idFoto));
+
+        // Actualizar campos básicos
+        fotoExistente.setContenido(fotoRequest.getContenido());
+        fotoExistente.setTemporada(fotoRequest.getTemporada());
+
+        // Actualizar relaciones según los IDs proporcionados
+        if (fotoRequest.getIdIntegrante() != null) {
+            Integrante integrante = integranteRepository.findById(fotoRequest.getIdIntegrante())
+                    .orElseThrow(() -> new RuntimeException("Integrante no encontrado"));
+            fotoExistente.setIntegrante(integrante);
+        } else {
+            fotoExistente.setIntegrante(null);
+        }
+
+        if (fotoRequest.getIdSeleccion() != null) {
+            Seleccion seleccion = seleccionRepository.findById(fotoRequest.getIdSeleccion())
+                    .orElseThrow(() -> new RuntimeException("Selección no encontrada"));
+            fotoExistente.setSeleccion(seleccion);
+        } else {
+            fotoExistente.setSeleccion(null);
+        }
+
+        if (fotoRequest.getIdPublicacion() != null) {
+            Publicacion publicacion = publicacionRepository.findById(fotoRequest.getIdPublicacion())
+                    .orElseThrow(() -> new RuntimeException("Publicación no encontrada"));
+            fotoExistente.setPublicacion(publicacion);
+        } else {
+            fotoExistente.setPublicacion(null);
+        }
+
+        Foto fotoActualizada = fotoRepository.save(fotoExistente);
+        return FotoMapper.toResponse(fotoActualizada);
+    }
+
+    @Transactional()
+    public void eliminarFotoPorId(Integer idFoto) {
+        // Verificar que la foto existe
+        Foto foto = fotoRepository.findById(idFoto)
+                .orElseThrow(() -> new RuntimeException("Foto no encontrada con id: " + idFoto));
+        
         fotoRepository.delete(foto);
     }
 }

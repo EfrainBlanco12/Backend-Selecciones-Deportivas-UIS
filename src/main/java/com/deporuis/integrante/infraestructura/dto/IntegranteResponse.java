@@ -1,13 +1,18 @@
 package com.deporuis.integrante.infraestructura.dto;
 
+import com.deporuis.Foto.infraestructura.dto.FotoResponse;
+import com.deporuis.auth.infraestructura.dto.RolResponse;
+import com.deporuis.posicion.infraestructura.dto.PosicionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class IntegranteResponse {
     private Integer idIntegrante;
 
@@ -27,11 +32,9 @@ public class IntegranteResponse {
 
     private String correoUniversitario;
 
-    private Integer idRol;
-
     private Integer idSeleccion;
 
-    private Integer idFoto;
-
-    private List<Integer> idPosiciones;
+    private RolResponse rol;
+    private List<FotoResponse> fotos;
+    private List<PosicionResponse> posiciones;
 }

@@ -1,10 +1,17 @@
 package com.deporuis.integrante.aplicacion.mapper;
 
+import com.deporuis.Foto.aplicacion.mapper.FotoMapper;
+import com.deporuis.auth.infraestructura.dto.RolResponse;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.infraestructura.dto.IntegranteRequest;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
+import com.deporuis.posicion.infraestructura.dto.PosicionResponse;
+
+import java.util.List;
+import java.util.Objects;
 
 public class IntegranteMapper {
+
     public static Integrante requestToIntegrante(IntegranteRequest integranteRequest) {
         return new Integrante(
                 integranteRequest.getCodigoUniversitario(),
@@ -18,21 +25,59 @@ public class IntegranteMapper {
         );
     }
 
+    /** Alias para mantener compatibilidad con servicios existentes */
     public static IntegranteResponse integranteToResponse(Integrante integrante) {
-        return new IntegranteResponse(
-                integrante.getIdIntegrante(),
-                integrante.getCodigoUniversitario(),
-                integrante.getNombres(),
-                integrante.getApellidos(),
-                integrante.getFechaNacimiento(),
-                integrante.getAltura(),
-                integrante.getPeso(),
-                integrante.getDorsal(),
-                integrante.getCorreoInstitucional(),
-                integrante.getRol().getIdRol(),
-                integrante.getSeleccion().getIdSeleccion(),
-                integrante.getFoto().getIdFoto(),
-                integrante.getPosiciones().stream().map(integrantePosicion -> integrantePosicion.getPosicion().getIdPosicion()).toList()
+        return toResponse(integrante);
+    }
+
+    /** Mapea Integrante -> IntegranteResponse con:
+     *  - idSeleccion (solo id)
+     *  - rol (objeto), foto (objeto), posiciones (lista de objetos)
+     */
+    public static IntegranteResponse toResponse(Integrante integrante) {
+        if (integrante == null) return null;
+
+        IntegranteResponse dto = new IntegranteResponse();
+
+        dto.setIdIntegrante(integrante.getIdIntegrante());
+        dto.setCodigoUniversitario(integrante.getCodigoUniversitario());
+        dto.setNombres(integrante.getNombres());
+        dto.setApellidos(integrante.getApellidos());
+        dto.setFechaNacimiento(integrante.getFechaNacimiento());
+        dto.setAltura(integrante.getAltura());
+        dto.setPeso(integrante.getPeso());
+        dto.setDorsal(integrante.getDorsal());
+        dto.setCorreoUniversitario(integrante.getCorreoInstitucional());
+
+        // Solo ID para selección
+        dto.setIdSeleccion(
+                integrante.getSeleccion() != null ? integrante.getSeleccion().getIdSeleccion() : null
         );
+
+        // Objeto completo para rol
+        dto.setRol(
+                integrante.getRol() != null ? new RolResponse(integrante.getRol()) : null
+        );
+
+        // Lista de fotos
+        List<com.deporuis.Foto.infraestructura.dto.FotoResponse> fotos = (integrante.getFotos() == null || integrante.getFotos().isEmpty())
+                ? List.of()
+                : integrante.getFotos().stream()
+                .filter(Objects::nonNull)
+                .map(FotoMapper::toResponse)
+                .toList();
+        dto.setFotos(fotos);
+
+        // Lista de objetos para posiciones (NO IDs)
+        List<PosicionResponse> posiciones = (integrante.getPosiciones() == null)
+                ? List.of()
+                : integrante.getPosiciones().stream()
+                .map(ip -> ip != null ? ip.getPosicion() : null)
+                .filter(Objects::nonNull)
+                .map(PosicionResponse::new)
+                .toList();
+        dto.setPosiciones(posiciones);
+
+        return dto;
     }
 }

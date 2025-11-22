@@ -11,6 +11,7 @@ import com.deporuis.seleccion.aplicacion.mapper.SeleccionMapper;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionHorario;
 import com.deporuis.seleccion.infraestructura.SeleccionRepository;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,5 +106,58 @@ public class SeleccionCommandService {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
         seleccion.setVisibilidad(false);
         seleccionRepository.save(seleccion);
+    }
+
+    @Transactional()
+    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest) {
+        Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
+
+        // Actualizar solo los campos que vienen en el request
+        if (patchRequest.getFechaCreacion() != null) {
+            seleccion.setFechaCreacion(patchRequest.getFechaCreacion());
+        }
+
+        if (patchRequest.getNombreSeleccion() != null) {
+            seleccion.setNombreSeleccion(patchRequest.getNombreSeleccion());
+        }
+
+        if (patchRequest.getEspacioDeportivo() != null) {
+            seleccion.setEspacioDeportivo(patchRequest.getEspacioDeportivo());
+        }
+
+        if (patchRequest.getEquipo() != null) {
+            seleccion.setEquipo(patchRequest.getEquipo());
+        }
+
+        if (patchRequest.getTipo_seleccion() != null) {
+            seleccion.setTipo_seleccion(patchRequest.getTipo_seleccion());
+        }
+
+        // Actualizar deporte si viene en el request
+        if (patchRequest.getIdDeporte() != null) {
+            Deporte deporte = seleccionVerificarExistenciaService.verificarDeporte(patchRequest.getIdDeporte());
+            seleccion.setDeporte(deporte);
+        }
+
+        // Actualizar fotos solo si vienen en el request
+        if (patchRequest.getFotos() != null) {
+            fotoCommandService.eliminarFotosSeleccion(seleccion);
+            List<Foto> nuevasFotos = fotoCommandService.crearFotosSeleccion(patchRequest.getFotos(), seleccion);
+            nuevasFotos = seleccionVerificarExistenciaService.verificarFotos(nuevasFotos);
+            seleccion.setFotos(nuevasFotos);
+        }
+
+        // Actualizar horarios solo si vienen en el request
+        if (patchRequest.getHorarios() != null) {
+            seleccionRelacionService.eliminarRelacionesSeleccion(seleccion);
+            List<Horario> nuevosHorarios = horarioCommandService.obtenerOcrearHorariosSeleccion(patchRequest.getHorarios());
+            nuevosHorarios = seleccionVerificarExistenciaService.verificarHorarios(nuevosHorarios);
+            List<SeleccionHorario> relacionesHorario = seleccionRelacionService.crearRelacionesHorarios(seleccion, nuevosHorarios);
+            seleccion.setHorarios(relacionesHorario);
+        }
+
+        Seleccion seleccionActualizada = seleccionRepository.save(seleccion);
+
+        return SeleccionMapper.seleccionToResponse(seleccionActualizada);
     }
 }

@@ -1,11 +1,10 @@
 package com.deporuis.publicacion.unitarias;
 
-import com.deporuis.Foto.dominio.Foto;
-import com.deporuis.publicacion.aplicacion.mapper.PublicacionMapper;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionRequest;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
+import com.deporuis.publicacion.aplicacion.mapper.PublicacionMapper;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionPublicacion;
 import org.junit.jupiter.api.Test;
@@ -18,58 +17,56 @@ import static org.junit.jupiter.api.Assertions.*;
 class PublicacionMapperTest {
 
     @Test
-    void toResponse_mapeaCamposIncluyendoListas() {
-        Publicacion p = new Publicacion();
-        p.setIdPublicacion(7);
+    void toResponse_deberiaMapearCamposBasicosYIdSeleccionesDesdeRelaciones() {
+        var p = new Publicacion();
+        p.setIdPublicacion(1);
         p.setTitulo("T");
         p.setDescripcion("D");
         p.setLugar("L");
-        p.setFecha(LocalDateTime.of(2025, 1, 1, 10, 0));
+        p.setFecha(LocalDateTime.of(2024,1,1,9,0));
         p.setDuracion("2h");
+        p.setVisibilidad(true);
         p.setTipoPublicacion(TipoPublicacion.NOTICIA);
+        p.setFecha(LocalDateTime.of(2024,1,1,9,0));
 
-        // relaciones SeleccionPublicacion
-        Seleccion s1 = new Seleccion(); s1.setIdSeleccion(10);
-        Seleccion s2 = new Seleccion(); s2.setIdSeleccion(20);
-        SeleccionPublicacion sp1 = new SeleccionPublicacion(null, s1, p);
-        SeleccionPublicacion sp2 = new SeleccionPublicacion(null, s2, p);
+        var s1 = new Seleccion(); s1.setIdSeleccion(10);
+        var s2 = new Seleccion(); s2.setIdSeleccion(20);
+        var sp1 = new SeleccionPublicacion(null, s1, p);
+        var sp2 = new SeleccionPublicacion(null, s2, p);
         p.setSelecciones(List.of(sp1, sp2));
 
-        // fotos
-        Foto f1 = new Foto(); f1.setIdFoto(101);
-        Foto f2 = new Foto(); f2.setIdFoto(102);
-        p.setFotos(List.of(f1, f2));
+        PublicacionResponse dto = PublicacionMapper.toResponse(p);
 
-        PublicacionResponse r = PublicacionMapper.toResponse(p);
+        assertEquals(1, dto.getIdPublicacion());
+        assertEquals("T", dto.getTitulo());
+        assertEquals("D", dto.getDescripcion());
+        assertEquals("L", dto.getLugar());
+        assertEquals(LocalDateTime.of(2024,1,1,9,0), dto.getFecha());
+        assertEquals("2h", dto.getDuracion());
+        assertTrue(dto.getVisibilidad());
 
-        assertEquals(7, r.getIdPublicacion());
-        assertEquals("T", r.getTituloPublicacion());
-        assertEquals("D", r.getDescripcion());
-        assertEquals("L", r.getLugar());
-        assertEquals(LocalDateTime.of(2025, 1, 1, 10, 0), r.getFecha());
-        assertEquals("2h", r.getDuracion());
-        assertEquals(TipoPublicacion.NOTICIA, r.getTipoPublicacion());
-        assertEquals(List.of(10, 20), r.getSelecciones());
-        assertEquals(List.of(101, 102), r.getFotos());
+        assertEquals(TipoPublicacion.NOTICIA.name(), dto.getTipoPublicacion());
+        assertNotNull(dto.getIdSelecciones());
+        assertEquals(List.of(10,20), dto.getIdSelecciones());
     }
 
     @Test
-    void requestToPublicacion_construyeEntidadConCamposBasicos() {
-        PublicacionRequest req = new PublicacionRequest();
-        req.setTitulo("T");
-        req.setDescripcion("D");
-        req.setLugar("L");
-        req.setFecha(LocalDateTime.of(2025, 2, 2, 9, 30));
-        req.setDuracion("90m");
+    void requestToPublicacion_deberiaConstruirEntidadDesdeRequest() {
+        var req = new PublicacionRequest();
+        req.setTitulo("Inicio");
+        req.setDescripcion("Desc");
+        req.setLugar("Cancha A");
+        req.setFecha(LocalDateTime.of(2024,1,1,9,0));
+        req.setDuracion("2h");
         req.setTipoPublicacion(TipoPublicacion.EVENTO);
 
-        Publicacion p = PublicacionMapper.requestToPublicacion(req);
+        Publicacion entity = PublicacionMapper.requestToPublicacion(req);
 
-        assertEquals("T", p.getTitulo());
-        assertEquals("D", p.getDescripcion());
-        assertEquals("L", p.getLugar());
-        assertEquals(LocalDateTime.of(2025, 2, 2, 9, 30), p.getFecha());
-        assertEquals("90m", p.getDuracion());
-        assertEquals(TipoPublicacion.EVENTO, p.getTipoPublicacion());
+        assertEquals("Inicio", entity.getTitulo());
+        assertEquals("Desc", entity.getDescripcion());
+        assertEquals("Cancha A", entity.getLugar());
+        assertEquals(LocalDateTime.of(2024,1,1,9,0), entity.getFecha());
+        assertEquals("2h", entity.getDuracion());
+        assertEquals(TipoPublicacion.EVENTO, entity.getTipoPublicacion());
     }
 }

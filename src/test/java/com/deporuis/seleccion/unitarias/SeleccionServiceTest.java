@@ -3,6 +3,7 @@ package com.deporuis.seleccion.unitarias;
 import com.deporuis.seleccion.aplicacion.SeleccionCommandService;
 import com.deporuis.seleccion.aplicacion.SeleccionQueryService;
 import com.deporuis.seleccion.aplicacion.SeleccionService;
+import com.deporuis.seleccion.infraestructura.dto.SeleccionPatchRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionRequest;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,6 +82,15 @@ class SeleccionServiceTest {
         when(commandService.actualizarSeleccion(7, request)).thenReturn(response);
         assertSame(response, service.actualizarSeleccion(7, request));
         verify(commandService).actualizarSeleccion(7, request);
+        verifyNoMoreInteractions(commandService, queryService);
+    }
+
+    @Test
+    void actualizarSeleccionParcial_delegaEnCommand() {
+        SeleccionPatchRequest patchRequest = new SeleccionPatchRequest();
+        when(commandService.actualizarSeleccionParcial(8, patchRequest)).thenReturn(response);
+        assertSame(response, service.actualizarSeleccionParcial(8, patchRequest));
+        verify(commandService).actualizarSeleccionParcial(8, patchRequest);
         verifyNoMoreInteractions(commandService, queryService);
     }
 }

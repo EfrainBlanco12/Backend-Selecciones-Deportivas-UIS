@@ -33,7 +33,10 @@ public class SeleccionMapper {
                 .map(f -> new FotoResponse(
                         f.getIdFoto(),
                         f.getContenido(),
-                        f.getTemporada()
+                        f.getTemporada(),
+                        f.getIntegrante() != null ? f.getIntegrante().getIdIntegrante() : null,
+                        f.getSeleccion() != null ? f.getSeleccion().getIdSeleccion() : null,
+                        f.getPublicacion() != null ? f.getPublicacion().getIdPublicacion() : null
                 ))
                 .toList();
 
