@@ -21,8 +21,8 @@ public class PublicacionService {
      * Creacion de una publicacion y relaciones de las tablas muchos a muchos con las tablas fotos y selecciones
      */
     @Transactional()
-    public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest) {
-        return publicacionCommandService.crearPublicacion(publicacionRequest);
+    public PublicacionResponse crearPublicacion(PublicacionRequest publicacionRequest, Integer usuarioModifico) {
+        return publicacionCommandService.crearPublicacion(publicacionRequest, usuarioModifico);
     }
 
     /**
@@ -49,8 +49,8 @@ public class PublicacionService {
      * Actualiza una publicacion y sus relaciones muchos a muchos con las tablas selecciones y foto
      */
     @Transactional()
-    public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
-        return publicacionCommandService.actualizarPublicacion(id, request);
+    public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request, Integer usuarioModifico) {
+        return publicacionCommandService.actualizarPublicacion(id, request, usuarioModifico);
     }
 
     /**

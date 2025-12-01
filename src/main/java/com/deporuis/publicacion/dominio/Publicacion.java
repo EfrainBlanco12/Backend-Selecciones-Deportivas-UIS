@@ -42,6 +42,12 @@ public class Publicacion {
     @Column(name = "tipo_publicacion", nullable = false, columnDefinition = "ENUM('NOTICIA', 'EVENTO') default 'NOTICIA'")
     private TipoPublicacion tipoPublicacion = TipoPublicacion.NOTICIA;
 
+    @Column(name = "usuario_modifico")
+    private Integer usuarioModifico;
+
+    @Column(name = "fecha_modificacion", nullable = false)
+    private LocalDateTime fechaModificacion;
+
     @OneToMany(mappedBy = "publicacion")
     private List<Foto> fotos = new ArrayList<>();
 
@@ -55,5 +61,6 @@ public class Publicacion {
         this.fecha = fecha;
         this.duracion = duracion;
         this.tipoPublicacion = tipoPublicacion;
+        this.fechaModificacion = LocalDateTime.now();
     }
 }

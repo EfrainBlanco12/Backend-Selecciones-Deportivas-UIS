@@ -5,6 +5,7 @@ import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.deporte.dominio.Deporte;
 import com.deporuis.horario.aplicacion.HorarioCommandService;
 import com.deporuis.horario.dominio.Horario;
+import java.time.LocalDateTime;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionRelacionService;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.aplicacion.mapper.SeleccionMapper;
@@ -39,11 +40,14 @@ public class SeleccionCommandService {
     private SeleccionRelacionService seleccionRelacionService;
 
     @Transactional()
-    public SeleccionResponse crearSeleccion(SeleccionRequest request) {
+    public SeleccionResponse crearSeleccion(SeleccionRequest request, Integer usuarioModifico) {
         Seleccion seleccion = SeleccionMapper.requestToSeleccion(request);
 
         Deporte deporte = seleccionVerificarExistenciaService.verificarDeporte(request.getIdDeporte());
         seleccion.setDeporte(deporte);
+
+        seleccion.setUsuarioModifico(usuarioModifico);
+        seleccion.setFechaModificacion(LocalDateTime.now());
 
         seleccion = seleccionRepository.save(seleccion);
 
@@ -62,7 +66,7 @@ public class SeleccionCommandService {
     }
 
     @Transactional()
-    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest) {
+    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest, Integer usuarioModifico) {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
 
         seleccion.setFechaCreacion(seleccionRequest.getFechaCreacion());
@@ -73,6 +77,9 @@ public class SeleccionCommandService {
 
         Deporte deporte = seleccionVerificarExistenciaService.verificarDeporte(seleccionRequest.getIdDeporte());
         seleccion.setDeporte(deporte);
+
+        seleccion.setUsuarioModifico(usuarioModifico);
+        seleccion.setFechaModificacion(LocalDateTime.now());
 
         // Fotos
         fotoCommandService.eliminarFotosSeleccion(seleccion);
@@ -109,8 +116,11 @@ public class SeleccionCommandService {
     }
 
     @Transactional()
-    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest) {
+    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest, Integer usuarioModifico) {
         Seleccion seleccion = seleccionVerificarExistenciaService.verificarSeleccion(id);
+
+        seleccion.setUsuarioModifico(usuarioModifico);
+        seleccion.setFechaModificacion(LocalDateTime.now());
 
         // Actualizar solo los campos que vienen en el request
         if (patchRequest.getFechaCreacion() != null) {

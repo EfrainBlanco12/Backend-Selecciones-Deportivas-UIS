@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,22 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestPropertySource(properties = "spring.profiles.active=test")
 
-@WebMvcTest(
-        controllers = SeleccionController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.REGEX,
-                pattern = "com\\.deporuis\\.auth\\..*"
-        )
-)
-@AutoConfigureMockMvc(addFilters = true) // mantenemos la cadena de seguridad
+@WebMvcTest(controllers = SeleccionController.class)
+@AutoConfigureMockMvc(addFilters = false) // deshabilitar filtros para testing
 class SeleccionControllerIT {
 
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper om;
 
     @MockBean private SeleccionService service;
-
-    @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
     @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
 
     private SeleccionRequest buildReq() {
@@ -71,14 +61,17 @@ class SeleccionControllerIT {
         SeleccionResponse resp = new SeleccionResponse();
         resp.setIdSeleccion(1);
         resp.setNombreSeleccion("Seleccion UIS");
+        resp.setUsuarioModifico(100);
 
-        when(service.crearSeleccion(any())).thenReturn(resp);
+        when(service.crearSeleccion(any(), eq(100))).thenReturn(resp);
 
         mvc.perform(post("/private/seleccion/crear")
                         .with(csrf()) // CSRF requerido
+                        .header("usuariomodifico", "100")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(buildReq())))
-                .andExpect(status().isOk()); // tu controller devuelve 200
+                .andExpect(status().isCreated()) // tu controller devuelve 201 CREATED
+                .andExpect(jsonPath("$.usuarioModifico").value(100));
     }
 
     @WithMockUser(roles = {"ENTRENADOR"})
@@ -116,15 +109,18 @@ class SeleccionControllerIT {
         SeleccionResponse resp = new SeleccionResponse();
         resp.setIdSeleccion(3);
         resp.setNombreSeleccion("C");
+        resp.setUsuarioModifico(200);
 
-        when(service.actualizarSeleccion(eq(3), any()))
+        when(service.actualizarSeleccion(eq(3), any(), eq(200)))
                 .thenReturn(resp);
 
         mvc.perform(put("/private/seleccion/actualizar/3")
                         .with(csrf()) // CSRF requerido
+                        .header("usuariomodifico", "200")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(buildReq())))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.usuarioModifico").value(200));
     }
 
     @WithMockUser(roles = {"ADMINISTRADOR"})
@@ -132,7 +128,7 @@ class SeleccionControllerIT {
     void eliminar_retorna200_ok() throws Exception {
         mvc.perform(delete("/private/seleccion/eliminar/11")
                         .with(csrf())) // CSRF requerido
-                .andExpect(status().isOk()); // tu controller devuelve 200
+                .andExpect(status().isNoContent()); // tu controller devuelve 204 NO CONTENT
     }
 
     @WithMockUser(roles = {"ADMINISTRADOR"})
@@ -140,7 +136,7 @@ class SeleccionControllerIT {
     void softdelete_retorna200_ok() throws Exception {
         mvc.perform(patch("/private/seleccion/softdelete/12")
                         .with(csrf())) // CSRF requerido
-                .andExpect(status().isOk()); // tu controller devuelve 200
+                .andExpect(status().isNoContent()); // tu controller devuelve 204 NO CONTENT
     }
 
     @WithMockUser(roles = {"ENTRENADOR"})
@@ -152,16 +148,19 @@ class SeleccionControllerIT {
         SeleccionResponse resp = new SeleccionResponse();
         resp.setIdSeleccion(15);
         resp.setNombreSeleccion("Nombre Actualizado");
+        resp.setUsuarioModifico(300);
 
-        when(service.actualizarSeleccionParcial(eq(15), any()))
+        when(service.actualizarSeleccionParcial(eq(15), any(), eq(300)))
                 .thenReturn(resp);
 
         mvc.perform(patch("/private/seleccion/actualizar-parcial/15")
                         .with(csrf())
+                        .header("usuariomodifico", "300")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(patchReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombreSeleccion").value("Nombre Actualizado"));
+                .andExpect(jsonPath("$.nombreSeleccion").value("Nombre Actualizado"))
+                .andExpect(jsonPath("$.usuarioModifico").value(300));
     }
 
     @WithMockUser(roles = {"ADMINISTRADOR"})
@@ -175,15 +174,18 @@ class SeleccionControllerIT {
         SeleccionResponse resp = new SeleccionResponse();
         resp.setIdSeleccion(20);
         resp.setNombreSeleccion("Nuevo nombre");
+        resp.setUsuarioModifico(400);
 
-        when(service.actualizarSeleccionParcial(eq(20), any()))
+        when(service.actualizarSeleccionParcial(eq(20), any(), eq(400)))
                 .thenReturn(resp);
 
         mvc.perform(patch("/private/seleccion/actualizar-parcial/20")
                         .with(csrf())
+                        .header("usuariomodifico", "400")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(patchReq)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.usuarioModifico").value(400));
     }
 
     @WithMockUser(roles = {"ADMINISTRADOR"})
@@ -195,15 +197,18 @@ class SeleccionControllerIT {
         SeleccionResponse resp = new SeleccionResponse();
         resp.setIdSeleccion(25);
         resp.setNombreSeleccion("Sin cambios");
+        resp.setUsuarioModifico(500);
 
-        when(service.actualizarSeleccionParcial(eq(25), any()))
+        when(service.actualizarSeleccionParcial(eq(25), any(), eq(500)))
                 .thenReturn(resp);
 
         mvc.perform(patch("/private/seleccion/actualizar-parcial/25")
                         .with(csrf())
+                        .header("usuariomodifico", "500")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(patchReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombreSeleccion").value("Sin cambios"));
+                .andExpect(jsonPath("$.nombreSeleccion").value("Sin cambios"))
+                .andExpect(jsonPath("$.usuarioModifico").value(500));
     }
 }

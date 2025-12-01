@@ -65,7 +65,9 @@ public class SeleccionMapper {
                 seleccion.getTipo_seleccion(),
                 deporteDto,
                 fotosDto,
-                horariosDto
+                horariosDto,
+                seleccion.getUsuarioModifico(),
+                seleccion.getFechaModificacion()
         );
     }
 }

@@ -24,6 +24,8 @@ public class PublicacionMapper {
         dto.setVisibilidad(p.getVisibilidad());
         dto.setTipoPublicacion(p.getTipoPublicacion() != null ? p.getTipoPublicacion().name() : null);
         dto.setFechaCreacion(p.getFecha());
+        dto.setUsuarioModifico(p.getUsuarioModifico());
+        dto.setFechaModificacion(p.getFechaModificacion());
 
         // Fotos
         List<FotoResponse> fotosDto = p.getFotos() == null ? List.of()

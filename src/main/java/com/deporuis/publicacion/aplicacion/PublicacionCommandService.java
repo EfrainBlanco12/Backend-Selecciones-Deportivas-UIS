@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -33,8 +34,12 @@ public class PublicacionCommandService {
     private FotoCommandService fotoCommandService;
 
     @Transactional()
-    public PublicacionResponse crearPublicacion(PublicacionRequest request) {
+    public PublicacionResponse crearPublicacion(PublicacionRequest request, Integer usuarioModifico) {
         Publicacion publicacion = PublicacionMapper.requestToPublicacion(request);
+        
+        publicacion.setUsuarioModifico(usuarioModifico);
+        publicacion.setFechaModificacion(LocalDateTime.now());
+        
         publicacion = publicacionRepository.save(publicacion);
 
         List<Seleccion> selecciones = verificarExistenciaService.verificarSelecciones(request.getSelecciones());
@@ -50,7 +55,7 @@ public class PublicacionCommandService {
     }
 
     @Transactional()
-    public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request) {
+    public PublicacionResponse actualizarPublicacion(Integer id, PublicacionRequest request, Integer usuarioModifico) {
         Publicacion publicacion = verificarExistenciaService.verificarPublicacion(id);
 
         publicacion.setTitulo(request.getTitulo());
@@ -59,6 +64,9 @@ public class PublicacionCommandService {
         publicacion.setFecha(request.getFecha());
         publicacion.setDuracion(request.getDuracion());
         publicacion.setTipoPublicacion(request.getTipoPublicacion());
+        
+        publicacion.setUsuarioModifico(usuarioModifico);
+        publicacion.setFechaModificacion(LocalDateTime.now());
 
         List<Integer> idSelecciones = request.getSelecciones();
         List<Seleccion> nuevasSelecciones = verificarExistenciaService.verificarSelecciones(idSelecciones);

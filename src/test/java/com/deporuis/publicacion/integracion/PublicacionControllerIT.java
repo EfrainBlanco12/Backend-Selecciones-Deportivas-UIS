@@ -64,6 +64,8 @@ class PublicacionControllerIT {
         r.setVisibilidad(true);
         r.setTipoPublicacion(TipoPublicacion.NOTICIA.name()); // en tu DTO es String
         r.setFechaCreacion(LocalDateTime.of(2024,1,1,9,0));
+        r.setUsuarioModifico(100);
+        r.setFechaModificacion(LocalDateTime.of(2024,1,1,9,0));
         
         var sel1 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(10, "Selección 1");
         var sel2 = new com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse(20, "Selección 2");
@@ -90,15 +92,17 @@ class PublicacionControllerIT {
 
     @Test
     void post_crear_deberiaRetornar201ConBody() throws Exception {
-        when(publicacionService.crearPublicacion(any(PublicacionRequest.class))).thenReturn(sample());
+        when(publicacionService.crearPublicacion(any(PublicacionRequest.class), eq(100))).thenReturn(sample());
 
         mvc.perform(post("/private/publicacion/crear")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .header("usuariomodifico", "100")
                         .content(om.writeValueAsString(req())))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.idPublicacion", is(1)))
+                .andExpect(jsonPath("$.usuarioModifico", is(100)))
                 .andExpect(jsonPath("$.idSelecciones", containsInAnyOrder(10,20)));
     }
 
@@ -143,25 +147,28 @@ class PublicacionControllerIT {
     void get_obtener_por_id_deberiaRetornar200ConBody() throws Exception {
         when(publicacionService.obtenerPublicacion(1)).thenReturn(sample());
 
-        mvc.perform(get("/private/publicacion/obtener/{id}", 1)
+        mvc.perform(get("/private/publicacion/{idPublicacion}", 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.idPublicacion", is(1)))
+                .andExpect(jsonPath("$.usuarioModifico", is(100)))
                 .andExpect(jsonPath("$.idSelecciones", containsInAnyOrder(10,20)));
     }
 
     @Test
     void put_actualizar_deberiaRetornar200ConBody() throws Exception {
-        when(publicacionService.actualizarPublicacion(eq(1), any(PublicacionRequest.class))).thenReturn(sample());
+        when(publicacionService.actualizarPublicacion(eq(1), any(PublicacionRequest.class), eq(200))).thenReturn(sample());
 
         mvc.perform(put("/private/publicacion/actualizar/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .header("usuariomodifico", "200")
                         .content(om.writeValueAsString(req())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.idPublicacion", is(1)));
+                .andExpect(jsonPath("$.idPublicacion", is(1)))
+                .andExpect(jsonPath("$.usuarioModifico", is(100)));
     }
 
     @Test
