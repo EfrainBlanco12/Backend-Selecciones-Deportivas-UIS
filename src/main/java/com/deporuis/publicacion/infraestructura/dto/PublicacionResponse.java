@@ -25,6 +25,8 @@ public class PublicacionResponse {
     private Boolean visibilidad;
     private String tipoPublicacion;
     private LocalDateTime fechaCreacion;
+    private Integer usuarioModifico;
+    private LocalDateTime fechaModificacion;
 
     private List<FotoResponse> fotos;
     private List<SeleccionPublicacionResponse> idSelecciones;

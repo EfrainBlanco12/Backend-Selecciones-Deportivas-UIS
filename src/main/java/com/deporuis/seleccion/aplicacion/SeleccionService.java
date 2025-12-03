@@ -24,8 +24,8 @@ public class SeleccionService {
     private SeleccionQueryService seleccionQueryService;
 
     @Transactional()
-    public SeleccionResponse crearSeleccion(SeleccionRequest request) {
-        return seleccionCommandService.crearSeleccion(request);
+    public SeleccionResponse crearSeleccion(SeleccionRequest request, Integer usuarioModifico) {
+        return seleccionCommandService.crearSeleccion(request, usuarioModifico);
     }
 
     @Transactional(readOnly = true)
@@ -49,13 +49,13 @@ public class SeleccionService {
     }
 
     @Transactional()
-    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest) {
-        return seleccionCommandService.actualizarSeleccion(id, seleccionRequest);
+    public SeleccionResponse actualizarSeleccion(Integer id, SeleccionRequest seleccionRequest, Integer usuarioModifico) {
+        return seleccionCommandService.actualizarSeleccion(id, seleccionRequest, usuarioModifico);
     }
 
     @Transactional()
-    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest) {
-        return seleccionCommandService.actualizarSeleccionParcial(id, patchRequest);
+    public SeleccionResponse actualizarSeleccionParcial(Integer id, SeleccionPatchRequest patchRequest, Integer usuarioModifico) {
+        return seleccionCommandService.actualizarSeleccionParcial(id, patchRequest, usuarioModifico);
     }
 
     @Transactional(readOnly = true)

@@ -87,12 +87,17 @@ class PublicacionCommandServiceTest {
                 .thenReturn(List.of(foto));
         when(verificarExistenciaService.verificarFotos(List.of(foto))).thenReturn(List.of(foto));
 
-        PublicacionResponse resp = service.crearPublicacion(req);
+        PublicacionResponse resp = service.crearPublicacion(req, 100);
 
         assertNotNull(resp);
         assertEquals(99, resp.getIdPublicacion());
         assertEquals(List.of(1,2), resp.getIdSelecciones());
-        verify(publicacionRepository).save(any(Publicacion.class));
+        
+        // Verificar que se establecieron campos de auditoría
+        ArgumentCaptor<Publicacion> captor = ArgumentCaptor.forClass(Publicacion.class);
+        verify(publicacionRepository).save(captor.capture());
+        assertEquals(100, captor.getValue().getUsuarioModifico());
+        assertNotNull(captor.getValue().getFechaModificacion());
         verify(relacionService).crearRelacionesSeleccion(any(Publicacion.class), anyList());
         verify(fotoCommandService).crearFotosPublicacion(eq(req.getFotos()), any(Publicacion.class));
     }
@@ -115,9 +120,11 @@ class PublicacionCommandServiceTest {
 
         when(publicacionRepository.save(existente)).thenReturn(existente);
 
-        PublicacionResponse resp = service.actualizarPublicacion(50, req);
+        PublicacionResponse resp = service.actualizarPublicacion(50, req, 200);
 
         assertNotNull(resp);
+        assertEquals(200, existente.getUsuarioModifico());
+        assertNotNull(existente.getFechaModificacion());
         verify(publicacionRepository).save(existente);
         verify(relacionService).actualizarRelacionesSeleccion(eq(existente), eq(List.of(s1, s2)), eq(List.of(1,2)));
     }

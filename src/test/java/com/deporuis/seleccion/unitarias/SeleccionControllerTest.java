@@ -29,11 +29,11 @@ class SeleccionControllerTest {
     void crearSeleccion_retornaBody() {
         SeleccionRequest request = new SeleccionRequest();
         SeleccionResponse esperado = new SeleccionResponse();
-        when(service.crearSeleccion(request)).thenReturn(esperado);
-        ResponseEntity<SeleccionResponse> resp = controller.crearSeleccion(request);
+        when(service.crearSeleccion(request, 123)).thenReturn(esperado);
+        ResponseEntity<SeleccionResponse> resp = controller.crearSeleccion(request, 123);
         assertNotNull(resp);
         assertSame(esperado, resp.getBody());
-        verify(service).crearSeleccion(request);
+        verify(service).crearSeleccion(request, 123);
         verifyNoMoreInteractions(service);
     }
 
@@ -81,11 +81,11 @@ class SeleccionControllerTest {
     void actualizarSeleccion_ok() {
         SeleccionRequest request = new SeleccionRequest();
         SeleccionResponse actualizado = new SeleccionResponse();
-        when(service.actualizarSeleccion(9, request)).thenReturn(actualizado);
-        ResponseEntity<SeleccionResponse> resp = controller.actualizarSeleccion(9, request);
+        when(service.actualizarSeleccion(9, request, 456)).thenReturn(actualizado);
+        ResponseEntity<SeleccionResponse> resp = controller.actualizarSeleccion(9, request, 456);
         assertNotNull(resp);
         assertSame(actualizado, resp.getBody());
-        verify(service).actualizarSeleccion(9, request);
+        verify(service).actualizarSeleccion(9, request, 456);
         verifyNoMoreInteractions(service);
     }
 
@@ -93,11 +93,11 @@ class SeleccionControllerTest {
     void actualizarSeleccionParcial_ok() {
         SeleccionPatchRequest patchRequest = new SeleccionPatchRequest();
         SeleccionResponse actualizado = new SeleccionResponse();
-        when(service.actualizarSeleccionParcial(10, patchRequest)).thenReturn(actualizado);
-        ResponseEntity<SeleccionResponse> resp = controller.actualizarSeleccionParcial(10, patchRequest);
+        when(service.actualizarSeleccionParcial(10, patchRequest, 789)).thenReturn(actualizado);
+        ResponseEntity<SeleccionResponse> resp = controller.actualizarSeleccionParcial(10, patchRequest, 789);
         assertNotNull(resp);
         assertSame(actualizado, resp.getBody());
-        verify(service).actualizarSeleccionParcial(10, patchRequest);
+        verify(service).actualizarSeleccionParcial(10, patchRequest, 789);
         verifyNoMoreInteractions(service);
     }
 }

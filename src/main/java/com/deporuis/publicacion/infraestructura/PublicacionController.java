@@ -24,8 +24,10 @@ public class PublicacionController {
      */
     @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
-    public ResponseEntity<PublicacionResponse> crearPublicacion(@Valid @RequestBody PublicacionRequest publicacionRequest){
-        PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest);
+    public ResponseEntity<PublicacionResponse> crearPublicacion(
+            @Valid @RequestBody PublicacionRequest publicacionRequest,
+            @RequestHeader(value = "usuariomodifico", required = false) Integer usuarioModifico){
+        PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest, usuarioModifico);
         return ResponseEntity.status(HttpStatus.CREATED).body(publicacionCreada);
     }
     @GetMapping("/{idPublicacion}")
@@ -84,9 +86,10 @@ public class PublicacionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<PublicacionResponse> actualizarPublicacion(
             @PathVariable Integer id,
-            @Valid @RequestBody PublicacionRequest publicacionRequest
+            @Valid @RequestBody PublicacionRequest publicacionRequest,
+            @RequestHeader(value = "usuariomodifico", required = false) Integer usuarioModifico
     ) {
-        PublicacionResponse publicacionActualizada = publicacionService.actualizarPublicacion(id, publicacionRequest);
+        PublicacionResponse publicacionActualizada = publicacionService.actualizarPublicacion(id, publicacionRequest, usuarioModifico);
         return ResponseEntity.ok(publicacionActualizada);
     }
 

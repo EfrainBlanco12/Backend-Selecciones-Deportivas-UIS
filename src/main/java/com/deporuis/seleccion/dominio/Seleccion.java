@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,12 @@ public class Seleccion {
 
     private Boolean visibilidad = true;
 
+    @Column(name = "usuario_modifico")
+    private Integer usuarioModifico;
+
+    @Column(name = "fecha_modificacion", nullable = false)
+    private LocalDateTime fechaModificacion;
+
     @ManyToOne
     @JoinColumn(name = "id_deporte", nullable = false)
     private Deporte deporte;
@@ -69,5 +76,6 @@ public class Seleccion {
         this.espacioDeportivo = espacioDeportivo;
         this.equipo = equipo;
         this.tipo_seleccion = tipo_seleccion;
+        this.fechaModificacion = LocalDateTime.now();
     }
 }

@@ -64,25 +64,25 @@ class PublicacionServiceTest {
 
     @Test
     void crearPublicacion_delegaEnCommandService_yRetornaResponse() {
-        when(commandService.crearPublicacion(any(PublicacionRequest.class))).thenReturn(resp);
+        when(commandService.crearPublicacion(any(PublicacionRequest.class), eq(100))).thenReturn(resp);
 
-        PublicacionResponse out = service.crearPublicacion(req);
+        PublicacionResponse out = service.crearPublicacion(req, 100);
 
         assertNotNull(out);
         assertEquals(1, out.getIdPublicacion());
-        verify(commandService).crearPublicacion(eq(req));
+        verify(commandService).crearPublicacion(eq(req), eq(100));
         verifyNoInteractions(queryService);
     }
 
     @Test
     void actualizarPublicacion_delegaEnCommandService_yRetornaResponse() {
-        when(commandService.actualizarPublicacion(eq(7), any(PublicacionRequest.class))).thenReturn(resp);
+        when(commandService.actualizarPublicacion(eq(7), any(PublicacionRequest.class), eq(200))).thenReturn(resp);
 
-        PublicacionResponse out = service.actualizarPublicacion(7, req);
+        PublicacionResponse out = service.actualizarPublicacion(7, req, 200);
 
         assertNotNull(out);
         assertEquals(1, out.getIdPublicacion());
-        verify(commandService).actualizarPublicacion(eq(7), eq(req));
+        verify(commandService).actualizarPublicacion(eq(7), eq(req), eq(200));
         verifyNoInteractions(queryService);
     }
 

@@ -38,9 +38,9 @@ class SeleccionServiceTest {
 
     @Test
     void crearSeleccion_delegaEnCommand() {
-        when(commandService.crearSeleccion(request)).thenReturn(response);
-        assertSame(response, service.crearSeleccion(request));
-        verify(commandService).crearSeleccion(request);
+        when(commandService.crearSeleccion(request, 100)).thenReturn(response);
+        assertSame(response, service.crearSeleccion(request, 100));
+        verify(commandService).crearSeleccion(request, 100);
         verifyNoMoreInteractions(commandService, queryService);
     }
 
@@ -79,18 +79,18 @@ class SeleccionServiceTest {
 
     @Test
     void actualizarSeleccion_delegaEnCommand() {
-        when(commandService.actualizarSeleccion(7, request)).thenReturn(response);
-        assertSame(response, service.actualizarSeleccion(7, request));
-        verify(commandService).actualizarSeleccion(7, request);
+        when(commandService.actualizarSeleccion(7, request, 200)).thenReturn(response);
+        assertSame(response, service.actualizarSeleccion(7, request, 200));
+        verify(commandService).actualizarSeleccion(7, request, 200);
         verifyNoMoreInteractions(commandService, queryService);
     }
 
     @Test
     void actualizarSeleccionParcial_delegaEnCommand() {
         SeleccionPatchRequest patchRequest = new SeleccionPatchRequest();
-        when(commandService.actualizarSeleccionParcial(8, patchRequest)).thenReturn(response);
-        assertSame(response, service.actualizarSeleccionParcial(8, patchRequest));
-        verify(commandService).actualizarSeleccionParcial(8, patchRequest);
+        when(commandService.actualizarSeleccionParcial(8, patchRequest, 300)).thenReturn(response);
+        assertSame(response, service.actualizarSeleccionParcial(8, patchRequest, 300));
+        verify(commandService).actualizarSeleccionParcial(8, patchRequest, 300);
         verifyNoMoreInteractions(commandService, queryService);
     }
 }

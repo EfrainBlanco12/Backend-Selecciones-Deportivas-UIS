@@ -25,8 +25,10 @@ public class SeleccionController {
 
     @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
-    public ResponseEntity<SeleccionResponse> crearSeleccion(@Valid @RequestBody SeleccionRequest seleccionRequest) {
-        SeleccionResponse response = seleccionService.crearSeleccion(seleccionRequest);
+    public ResponseEntity<SeleccionResponse> crearSeleccion(
+            @Valid @RequestBody SeleccionRequest seleccionRequest,
+            @RequestHeader(value = "usuariomodifico", required = false) Integer usuarioModifico) {
+        SeleccionResponse response = seleccionService.crearSeleccion(seleccionRequest, usuarioModifico);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -72,9 +74,10 @@ public class SeleccionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<SeleccionResponse> actualizarSeleccion(
             @PathVariable Integer id,
-            @Valid @RequestBody SeleccionRequest seleccionRequest
+            @Valid @RequestBody SeleccionRequest seleccionRequest,
+            @RequestHeader(value = "usuariomodifico", required = false) Integer usuarioModifico
     ){
-        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccion(id, seleccionRequest);
+        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccion(id, seleccionRequest, usuarioModifico);
         return ResponseEntity.ok(seleccionActualizada);
     }
 
@@ -82,9 +85,10 @@ public class SeleccionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")
     public ResponseEntity<SeleccionResponse> actualizarSeleccionParcial(
             @PathVariable Integer id,
-            @RequestBody SeleccionPatchRequest patchRequest
+            @RequestBody SeleccionPatchRequest patchRequest,
+            @RequestHeader(value = "usuariomodifico", required = false) Integer usuarioModifico
     ){
-        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccionParcial(id, patchRequest);
+        SeleccionResponse seleccionActualizada = seleccionService.actualizarSeleccionParcial(id, patchRequest, usuarioModifico);
         return ResponseEntity.ok(seleccionActualizada);
     }
 

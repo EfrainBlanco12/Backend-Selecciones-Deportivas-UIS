@@ -44,7 +44,14 @@ public class AuthSecurityConfig {
                 // "https://*.deporuis.com"
         ));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        cfg.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "usuariomodifico"
+        ));
         cfg.setExposedHeaders(List.of("Authorization", "Location"));
         cfg.setAllowCredentials(true);
         cfg.setMaxAge(3600L); // cache del preflight 1h

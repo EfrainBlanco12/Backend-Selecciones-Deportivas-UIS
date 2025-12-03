@@ -78,9 +78,11 @@ class SeleccionCommandServiceTest {
         when(seleccionVerificarExistenciaService.verificarSeleccion(1)).thenReturn(seleccion);
         when(seleccionRepository.save(seleccion)).thenReturn(seleccion);
 
-        service.actualizarSeleccionParcial(1, patchRequest);
+        service.actualizarSeleccionParcial(1, patchRequest, 123);
 
         verify(seleccionVerificarExistenciaService).verificarSeleccion(1);
+        verify(seleccion).setUsuarioModifico(123);
+        verify(seleccion).setFechaModificacion(any());
         verify(seleccion).setNombreSeleccion("Nuevo Nombre");
         verify(seleccion, never()).setFechaCreacion(any());
         verify(seleccion, never()).setEspacioDeportivo(any());
@@ -97,9 +99,11 @@ class SeleccionCommandServiceTest {
         when(seleccionVerificarExistenciaService.verificarDeporte(5)).thenReturn(deporte);
         when(seleccionRepository.save(seleccion)).thenReturn(seleccion);
 
-        service.actualizarSeleccionParcial(2, patchRequest);
+        service.actualizarSeleccionParcial(2, patchRequest, 456);
 
         verify(seleccionVerificarExistenciaService).verificarSeleccion(2);
+        verify(seleccion).setUsuarioModifico(456);
+        verify(seleccion).setFechaModificacion(any());
         verify(seleccionVerificarExistenciaService).verificarDeporte(5);
         verify(seleccion).setDeporte(deporte);
         verify(seleccionRepository).save(seleccion);
@@ -114,9 +118,11 @@ class SeleccionCommandServiceTest {
         when(seleccionVerificarExistenciaService.verificarSeleccion(3)).thenReturn(seleccion);
         when(seleccionRepository.save(seleccion)).thenReturn(seleccion);
 
-        service.actualizarSeleccionParcial(3, patchRequest);
+        service.actualizarSeleccionParcial(3, patchRequest, 789);
 
         verify(seleccionVerificarExistenciaService).verificarSeleccion(3);
+        verify(seleccion).setUsuarioModifico(789);
+        verify(seleccion).setFechaModificacion(any());
         verify(seleccion).setTipo_seleccion(TipoSeleccion.FEMENINO);
         verify(seleccion).setEquipo(true);
         verify(seleccionRepository).save(seleccion);
@@ -133,9 +139,11 @@ class SeleccionCommandServiceTest {
         when(seleccionVerificarExistenciaService.verificarFotos(nuevasFotos)).thenReturn(nuevasFotos);
         when(seleccionRepository.save(seleccion)).thenReturn(seleccion);
 
-        service.actualizarSeleccionParcial(4, patchRequest);
+        service.actualizarSeleccionParcial(4, patchRequest, 101);
 
         verify(seleccionVerificarExistenciaService).verificarSeleccion(4);
+        verify(seleccion).setUsuarioModifico(101);
+        verify(seleccion).setFechaModificacion(any());
         verify(fotoCommandService).eliminarFotosSeleccion(seleccion);
         verify(fotoCommandService).crearFotosSeleccion(anyList(), eq(seleccion));
         verify(seleccionVerificarExistenciaService).verificarFotos(nuevasFotos);
@@ -157,9 +165,11 @@ class SeleccionCommandServiceTest {
         when(seleccionRelacionService.crearRelacionesHorarios(seleccion, nuevosHorarios)).thenReturn(relaciones);
         when(seleccionRepository.save(seleccion)).thenReturn(seleccion);
 
-        service.actualizarSeleccionParcial(5, patchRequest);
+        service.actualizarSeleccionParcial(5, patchRequest, 202);
 
         verify(seleccionVerificarExistenciaService).verificarSeleccion(5);
+        verify(seleccion).setUsuarioModifico(202);
+        verify(seleccion).setFechaModificacion(any());
         verify(seleccionRelacionService).eliminarRelacionesSeleccion(seleccion);
         verify(horarioCommandService).obtenerOcrearHorariosSeleccion(anyList());
         verify(seleccionVerificarExistenciaService).verificarHorarios(nuevosHorarios);
