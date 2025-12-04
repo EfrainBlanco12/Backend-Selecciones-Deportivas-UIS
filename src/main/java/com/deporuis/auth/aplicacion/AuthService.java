@@ -80,4 +80,49 @@ public class AuthService {
         // Guardar el login
         return loginRepository.save(login);
     }
+
+    /**
+     * Verifica si la contraseña proporcionada coincide con la almacenada para el código universitario
+     * @param codigoUniversitario El código universitario del usuario
+     * @param password La contraseña en texto plano a verificar
+     * @return true si la contraseña es correcta, false en caso contrario o si el usuario no existe
+     */
+    @Transactional(readOnly = true)
+    public boolean verificarPassword(String codigoUniversitario, String password) {
+        // Buscar el login por código universitario
+        return authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario)
+                .map(login -> passwordEncoder.matches(password, login.getPassword()))
+                .orElse(false);
+    }
+
+    /**
+     * Cambia la contraseña de un usuario existente
+     * @param codigoUniversitario El código universitario del usuario
+     * @param passwordNueva La nueva contraseña en texto plano
+     * @return El login actualizado
+     */
+    @Transactional
+    public Login cambiarPassword(String codigoUniversitario, String passwordNueva) {
+        // Buscar el login por código universitario
+        Login login = authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe un login para el código universitario: " + codigoUniversitario
+                ));
+
+        // Verificar que la nueva contraseña sea diferente a la actual
+        if (passwordEncoder.matches(passwordNueva, login.getPassword())) {
+            throw new com.deporuis.auth.excepciones.MismaPasswordException(
+                    "La nueva contraseña debe ser diferente a la contraseña actual"
+            );
+        }
+
+        // Encriptar la nueva contraseña
+        String passwordEncriptada = passwordEncoder.encode(passwordNueva);
+
+        // Actualizar la contraseña
+        login.setPassword(passwordEncriptada);
+
+        // Guardar los cambios
+        return loginRepository.save(login);
+    }
 }

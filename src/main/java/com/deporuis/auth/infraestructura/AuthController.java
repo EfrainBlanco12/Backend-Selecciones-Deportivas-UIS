@@ -3,12 +3,16 @@ package com.deporuis.auth.infraestructura;
 import com.deporuis.auth.aplicacion.AuthService;
 import com.deporuis.auth.aplicacion.JwtService;
 import com.deporuis.auth.dominio.Login;
+import com.deporuis.auth.infraestructura.dto.CambiarPasswordRequest;
+import com.deporuis.auth.infraestructura.dto.CambiarPasswordResponse;
 import com.deporuis.auth.infraestructura.dto.EliminarLoginResponse;
 import com.deporuis.auth.infraestructura.dto.LoginRequest;
 import com.deporuis.auth.infraestructura.dto.LoginResponse;
 import com.deporuis.auth.infraestructura.dto.RegistrarLoginRequest;
 import com.deporuis.auth.infraestructura.dto.RegistrarLoginResponse;
 import com.deporuis.auth.infraestructura.dto.VerificarLoginResponse;
+import com.deporuis.auth.infraestructura.dto.VerificarPasswordRequest;
+import com.deporuis.auth.infraestructura.dto.VerificarPasswordResponse;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
@@ -122,6 +126,48 @@ public class AuthController {
         EliminarLoginResponse response = new EliminarLoginResponse(
                 codigoUniversitario,
                 "Login eliminado exitosamente"
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Verifica si la contraseña proporcionada es correcta para un código universitario
+     */
+    @PostMapping("/verificar-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<VerificarPasswordResponse> verificarPassword(
+            @RequestBody @Valid VerificarPasswordRequest request) {
+        
+        boolean esValida = authService.verificarPassword(
+                request.getCodigo_universitario(), 
+                request.getPassword()
+        );
+        
+        VerificarPasswordResponse response = new VerificarPasswordResponse(
+                request.getCodigo_universitario(),
+                esValida
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Cambia la contraseña de un usuario
+     */
+    @PutMapping("/cambiar-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CambiarPasswordResponse> cambiarPassword(
+            @RequestBody @Valid CambiarPasswordRequest request) {
+        
+        Login loginActualizado = authService.cambiarPassword(
+                request.getCodigo_universitario(),
+                request.getPassword_nueva()
+        );
+        
+        CambiarPasswordResponse response = new CambiarPasswordResponse(
+                loginActualizado.getCodigoUniversitario(),
+                "Contraseña actualizada exitosamente"
         );
         
         return ResponseEntity.ok(response);

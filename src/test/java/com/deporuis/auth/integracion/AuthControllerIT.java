@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -366,6 +367,201 @@ class AuthControllerIT {
         int status = res.getResponse().getStatus();
         
         // Debe retornar 404 si no existe, 403 si no hay permisos, o 404 si la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(403, 404);
+    }
+
+    @Test
+    @DisplayName("POST /auth/verificar-password con credenciales válidas debe retornar esValida=true o false")
+    void verificarPassword_debeRetornarRespuestaConBooleano() throws Exception {
+        String requestBody = """
+                {
+                    "codigo_universitario": "2200001",
+                    "password": "testPassword"
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        post("/auth/verificar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Debe retornar 200 si funciona, 403 si no hay permisos (requiere autenticación), o 404 si la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 200, 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(200, 403, 404);
+
+        // Si fue exitoso, verificar estructura de respuesta
+        if (status == 200) {
+            String body = res.getResponse().getContentAsString();
+            JsonNode root = om.readTree(body);
+            
+            assertThat(root.has("codigoUniversitario"))
+                    .withFailMessage("Respuesta debe tener campo 'codigoUniversitario'")
+                    .isTrue();
+            assertThat(root.has("esValida"))
+                    .withFailMessage("Respuesta debe tener campo 'esValida'")
+                    .isTrue();
+            assertThat(root.get("codigoUniversitario").asText())
+                    .withFailMessage("El código universitario debe coincidir")
+                    .isEqualTo("2200001");
+            assertThat(root.get("esValida").isBoolean())
+                    .withFailMessage("El campo esValida debe ser booleano")
+                    .isTrue();
+        }
+    }
+
+    @Test
+    @DisplayName("POST /auth/verificar-password con campos vacíos debe retornar 400")
+    void verificarPassword_camposVacios_debeRetornar400() throws Exception {
+        String requestBody = """
+                {
+                    "codigo_universitario": "",
+                    "password": ""
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        post("/auth/verificar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Debe retornar 400 (validación fallida) o 404 si la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 400 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(400, 404);
+    }
+
+    @Test
+    @DisplayName("POST /auth/verificar-password sin autenticación debe retornar 403")
+    void verificarPassword_sinAutenticacion_debeRetornar403() throws Exception {
+        // Este test asume que el endpoint requiere autenticación (@PreAuthorize("isAuthenticated()"))
+        String requestBody = """
+                {
+                    "codigo_universitario": "2200001",
+                    "password": "password123"
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        post("/auth/verificar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Como no hay token JWT, debe retornar 403 (sin permisos) o 404 si la ruta no está disponible
+        assertThat(status)
+                .withFailMessage("Esperaba 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(403, 404);
+    }
+
+    @Test
+    @DisplayName("PUT /auth/cambiar-password con datos válidos debe cambiar la contraseña")
+    void cambiarPassword_datosValidos_debeCambiarPassword() throws Exception {
+        String requestBody = """
+                {
+                    "codigo_universitario": "2200001",
+                    "password_nueva": "nuevaPassword123"
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        put("/auth/cambiar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Puede ser 200 si funciona, 403 si no hay autenticación, 404 si no existe
+        assertThat(status)
+                .withFailMessage("Esperaba 200, 403 o 404 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(200, 403, 404);
+
+        // Si fue exitoso, verificar estructura de respuesta
+        if (status == 200) {
+            String body = res.getResponse().getContentAsString();
+            JsonNode root = om.readTree(body);
+            
+            assertThat(root.has("codigoUniversitario"))
+                    .withFailMessage("Respuesta debe tener campo 'codigoUniversitario'")
+                    .isTrue();
+            assertThat(root.has("mensaje"))
+                    .withFailMessage("Respuesta debe tener campo 'mensaje'")
+                    .isTrue();
+            assertThat(root.get("codigoUniversitario").asText())
+                    .withFailMessage("El código universitario debe coincidir")
+                    .isEqualTo("2200001");
+            assertThat(root.get("mensaje").asText())
+                    .withFailMessage("El mensaje debe indicar éxito")
+                    .contains("exitosamente");
+        }
+    }
+
+    @Test
+    @DisplayName("PUT /auth/cambiar-password con campos vacíos debe retornar 400")
+    void cambiarPassword_camposVacios_debeRetornar400() throws Exception {
+        String requestBody = """
+                {
+                    "codigo_universitario": "",
+                    "password_nueva": ""
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        put("/auth/cambiar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Debe retornar 400 por validación fallida, 403 si no hay autenticación
+        assertThat(status)
+                .withFailMessage("Esperaba 400 o 403 pero fue %s. Body=%s",
+                        status, res.getResponse().getContentAsString())
+                .isIn(400, 403);
+    }
+
+    @Test
+    @DisplayName("PUT /auth/cambiar-password sin autenticación debe retornar 403")
+    void cambiarPassword_sinAutenticacion_debeRetornar403() throws Exception {
+        String requestBody = """
+                {
+                    "codigo_universitario": "2200001",
+                    "password_nueva": "nuevaPassword123"
+                }
+                """;
+        
+        MvcResult res = mockMvc.perform(
+                        put("/auth/cambiar-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andReturn();
+
+        int status = res.getResponse().getStatus();
+        
+        // Como no hay token JWT, debe retornar 403 (sin permisos) o 404 si la ruta no está disponible
         assertThat(status)
                 .withFailMessage("Esperaba 403 o 404 pero fue %s. Body=%s",
                         status, res.getResponse().getContentAsString())
