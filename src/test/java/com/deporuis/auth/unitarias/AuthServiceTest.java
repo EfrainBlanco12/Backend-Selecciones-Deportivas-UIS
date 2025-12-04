@@ -202,6 +202,143 @@ class AuthServiceTest {
         verify(loginRepository, never()).delete(any(Login.class));
     }
 
+    @Test
+    void verificarPassword_passwordCorrecta_debeRetornarTrue() {
+        // Arrange
+        String codigoUniversitario = "2200001";
+        String passwordPlano = "password123";
+        String passwordEncriptada = "$2a$10$encrypted";
+        Login login = new Login(codigoUniversitario, passwordEncriptada);
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.of(login));
+        when(passwordEncoder.matches(passwordPlano, passwordEncriptada)).thenReturn(true);
+
+        // Act
+        boolean resultado = authService.verificarPassword(codigoUniversitario, passwordPlano);
+
+        // Assert
+        assertTrue(resultado);
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, times(1)).matches(passwordPlano, passwordEncriptada);
+    }
+
+    @Test
+    void verificarPassword_passwordIncorrecta_debeRetornarFalse() {
+        // Arrange
+        String codigoUniversitario = "2200001";
+        String passwordPlano = "passwordIncorrecta";
+        String passwordEncriptada = "$2a$10$encrypted";
+        Login login = new Login(codigoUniversitario, passwordEncriptada);
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.of(login));
+        when(passwordEncoder.matches(passwordPlano, passwordEncriptada)).thenReturn(false);
+
+        // Act
+        boolean resultado = authService.verificarPassword(codigoUniversitario, passwordPlano);
+
+        // Assert
+        assertFalse(resultado);
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, times(1)).matches(passwordPlano, passwordEncriptada);
+    }
+
+    @Test
+    void verificarPassword_loginNoExiste_debeRetornarFalse() {
+        // Arrange
+        String codigoUniversitario = "9999999";
+        String passwordPlano = "password123";
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.empty());
+
+        // Act
+        boolean resultado = authService.verificarPassword(codigoUniversitario, passwordPlano);
+
+        // Assert
+        assertFalse(resultado);
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    void cambiarPassword_loginExiste_debeActualizarPassword() {
+        // Arrange
+        String codigoUniversitario = "2200001";
+        String passwordNueva = "nuevaPassword123";
+        String passwordEncriptada = "$2a$10$nuevaEncriptada";
+
+        Login loginExistente = new Login();
+        loginExistente.setCodigoUniversitario(codigoUniversitario);
+        loginExistente.setPassword("$2a$10$antiguaEncriptada");
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.of(loginExistente));
+        when(passwordEncoder.encode(passwordNueva)).thenReturn(passwordEncriptada);
+        when(loginRepository.save(any(Login.class))).thenReturn(loginExistente);
+
+        // Act
+        Login resultado = authService.cambiarPassword(codigoUniversitario, passwordNueva);
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(codigoUniversitario, resultado.getCodigoUniversitario());
+        assertEquals(passwordEncriptada, resultado.getPassword());
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, times(1)).encode(passwordNueva);
+        verify(loginRepository, times(1)).save(loginExistente);
+    }
+
+    @Test
+    void cambiarPassword_loginNoExiste_debeLanzarExcepcion() {
+        // Arrange
+        String codigoUniversitario = "9999999";
+        String passwordNueva = "nuevaPassword123";
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> authService.cambiarPassword(codigoUniversitario, passwordNueva)
+        );
+
+        assertTrue(exception.getMessage().contains(codigoUniversitario));
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(loginRepository, never()).save(any(Login.class));
+    }
+
+    @Test
+    void cambiarPassword_mismaPassword_debeLanzarExcepcion() {
+        // Arrange
+        String codigoUniversitario = "2200001";
+        String passwordActual = "password123";
+        String passwordEncriptadaActual = "$2a$10$antiguaEncriptada";
+
+        Login loginExistente = new Login();
+        loginExistente.setCodigoUniversitario(codigoUniversitario);
+        loginExistente.setPassword(passwordEncriptadaActual);
+
+        when(authQueryService.buscarLoginPorCodigoUniversitario(codigoUniversitario))
+                .thenReturn(Optional.of(loginExistente));
+        when(passwordEncoder.matches(passwordActual, passwordEncriptadaActual)).thenReturn(true);
+
+        // Act & Assert
+        com.deporuis.auth.excepciones.MismaPasswordException exception = assertThrows(
+                com.deporuis.auth.excepciones.MismaPasswordException.class,
+                () -> authService.cambiarPassword(codigoUniversitario, passwordActual)
+        );
+
+        assertTrue(exception.getMessage().contains("debe ser diferente"));
+        verify(authQueryService, times(1)).buscarLoginPorCodigoUniversitario(codigoUniversitario);
+        verify(passwordEncoder, times(1)).matches(passwordActual, passwordEncriptadaActual);
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(loginRepository, never()).save(any(Login.class));
+    }
+
     private Integrante crearIntegrante(Integer id, String codigoUniversitario) {
         Integrante integrante = new Integrante(
                 codigoUniversitario,

@@ -2,6 +2,7 @@ package com.deporuis.excepcion;
 
 import com.deporuis.auth.excepciones.AccesoDenegadoCreacionIntegrantesException;
 import com.deporuis.auth.excepciones.LoginYaExisteException;
+import com.deporuis.auth.excepciones.MismaPasswordException;
 import com.deporuis.deporte.excepciones.DeporteYaExisteException;
 import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
@@ -122,6 +123,13 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(MismaPasswordException.class)
+    public ResponseEntity<Map<String, String>> handleMismaPassword(MismaPasswordException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
