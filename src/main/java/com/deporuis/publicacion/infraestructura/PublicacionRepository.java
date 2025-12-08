@@ -51,4 +51,26 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Intege
             @Param("tipo") TipoPublicacion tipo,
             Pageable pageable
     );
+
+    // Métodos para dashboard
+    Long countByTipoPublicacionAndVisibilidad(TipoPublicacion tipo, Boolean visibilidad);
+    
+    Long countByTipoPublicacionAndFechaGreaterThanEqualAndVisibilidad(
+            TipoPublicacion tipo, 
+            java.time.LocalDateTime fecha, 
+            Boolean visibilidad
+    );
+    
+    Long countByTipoPublicacionAndFechaBetweenAndVisibilidad(
+            TipoPublicacion tipo,
+            java.time.LocalDateTime fechaInicio,
+            java.time.LocalDateTime fechaFin,
+            Boolean visibilidad
+    );
+    
+    Long countByTipoPublicacionAndFechaLessThanAndVisibilidad(
+            TipoPublicacion tipo,
+            java.time.LocalDateTime fecha,
+            Boolean visibilidad
+    );
 }

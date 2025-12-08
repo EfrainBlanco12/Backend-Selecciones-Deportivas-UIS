@@ -19,5 +19,14 @@ public interface SeleccionRepository extends JpaRepository<Seleccion,Integer> {
     Optional<Seleccion> findById(Integer id);
 
     boolean existsByIdSeleccion(Integer idSeleccion);
+
+    // Métodos para dashboard
+    Long countByVisibilidad(Boolean visibilidad);
+    
+    Long countByFechaCreacionGreaterThanEqualAndVisibilidad(java.time.LocalDate fecha, Boolean visibilidad);
+    
+    Long countByFechaCreacionBetweenAndVisibilidad(java.time.LocalDate fechaInicio, java.time.LocalDate fechaFin, Boolean visibilidad);
+    
+    Long countByFechaCreacionLessThanAndVisibilidad(java.time.LocalDate fecha, Boolean visibilidad);
 }
 

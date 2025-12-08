@@ -57,4 +57,7 @@ public interface IntegranteRepository extends JpaRepository<Integrante, Integer>
             "WHEN i.rol.nombreRol = 'ENTRENADOR' THEN 2 " +
             "ELSE 3 END, i.apellidos ASC, i.nombres ASC")
     Page<Integrante> findIntegrantesConLogin(Pageable pageable);
+
+    // Método para dashboard
+    Long countByVisibilidad(Boolean visibilidad);
 }
