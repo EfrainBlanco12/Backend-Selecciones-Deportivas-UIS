@@ -1,6 +1,5 @@
 package com.deporuis.auth.aplicacion.helper;
 
-import com.deporuis.auth.aplicacion.CustomUserDetailsService;
 import com.deporuis.auth.dominio.Rol;
 import com.deporuis.auth.infraestructura.RolRepository;
 import com.deporuis.excepcion.common.ResourceNotFoundException;
@@ -18,9 +17,6 @@ public class RolVerificarExistenciaService {
 
     @Autowired
     private RolRepository rolRepository;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
 
     public Rol verificarRol(Integer id) {
         Optional<Rol> rol = rolRepository.findById(id);

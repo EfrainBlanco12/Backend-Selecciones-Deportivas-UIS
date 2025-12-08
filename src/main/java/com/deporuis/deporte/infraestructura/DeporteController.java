@@ -1,6 +1,5 @@
 package com.deporuis.deporte.infraestructura;
 
-import com.deporuis.deporte.aplicacion.DeporteQueryService;
 import com.deporuis.deporte.aplicacion.DeporteService;
 import com.deporuis.deporte.infraestructura.dto.DeporteRequest;
 import com.deporuis.deporte.infraestructura.dto.DeporteResponse;
@@ -20,9 +19,6 @@ public class DeporteController {
 
     @Autowired
     private DeporteService deporteService;
-
-    @Autowired
-    private DeporteQueryService deporteQueryService;
 
     @PostMapping("/crear")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENTRENADOR')")

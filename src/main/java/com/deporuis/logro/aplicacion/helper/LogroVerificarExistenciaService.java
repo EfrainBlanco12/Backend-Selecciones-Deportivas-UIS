@@ -1,12 +1,10 @@
 package com.deporuis.logro.aplicacion.helper;
 
-import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.logro.dominio.Logro;
 import com.deporuis.logro.excepciones.LogroNotFoundExcepcion;
 import com.deporuis.logro.infraestructura.LogroRepository;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.dominio.Seleccion;
-import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

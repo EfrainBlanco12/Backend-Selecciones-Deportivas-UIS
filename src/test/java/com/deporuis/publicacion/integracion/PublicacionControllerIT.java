@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -49,9 +49,9 @@ class PublicacionControllerIT {
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper om;
 
-    @MockBean private PublicacionService publicacionService;
-    @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
-    @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
+    @MockitoBean private PublicacionService publicacionService;
+    @MockitoBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
+    @MockitoBean private com.deporuis.auth.aplicacion.JwtService jwtService;
 
     private PublicacionResponse sample() {
         var r = new PublicacionResponse();

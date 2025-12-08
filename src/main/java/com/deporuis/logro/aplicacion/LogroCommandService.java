@@ -9,16 +9,11 @@ import com.deporuis.logro.infraestructura.dto.LogroRequest;
 import com.deporuis.logro.infraestructura.dto.LogroResponse;
 import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.seleccion.dominio.SeleccionLogro;
-import com.deporuis.seleccion.dominio.SeleccionPublicacion;
-import com.deporuis.seleccion.infraestructura.SeleccionLogroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class LogroCommandService {

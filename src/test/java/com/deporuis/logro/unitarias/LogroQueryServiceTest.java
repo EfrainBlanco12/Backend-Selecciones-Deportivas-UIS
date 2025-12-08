@@ -2,7 +2,6 @@ package com.deporuis.logro.unitarias;
 
 import com.deporuis.logro.aplicacion.LogroQueryService;
 import com.deporuis.logro.aplicacion.helper.LogroVerificarExistenciaService;
-import com.deporuis.logro.aplicacion.mapper.LogroMapper;
 import com.deporuis.logro.dominio.Logro;
 import com.deporuis.logro.infraestructura.LogroRepository;
 import com.deporuis.logro.infraestructura.dto.LogroResponse;

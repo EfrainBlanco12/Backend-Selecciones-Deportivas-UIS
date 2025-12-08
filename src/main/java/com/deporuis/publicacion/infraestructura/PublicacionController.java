@@ -30,6 +30,10 @@ public class PublicacionController {
         PublicacionResponse publicacionCreada = publicacionService.crearPublicacion(publicacionRequest, usuarioModifico);
         return ResponseEntity.status(HttpStatus.CREATED).body(publicacionCreada);
     }
+
+    /**
+     * Obtener una sola publicación por su ID (GET /publicacion/{id})
+     */
     @GetMapping("/{idPublicacion}")
     public ResponseEntity<PublicacionResponse> obtenerEventoPorId(
             @PathVariable Integer idPublicacion) {
@@ -72,12 +76,6 @@ public class PublicacionController {
         Page<PublicacionResponse> pagina = publicacionService.obtenerEventosPaginados(page, size);
         return ResponseEntity.ok(pagina);
     }
-
-    /**
-     * Obtener una sola publicación por su ID (GET /publicacion/{id})
-     */
-
-
 
     /**
      * Actualizar una publicación existente (PUT /publicacion/{id})

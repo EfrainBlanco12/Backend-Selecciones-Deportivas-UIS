@@ -13,7 +13,6 @@ import com.deporuis.posicion.aplicacion.helper.PosicionVerificarExistenciaServic
 import com.deporuis.posicion.dominio.Posicion;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.dominio.Seleccion;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

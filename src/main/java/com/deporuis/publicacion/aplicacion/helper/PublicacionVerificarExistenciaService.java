@@ -2,14 +2,11 @@ package com.deporuis.publicacion.aplicacion.helper;
 
 import com.deporuis.Foto.aplicacion.helper.FotoVerificarExistenciaService;
 import com.deporuis.Foto.dominio.Foto;
-import com.deporuis.Foto.infraestructura.FotoRepository;
-import com.deporuis.excepcion.common.BadRequestException;
 import com.deporuis.publicacion.dominio.Publicacion;
 import com.deporuis.publicacion.excepciones.PublicacionNotFoundException;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.seleccion.aplicacion.helper.SeleccionVerificarExistenciaService;
 import com.deporuis.seleccion.dominio.Seleccion;
-import com.deporuis.seleccion.infraestructura.SeleccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

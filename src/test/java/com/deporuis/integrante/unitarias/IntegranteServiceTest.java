@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageImpl;
 // import org.springframework.data.domain.PageRequest; // <- No se usa aquí
 
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

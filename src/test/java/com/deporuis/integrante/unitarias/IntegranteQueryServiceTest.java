@@ -7,7 +7,6 @@ import com.deporuis.seleccion.dominio.Seleccion;
 import com.deporuis.posicion.dominio.Posicion;
 import com.deporuis.integrante.aplicacion.IntegranteQueryService;
 import com.deporuis.integrante.aplicacion.helper.IntegranteVerificarExistenciaService;
-import com.deporuis.integrante.aplicacion.mapper.IntegranteMapper;
 import com.deporuis.integrante.dominio.Integrante;
 import com.deporuis.integrante.dominio.IntegrantePosicion;
 import com.deporuis.integrante.infraestructura.IntegranteRepository;
@@ -23,7 +22,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class IntegranteQueryServiceTest {

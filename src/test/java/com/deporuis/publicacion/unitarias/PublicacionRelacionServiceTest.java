@@ -60,6 +60,7 @@ class PublicacionRelacionServiceTest {
         assertTrue(resultado.stream().anyMatch(sp -> sp.getSeleccion().getIdSeleccion().equals(1)));
         assertTrue(resultado.stream().anyMatch(sp -> sp.getSeleccion().getIdSeleccion().equals(2)));
 
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Iterable<SeleccionPublicacion>> captor = ArgumentCaptor.forClass(Iterable.class);
         verify(seleccionPublicacionRepository).saveAll(captor.capture());
         List<SeleccionPublicacion> enviados = toList(captor.getValue());
@@ -81,6 +82,7 @@ class PublicacionRelacionServiceTest {
 
         service.eliminarRelacionesSeleccion(publicacion);
 
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Iterable<SeleccionPublicacion>> delCaptor = ArgumentCaptor.forClass(Iterable.class);
         verify(seleccionPublicacionRepository).deleteAll(delCaptor.capture());
         List<SeleccionPublicacion> borradas = toList(delCaptor.getValue());
@@ -131,12 +133,14 @@ class PublicacionRelacionServiceTest {
         assertTrue(resultado.stream().anyMatch(x -> x.getSeleccion().getIdSeleccion().equals(2)));
         assertTrue(resultado.stream().anyMatch(x -> x.getSeleccion().getIdSeleccion().equals(3)));
 
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Iterable<SeleccionPublicacion>> deleteCaptor = ArgumentCaptor.forClass(Iterable.class);
         verify(seleccionPublicacionRepository).deleteAll(deleteCaptor.capture());
         List<SeleccionPublicacion> eliminadas = toList(deleteCaptor.getValue());
         assertEquals(1, eliminadas.size());
         assertEquals(1, eliminadas.get(0).getSeleccion().getIdSeleccion());
 
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Iterable<SeleccionPublicacion>> saveCaptor = ArgumentCaptor.forClass(Iterable.class);
         verify(seleccionPublicacionRepository, atLeastOnce()).saveAll(saveCaptor.capture());
 

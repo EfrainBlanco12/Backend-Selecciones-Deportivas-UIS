@@ -1,7 +1,6 @@
 package com.deporuis.integrante.aplicacion;
 
 import com.deporuis.Foto.aplicacion.FotoCommandService;
-import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.auth.dominio.Rol;
 import com.deporuis.integrante.aplicacion.helper.IntegranteRelacionService;
 import com.deporuis.integrante.aplicacion.helper.IntegranteVerificarExistenciaService;

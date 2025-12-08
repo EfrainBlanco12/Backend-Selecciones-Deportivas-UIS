@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
@@ -44,9 +44,9 @@ class LogroControllerIT {
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper om;
 
-    @MockBean private LogroService service;
-    @MockBean private com.deporuis.auth.aplicacion.JwtService jwtService;
-    @MockBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
+    @MockitoBean private LogroService service;
+    @MockitoBean private com.deporuis.auth.aplicacion.JwtService jwtService;
+    @MockitoBean private com.deporuis.auth.infraestructura.JwtFilter jwtFilter;
 
     private LogroRequest buildCrear() {
         LogroRequest r = new LogroRequest();

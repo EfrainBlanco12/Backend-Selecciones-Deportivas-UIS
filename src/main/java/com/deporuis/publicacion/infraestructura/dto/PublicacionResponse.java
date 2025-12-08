@@ -1,9 +1,7 @@
 package com.deporuis.publicacion.infraestructura.dto;
 
 import com.deporuis.Foto.infraestructura.dto.FotoResponse;
-import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse;
-import com.deporuis.seleccion.infraestructura.dto.SeleccionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

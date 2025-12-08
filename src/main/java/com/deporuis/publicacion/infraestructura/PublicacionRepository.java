@@ -5,7 +5,6 @@ import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.seleccion.infraestructura.dto.SeleccionPublicacionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -51,5 +50,27 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Intege
             @Param("idSeleccion") Integer idSeleccion,
             @Param("tipo") TipoPublicacion tipo,
             Pageable pageable
+    );
+
+    // Métodos para dashboard
+    Long countByTipoPublicacionAndVisibilidad(TipoPublicacion tipo, Boolean visibilidad);
+    
+    Long countByTipoPublicacionAndFechaGreaterThanEqualAndVisibilidad(
+            TipoPublicacion tipo, 
+            java.time.LocalDateTime fecha, 
+            Boolean visibilidad
+    );
+    
+    Long countByTipoPublicacionAndFechaBetweenAndVisibilidad(
+            TipoPublicacion tipo,
+            java.time.LocalDateTime fechaInicio,
+            java.time.LocalDateTime fechaFin,
+            Boolean visibilidad
+    );
+    
+    Long countByTipoPublicacionAndFechaLessThanAndVisibilidad(
+            TipoPublicacion tipo,
+            java.time.LocalDateTime fecha,
+            Boolean visibilidad
     );
 }
