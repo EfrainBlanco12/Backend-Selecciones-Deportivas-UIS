@@ -1,6 +1,5 @@
 package com.deporuis.deporte.aplicacion;
 
-import com.deporuis.deporte.infraestructura.DeporteRepository;
 import com.deporuis.deporte.infraestructura.dto.DeporteRequest;
 import com.deporuis.deporte.infraestructura.dto.DeporteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import java.util.List;
 
 @Service
 public class DeporteService {
-
-    @Autowired
-    private DeporteRepository deporteRepository;
 
     @Autowired
     private DeporteCommandService deporteCommandService;

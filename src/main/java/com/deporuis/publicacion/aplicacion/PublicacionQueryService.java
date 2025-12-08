@@ -4,13 +4,10 @@ import com.deporuis.publicacion.aplicacion.mapper.PublicacionMapper;
 import com.deporuis.publicacion.dominio.TipoPublicacion;
 import com.deporuis.publicacion.infraestructura.PublicacionRepository;
 import com.deporuis.publicacion.infraestructura.dto.PublicacionResponse;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

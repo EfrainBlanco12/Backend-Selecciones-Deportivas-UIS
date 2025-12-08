@@ -1,11 +1,9 @@
 package com.deporuis.integrante.infraestructura;
 
 import com.deporuis.integrante.dominio.Integrante;
-import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
 import com.deporuis.seleccion.dominio.Seleccion;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

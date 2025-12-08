@@ -4,7 +4,6 @@ import com.deporuis.Foto.infraestructura.dto.FotoResponse;
 import com.deporuis.auth.infraestructura.dto.RolResponse;
 import com.deporuis.auth.infraestructura.JwtFilter;              // ⬅️ importa el filtro
 import com.deporuis.deporte.dominio.Deporte;
-import com.deporuis.excepcion.common.ResourceNotFoundException;
 import com.deporuis.integrante.aplicacion.IntegranteService;
 import com.deporuis.integrante.infraestructura.IntegranteController;
 import com.deporuis.integrante.infraestructura.dto.IntegranteResponse;
@@ -15,7 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -36,11 +35,11 @@ class IntegranteControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private IntegranteService integranteService;
 
     // ⬇️ ESTA LÍNEA ES LA CLAVE: evita que Spring cree el JwtFilter real (y por ende JwtService)
-    @MockBean
+    @MockitoBean
     private JwtFilter jwtFilter;
 
     /**

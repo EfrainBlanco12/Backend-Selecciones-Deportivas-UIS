@@ -6,7 +6,6 @@ import com.deporuis.deporte.infraestructura.DeporteRepository;
 import com.deporuis.deporte.infraestructura.dto.DeporteResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

@@ -1,6 +1,5 @@
 package com.deporuis.integrante.dominio;
 
-import com.deporuis.auth.dominio.Login;
 import com.deporuis.auth.dominio.Rol;
 import com.deporuis.Foto.dominio.Foto;
 import com.deporuis.seleccion.dominio.Seleccion;

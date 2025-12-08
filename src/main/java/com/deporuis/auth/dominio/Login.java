@@ -1,6 +1,5 @@
 package com.deporuis.auth.dominio;
 
-import com.deporuis.integrante.dominio.Integrante;
 import jakarta.persistence.*;
 import lombok.*;
 

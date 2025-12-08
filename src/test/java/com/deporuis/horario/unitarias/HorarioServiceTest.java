@@ -6,7 +6,6 @@ import com.deporuis.horario.aplicacion.HorarioService;
 import com.deporuis.horario.infraestructura.dto.HorarioRequest;
 import com.deporuis.horario.infraestructura.dto.HorarioResponse;
 import com.deporuis.horario.dominio.DiaHorario;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

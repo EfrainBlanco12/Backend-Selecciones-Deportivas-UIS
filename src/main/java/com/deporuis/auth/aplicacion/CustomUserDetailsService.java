@@ -26,7 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         Integrante integrante = integranteRepository.findByCodigoUniversitario(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Integrante no encontrado"));
 
-        String rol = integrante.getRol().toString();
         return new User(
                 login.getCodigoUniversitario(),
                 login.getPassword(),

@@ -1,7 +1,6 @@
 package com.deporuis.logro.dominio;
 
 import com.deporuis.seleccion.dominio.SeleccionLogro;
-import com.deporuis.seleccion.dominio.SeleccionPublicacion;
 import jakarta.persistence.*;
 import lombok.*;
 
