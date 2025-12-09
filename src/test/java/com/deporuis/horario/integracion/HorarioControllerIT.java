@@ -171,4 +171,11 @@ class HorarioControllerIT {
                         .with(csrf()))
                 .andExpect(status().isForbidden());
     }
+
+    // NOTA: El módulo de horarios NO implementa soft delete (eliminación lógica).
+    // Solo tiene eliminación física (DELETE /eliminar/{id}).
+    // Si se requiere soft delete, agregar:
+    // - Campo 'visibilidad' en la entidad Horario
+    // - Método softDeleteHorario en HorarioService
+    // - Endpoint PATCH /softdelete/{id} en HorarioController
 }

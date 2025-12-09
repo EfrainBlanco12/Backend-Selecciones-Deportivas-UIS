@@ -14,6 +14,7 @@ import com.deporuis.posicion.dominio.Posicion;
 import com.deporuis.Foto.aplicacion.FotoCommandService;
 import com.deporuis.Foto.infraestructura.dto.FotoRequest;
 import com.deporuis.Foto.dominio.Foto;
+import com.deporuis.deporte.dominio.Deporte;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
 import java.time.LocalDate;
@@ -70,8 +71,9 @@ class IntegranteCommandServiceTest {
         Foto foto = new Foto(); foto.setIdFoto(7);
         when(fotoCmd.crearFotosIntegrante(anyList(), any())).thenReturn(List.of(foto));
         when(repo.save(any(Integrante.class))).thenAnswer(inv -> { Integrante i = inv.getArgument(0); i.setIdIntegrante(9); return i; });
-        Posicion p1 = new Posicion(); p1.setIdPosicion(1);
-        Posicion p2 = new Posicion(); p2.setIdPosicion(2);
+        Deporte deporte = new Deporte(); deporte.setIdDeporte(1); deporte.setNombreDeporte("Fútbol");
+        Posicion p1 = new Posicion(); p1.setIdPosicion(1); p1.setDeporte(deporte);
+        Posicion p2 = new Posicion(); p2.setIdPosicion(2); p2.setDeporte(deporte);
         when(verificar.verificarPosiciones(anyList())).thenReturn(List.of(p1,p2));
         when(relacion.crearRelacionesPosicion(any(Integrante.class), anyList())).thenAnswer(inv -> {
             Integrante i = inv.getArgument(0);
@@ -101,7 +103,8 @@ class IntegranteCommandServiceTest {
         Foto nueva = new Foto(); nueva.setIdFoto(8);
         when(fotoCmd.crearFotosIntegrante(anyList(), any())).thenReturn(List.of(nueva));
         doNothing().when(relacion).eliminarRelacionesPosicion(any());
-        Posicion p1 = new Posicion(); p1.setIdPosicion(1);
+        Deporte deporte = new Deporte(); deporte.setIdDeporte(1); deporte.setNombreDeporte("Fútbol");
+        Posicion p1 = new Posicion(); p1.setIdPosicion(1); p1.setDeporte(deporte);
         when(verificar.verificarPosiciones(anyList())).thenReturn(List.of(p1));
         when(relacion.crearRelacionesPosicion(any(Integrante.class), anyList())).thenReturn(List.of(new IntegrantePosicion(null, existente, p1)));
         when(repo.save(any(Integrante.class))).thenReturn(existente);

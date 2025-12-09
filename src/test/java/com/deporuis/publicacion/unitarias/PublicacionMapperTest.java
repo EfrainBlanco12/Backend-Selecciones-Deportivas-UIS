@@ -47,7 +47,9 @@ class PublicacionMapperTest {
 
         assertEquals(TipoPublicacion.NOTICIA.name(), dto.getTipoPublicacion());
         assertNotNull(dto.getIdSelecciones());
-        assertEquals(List.of(10,20), dto.getIdSelecciones());
+        assertEquals(2, dto.getIdSelecciones().size());
+        assertEquals(10, dto.getIdSelecciones().get(0).getIdSeleccion());
+        assertEquals(20, dto.getIdSelecciones().get(1).getIdSeleccion());
     }
 
     @Test

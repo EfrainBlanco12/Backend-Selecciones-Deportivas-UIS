@@ -25,7 +25,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = IntegranteController.class)
@@ -251,5 +251,158 @@ class IntegranteControllerIT {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(false));
+    }
+
+    @Test
+    void crearIntegrante_debeRetornar201Created() throws Exception {
+        // Arrange
+        byte[] fotoBytes = new byte[]{1, 2, 3};
+        String expectedBase64 = Base64.getEncoder().encodeToString(fotoBytes);
+
+        IntegranteResponse response = sampleResponse(
+                100,           // idIntegrante
+                50,            // idSeleccion
+                7,  "DEPORTISTA",
+                10, fotoBytes,
+                2024,
+                3,  "9", "Fútbol"
+        );
+        response.setCodigoUniversitario("2025100");
+
+        String requestBody = """
+                {
+                    "codigoUniversitario": "2025100",
+                    "nombres": "Nombre100",
+                    "apellidos": "Apellido100",
+                    "fechaNacimiento": "2000-01-01",
+                    "altura": 1.70,
+                    "peso": 70.0,
+                    "dorsal": 10,
+                    "correoUniversitario": "u100@uis.edu.co",
+                    "correoInstitucional": "u100@correo.uis.edu.co",
+                    "idSeleccion": 50,
+                    "idRol": 7,
+                    "fotos": [{"idFoto": 10, "temporada": 2024}],
+                    "posiciones": [3]
+                }
+                """;
+
+        Mockito.when(integranteService.crearIntegrante(Mockito.any())).thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(post("/private/integrante/crear")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idIntegrante").value(100))
+                .andExpect(jsonPath("$.codigoUniversitario").value("2025100"))
+                .andExpect(jsonPath("$.idSeleccion").value(50))
+                .andExpect(jsonPath("$.rol.idRol").value(7))
+                .andExpect(jsonPath("$.fotos[0].contenido").value(expectedBase64));
+    }
+
+    @Test
+    void actualizarIntegrante_debeRetornar200Ok() throws Exception {
+        // Arrange
+        byte[] fotoBytes = new byte[]{4, 5, 6};
+        String expectedBase64 = Base64.getEncoder().encodeToString(fotoBytes);
+
+        IntegranteResponse response = sampleResponse(
+                25,            // idIntegrante
+                30,            // idSeleccion
+                7,  "DEPORTISTA",
+                12, fotoBytes,
+                2024,
+                5,  "10", "Fútbol"
+        );
+        response.setNombres("Nombre Actualizado");
+        response.setCodigoUniversitario("2025025");
+
+        String requestBody = """
+                {
+                    "codigoUniversitario": "2025025",
+                    "nombres": "Nombre Actualizado",
+                    "apellidos": "Apellido25",
+                    "fechaNacimiento": "2000-05-15",
+                    "altura": 1.75,
+                    "peso": 75.0,
+                    "dorsal": 15,
+                    "correoUniversitario": "u25@uis.edu.co",
+                    "correoInstitucional": "u25@correo.uis.edu.co",
+                    "idSeleccion": 30,
+                    "idRol": 7,
+                    "fotos": [{"idFoto": 12, "temporada": 2024}],
+                    "posiciones": [5]
+                }
+                """;
+
+        Mockito.when(integranteService.actualizarIntegrante(Mockito.eq(25), Mockito.any()))
+                .thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(put("/private/integrante/actualizar/{id}", 25)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idIntegrante").value(25))
+                .andExpect(jsonPath("$.nombres").value("Nombre Actualizado"))
+                .andExpect(jsonPath("$.idSeleccion").value(30))
+                .andExpect(jsonPath("$.fotos[0].contenido").value(expectedBase64));
+    }
+
+    @Test
+    void softDeleteIntegrante_debeRetornar204NoContent() throws Exception {
+        // Arrange
+        Mockito.doNothing().when(integranteService).softDeleteIntegrante(10);
+
+        // Act & Assert
+        mockMvc.perform(patch("/private/integrante/softdelete/{id}", 10)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        // Verify
+        Mockito.verify(integranteService).softDeleteIntegrante(10);
+    }
+
+    @Test
+    void obtenerEntrenador_debeRetornarEntrenadorDeSeleccion() throws Exception {
+        // Arrange
+        byte[] fotoBytes = new byte[]{7, 8, 9};
+        String expectedBase64 = Base64.getEncoder().encodeToString(fotoBytes);
+
+        IntegranteResponse response = sampleResponse(
+                200,           // idIntegrante
+                100,           // idSeleccion
+                2,  "ENTRENADOR",
+                50, fotoBytes,
+                2024,
+                1,  "Entrenador", "Fútbol"
+        );
+
+        Mockito.when(integranteService.obtenerEntrenadorPorSeleccion(100)).thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(get("/private/integrante/{idSeleccion}/entrenador", 100)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idIntegrante").value(200))
+                .andExpect(jsonPath("$.idSeleccion").value(100))
+                .andExpect(jsonPath("$.rol.idRol").value(2))
+                .andExpect(jsonPath("$.rol.nombreRol").value("ENTRENADOR"))
+                .andExpect(jsonPath("$.fotos[0].contenido").value(expectedBase64));
+    }
+
+    @Test
+    void contarIntegrantes_debeRetornarConteo() throws Exception {
+        // Arrange
+        Mockito.when(integranteService.contarIntegrantesPorSeleccion(100)).thenReturn(25L);
+
+        // Act & Assert
+        mockMvc.perform(get("/private/integrante/{idSeleccion}/conteo", 100)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(25));
     }
 }
