@@ -92,9 +92,17 @@ class PosicionControllerIT {
     void listarPorDeporte_retorna200() throws Exception {
         when(service.obtenerPosicionPorDeporte(2)).thenReturn(List.of(buildResponse()));
 
-        mvc.perform(get("/private/posicion/por-deporte/2"))
-                .andExpect(status().isOk());
+        mvc.perform(get("/private/posicion/lista/{idDeporte}", 2))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].idPosicion").value(99))
+                .andExpect(jsonPath("$[0].nombrePosicion").value("Central"));
     }
+
+    // NOTA: El controlador PosicionController no tiene endpoint para obtener por ID individual
+    // Solo existe /lista/{idDeporte} que retorna todas las posiciones de un deporte
+    // Si se requiere obtener por ID, agregar endpoint GET /private/posicion/obtener/{id}
 
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test

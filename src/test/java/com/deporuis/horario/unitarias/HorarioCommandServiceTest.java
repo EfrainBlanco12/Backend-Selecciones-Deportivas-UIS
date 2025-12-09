@@ -6,9 +6,10 @@ import com.deporuis.horario.aplicacion.helper.HorarioVerificarExistenciaService;
 import com.deporuis.horario.dominio.DiaHorario;
 import com.deporuis.horario.dominio.Horario;
 import com.deporuis.horario.infraestructura.HorarioRepository;
+import com.deporuis.seleccion.dominio.Seleccion;
+import com.deporuis.seleccion.dominio.SeleccionHorario;
 import com.deporuis.horario.infraestructura.dto.HorarioRequest;
 import com.deporuis.horario.infraestructura.dto.HorarioResponse;
-import com.deporuis.seleccion.dominio.SeleccionHorario;
 import com.deporuis.seleccion.infraestructura.SeleccionHorarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,11 +74,13 @@ class HorarioCommandServiceTest {
         Horario horarioGuardado = saved(15);
         when(repo.save(any(Horario.class))).thenReturn(horarioGuardado);
 
-        List<SeleccionHorario> relaciones = List.of(
-                mock(SeleccionHorario.class),
-                mock(SeleccionHorario.class),
-                mock(SeleccionHorario.class)
-        );
+        Seleccion s1 = new Seleccion(); s1.setIdSeleccion(1);
+        Seleccion s2 = new Seleccion(); s2.setIdSeleccion(2);
+        Seleccion s3 = new Seleccion(); s3.setIdSeleccion(3);
+        SeleccionHorario sh1 = new SeleccionHorario(); sh1.setSeleccion(s1);
+        SeleccionHorario sh2 = new SeleccionHorario(); sh2.setSeleccion(s2);
+        SeleccionHorario sh3 = new SeleccionHorario(); sh3.setSeleccion(s3);
+        List<SeleccionHorario> relaciones = List.of(sh1, sh2, sh3);
         when(relacionService.crearRelacionesConSelecciones(horarioGuardado, List.of(1, 2, 3)))
                 .thenReturn(relaciones);
 
@@ -110,7 +113,9 @@ class HorarioCommandServiceTest {
         Horario horarioGuardado = saved(25);
         when(repo.save(any(Horario.class))).thenReturn(horarioGuardado);
 
-        List<SeleccionHorario> relaciones = List.of(mock(SeleccionHorario.class));
+        Seleccion s = new Seleccion(); s.setIdSeleccion(5);
+        SeleccionHorario sh = new SeleccionHorario(); sh.setSeleccion(s);
+        List<SeleccionHorario> relaciones = List.of(sh);
         when(relacionService.crearRelacionesConSelecciones(horarioGuardado, List.of(5)))
                 .thenReturn(relaciones);
 
@@ -148,7 +153,11 @@ class HorarioCommandServiceTest {
         when(verificar.verificarHorario(15)).thenReturn(horarioExistente);
         when(repo.save(horarioExistente)).thenReturn(horarioExistente);
 
-        List<SeleccionHorario> relaciones = List.of(mock(SeleccionHorario.class), mock(SeleccionHorario.class));
+        Seleccion s1 = new Seleccion(); s1.setIdSeleccion(1);
+        Seleccion s2 = new Seleccion(); s2.setIdSeleccion(2);
+        SeleccionHorario sh1 = new SeleccionHorario(); sh1.setSeleccion(s1);
+        SeleccionHorario sh2 = new SeleccionHorario(); sh2.setSeleccion(s2);
+        List<SeleccionHorario> relaciones = List.of(sh1, sh2);
         when(relacionService.crearRelacionesConSelecciones(horarioExistente, List.of(1, 2)))
                 .thenReturn(relaciones);
 

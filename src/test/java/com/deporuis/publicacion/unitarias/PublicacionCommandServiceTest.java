@@ -90,7 +90,9 @@ class PublicacionCommandServiceTest {
 
         assertNotNull(resp);
         assertEquals(99, resp.getIdPublicacion());
-        assertEquals(List.of(1,2), resp.getIdSelecciones());
+        assertEquals(2, resp.getIdSelecciones().size());
+        assertEquals(1, resp.getIdSelecciones().get(0).getIdSeleccion());
+        assertEquals(2, resp.getIdSelecciones().get(1).getIdSeleccion());
         
         // Verificar que se establecieron campos de auditoría
         ArgumentCaptor<Publicacion> captor = ArgumentCaptor.forClass(Publicacion.class);
