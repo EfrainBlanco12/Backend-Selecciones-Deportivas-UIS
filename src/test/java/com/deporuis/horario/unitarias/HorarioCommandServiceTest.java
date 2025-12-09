@@ -157,9 +157,8 @@ class HorarioCommandServiceTest {
         Seleccion s2 = new Seleccion(); s2.setIdSeleccion(2);
         SeleccionHorario sh1 = new SeleccionHorario(); sh1.setSeleccion(s1);
         SeleccionHorario sh2 = new SeleccionHorario(); sh2.setSeleccion(s2);
-        List<SeleccionHorario> relaciones = List.of(sh1, sh2);
         when(relacionService.crearRelacionesConSelecciones(horarioExistente, List.of(1, 2)))
-                .thenReturn(relaciones);
+                .thenReturn(List.of(sh1, sh2));
 
         HorarioResponse out = service.actualizarHorario(15, request);
 

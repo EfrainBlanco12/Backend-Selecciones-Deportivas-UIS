@@ -100,10 +100,6 @@ class PosicionControllerIT {
                 .andExpect(jsonPath("$[0].nombrePosicion").value("Central"));
     }
 
-    // NOTA: El controlador PosicionController no tiene endpoint para obtener por ID individual
-    // Solo existe /lista/{idDeporte} que retorna todas las posiciones de un deporte
-    // Si se requiere obtener por ID, agregar endpoint GET /private/posicion/obtener/{id}
-
     @WithMockUser(roles = {"ENTRENADOR"})
     @Test
     void actualizar_retorna200() throws Exception {
