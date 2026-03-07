@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Método Ceiba - Auto-managed agent files
+.github/agents/metodo-ceiba-*.agent.md
+
+# Método Ceiba - Auto-injected agent skills
+.github/skills/
