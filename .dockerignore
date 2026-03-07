@@ -1,0 +1,33 @@
+# Archivos de build
+target/
+!target/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Docker
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# Documentacion
+docs/
+README.md
+*.md
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

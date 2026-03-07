@@ -1,0 +1,43 @@
+# ============================================
+# Docker Compose para desarrollo local
+# ============================================
+# Uso: docker-compose up -d
+# Esto levanta MySQL + tu API localmente
+# ============================================
+
+services:
+  # Base de datos MySQL local
+  mysql:
+    image: mysql:8.0
+    container_name: deporuis-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: deporuis
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Spring Boot
+  api:
+    build: .
+    container_name: deporuis-api
+    ports:
+      - "8080:8080"
+    environment:
+      # Sobreescribe el perfil a dev para desarrollo local con Docker
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/deporuis?useSSL=false&serverTimezone=America/Bogota&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
