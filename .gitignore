@@ -32,6 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+### Docs y archivos locales ###
+docs/
+*.py
+
 # Método Ceiba - Auto-managed agent files
 .github/agents/metodo-ceiba-*.agent.md
 
