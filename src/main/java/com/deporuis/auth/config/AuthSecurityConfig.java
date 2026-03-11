@@ -38,10 +38,8 @@ public class AuthSecurityConfig {
         // Usa allowedOriginPatterns cuando allowCredentials=true (no se permite "*" en allowedOrigins)
         cfg.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
-                "http://127.0.0.1:4200"
-                // En producción, se agregan aquí dominios y se eliminan wildcard.
-                // "https://app.deporuis.com",
-                // "https://*.deporuis.com"
+                "http://127.0.0.1:4200",
+                "https://frontend-selecciones-deportivas-uis.onrender.com"
         ));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of(
